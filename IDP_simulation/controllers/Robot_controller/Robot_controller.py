@@ -1,9 +1,17 @@
 """Robot_controller controller."""
-from controller import Robot
+from controller import Robot, DistanceSensor
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6
+
+
+
+
+def setup_ultrasonic():
+    dsUltrasonic = robot.getDevice('ultrasonic')
+    dsUltrasonic.enable(timestep)
+    return dsUltrasonic
 
 
 def setup_wheels():
@@ -217,7 +225,10 @@ robot = Robot()
 left_wheel, right_wheel = setup_wheels()
 emitter, receiver = setup_communication()
 gps, compass = setup_sensors()
+dsUltrasonic = setup_ultrasonic()
+
 
 while robot.step(timestep) != -1:
-
+    # Get sensor values
+    DistanceUltrasonic = dsUltrasonic.getValue()
 
