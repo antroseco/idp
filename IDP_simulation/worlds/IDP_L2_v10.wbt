@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.05559120224213778 -0.9921866024141959 -0.11169316999283364 4.860843964325082
-  position 0.3908037104644178 0.10481113988478362 0.025587210240622493
+  orientation 0.07225911705135038 -0.9897247378081888 -0.12338380515072096 4.909117786790261
+  position 0.37114515402091836 0.12361747929172051 0.07262517033141164
 }
 Background {
   skyColor [
@@ -168,7 +168,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.02000000391046377 -0.004997452491810772 0.029999999997836674
-        rotation -1 1.5409908384908597e-09 -1.5409861239445273e-09 1.5708000008506064
+        rotation -1 1.5409908384908597e-09 -1.5409861239445275e-09 1.5708000008506064
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -283,17 +283,26 @@ Robot {
     }
     DistanceSensor {
       translation 0.06 0 0
+      rotation 1 0 0 -1.5707953071795862
       children [
-        Shape {
+        DEF ultrasonic_shape Shape {
           appearance PBRAppearance {
             baseColor 0 1 0.5
           }
           geometry Box {
-            size 0.005 0.005 0.02
+            size 0.015 0.045 0.02
           }
         }
       ]
-      name "hc_sr04"
+      name "ultrasonic"
+      boundingObject USE ultrasonic_shape
+      lookupTable [
+        0 0 0
+        1.5 1.5 0
+      ]
+      type "sonar"
+      aperture 0.5236
+      resolution 0.003
     }
     SharpGP2Y0A02YK0F {
       translation 0.06 0.01 0.01
