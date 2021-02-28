@@ -1,0 +1,56 @@
+PROTO target [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 1 0 0
+  field SFColor colour 1 0 0 
+  field SFString name "target"
+]
+{
+Solid {
+  name IS name
+  translation IS translation
+  rotation IS rotation
+  children [
+    Transform {
+      translation 0 0.025 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor IS colour
+            roughness 1
+            metalness 0
+            emissiveColor IS colour
+          }
+          geometry Sphere {
+            radius 0.0025
+          }
+        }
+        SpotLight {
+          attenuation 0 0 12.47
+          color IS colour
+          beamWidth 0.2
+          cutOffAngle 0.6
+          direction 0 1 0
+          intensity 0.01
+          radius 0.5
+        }
+      ]
+    }
+    Solid {
+      children [
+        DEF BOX Shape {
+          appearance PBRAppearance {
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.05 0.05 0.05
+          }
+        }
+      ]
+    }
+  ]
+  boundingObject USE BOX
+  physics Physics {
+  }
+}
+}
