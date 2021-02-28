@@ -1,0 +1,137 @@
+PROTO TwoWheelRobot [
+  field SFVec3f    translation  0 0 0
+  field SFRotation rotation     0 1 0 0
+  field SFColor colour 1 0 0 
+]
+{
+Robot {
+  translation IS translation
+  rotation IS rotation
+  children [
+    Camera {
+      translation 0 0 0.1
+      width 1
+      height 1
+    }
+    Solid {
+      translation 0 -0.03 0
+      children [
+        Shape {
+          geometry DEF CASTOR_BALL Sphere {
+            radius 0.01
+          }
+        }
+      ]
+      name "solid(2)"
+      contactMaterial "slippy"
+      boundingObject USE CASTOR_BALL
+      physics Physics {
+      }
+    }
+    DEF BODY Shape {
+      appearance PBRAppearance {
+        baseColor IS colour
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.1 0.05 0.2
+      }
+    }
+    DEF WHEEL1 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor 0.06 0 0.05
+      }
+      device [
+        RotationalMotor {
+          name "wheel1"
+          maxTorque 100
+        }
+      ]
+      endPoint Solid {
+        translation 0.06000000000005251 1.4531748733392746e-07 0.04999909020156158
+        rotation 0.0019079727809748464 -0.0019079797047584805 -0.9999963596200304 4.712381666377444
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 0.305882 0.898039 0.25098
+              roughness 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.04
+              subdivision 24
+            }
+          }
+        ]
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL2 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor -0.06 0 0.05
+      }
+      device [
+        RotationalMotor {
+          name "wheel2"
+          maxTorque 100
+        }
+      ]
+      endPoint Solid {
+        translation -0.05999999999986491 2.9408924358078494e-07 0.049999115915629125
+        rotation 0.0017048106017812177 -0.001704816680961621 -0.9999970936062246 4.712382400408873
+        children [
+          USE WHEEL
+        ]
+        name "solid(1)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF DS_RIGHT DistanceSensor {
+      translation -0.03 0 0.1
+      rotation 0 1 0 -1.87079
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "ds_right"
+    }
+    DEF DS_LEFT DistanceSensor {
+      translation 0.03 0 0.1
+      rotation 0 1 0 -1.27079
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "ds_left"
+    }
+  ]
+  boundingObject USE BODY
+  physics Physics {
+    density -1
+    mass 1
+  }
+  controller "four_wheel_colision_avoidance"
+}
+}
