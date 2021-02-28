@@ -10,7 +10,7 @@ MAX_VELOCITY = 6
 
 def setup_ultrasonic():
     dsUltrasonic = robot.getDevice('ultrasonic')
-    dsUltrasonic.enable(timestep)
+    dsUltrasonic.enable(TIME_STEP)
     return dsUltrasonic
 
 
@@ -228,7 +228,7 @@ gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 
 
-while robot.step(timestep) != -1:
+while robot.step(TIME_STEP) != -1:
     # Get sensor values
     DistanceUltrasonic = dsUltrasonic.getValue()
 
