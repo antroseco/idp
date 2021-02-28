@@ -1,0 +1,32 @@
+PROTO UltraSonicSensorRobot [
+	field SFVec3f translation 0 0.01 0
+	field SFRotation rotation 1 0 0 -1.5707953071795862
+]
+
+{
+Robot {
+  translation IS translation
+  rotation IS rotation
+  children [
+    DistanceSensor {
+      translation 0.0075 0 0
+      name "ultrasonic"
+      lookupTable [
+        0 0 0
+        1.5 1.5 0
+      ]
+      type "sonar"
+      resolution 0.003
+    }
+    DEF sensorShape Shape {
+      appearance PBRAppearance {
+      }
+      geometry Box {
+        size 0.015 0.045 0.02
+      }
+    }
+  ]
+  boundingObject USE sensorShape
+  controller "ultrasonic_sensor_controller"
+}
+}
