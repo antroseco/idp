@@ -14,6 +14,11 @@ MAX_VELOCITY = 6
 
 
 
+def setup_infrared():
+    infrared = robot.getDevice('IR sensor')
+    infrared.enable(TIME_STEP)
+    return infrared
+
 
 def setup_ultrasonic():
     dsUltrasonic = robot.getDevice('ultrasonic')
@@ -62,10 +67,10 @@ def setup_sensors():
     return: gps, compass
     """
     gps = robot.getDevice('gps')
-    gps.enable(100)
+    gps.enable(TIME_STEP)
     
     compass = robot.getDevice('compass')
-    compass.enable(1)
+    compass.enable(TIME_STEP)
     
     return gps, compass
     
@@ -222,7 +227,54 @@ def PID_translation(coord):
     return
     
     
-
+    
+    
+def get_wall_position(angle):
+    """
+    finds distance from centre of the robot to the wall depending on the position and rotation of the robot
+    input: angle (bearing 0 to 360 degrees)
+    """    
+    position = gps.getValues()
+    x = position[0]
+    z = position[2]
+    
+    
+    #find angles at which you can see the walls
+    #eg top wall can be seen at angles between left_wall and top_wall
+    #eg right wall can be seen at angles between top_wall and right_wall
+    
+    left_wall = math.degrees(math.atan(abs((1.2 - z) / (1.2 - x))))
+    top_wall = math.degrees(math.atan(abs((1.2 - z) / (-1.2 - x)))) + 90
+    right_wall = math.degrees(math.atan(abs((-1.2 - z) / (-1.2 - x)))) + 180
+    bottom_wall = math.degrees(math.atan(abs((-1.2 - z) / (1.2 - x)))) + 270
+    
+    #now find the distance from the wall that robot is looking at
+    dist = 0
+    
+    if bottom_wall < angle or angle <= left_wall:
+        dist = abs((1.2 - x)/math.cos(math.radians(angle)))
+    elif angle <= top_wall:
+        dist = abs((1.2 - z)/math.sin(math.radians(angle)))
+    elif angle <= right_wall:
+        dist = abs((-1.2 - x)/math.cos(math.radians(angle)))
+    else:
+        dist = abs((-1.2 - z)/math.sin(math.radians(angle)))
+    
+    return dist
+    
+    
+def box_position(distance, angle, position):
+    """
+    finds the box position based on the current angle and location of the robot
+    and the distance between the robot and box
+    """    
+    print(position[0], position[2], distance, angle)
+    x = position[0] + distance * math.cos(angle)
+    z = position[2] + distance * math.sin(angle)
+    
+    return x, z
+    
+    
 
 def sweep(velocity):
     """
@@ -232,10 +284,9 @@ def sweep(velocity):
     """    
     
     #find current rotation [0-360 degrees]
-    initial_angle = bearing()
-        
-    distances = []    
-        
+    initial_angle = bearing()        
+    boxes = []    
+    
     #sweep 180 degrees    
     swept_angle = 0
     while swept_angle < 180:
@@ -243,20 +294,37 @@ def sweep(velocity):
         right_wheel.setVelocity(velocity)
         left_wheel.setVelocity(-velocity)
         
-        distances.append(dsUltrasonic.getValue())
-        print(dsUltrasonic.getValue())
         robot.step(TIME_STEP)
         
-        if bearing() > initial_angle:
-            swept_angle = bearing() - initial_angle
+        
+        #get infrared reading and convert to meters
+        infrared_dist = 0.7611 * math.pow(infrared.getValue(), -0.9313) - 0.1252
+        
+        #distance from robot centre to wall in this direction
+        current_angle = bearing()
+        wall_dist = get_wall_position(current_angle)
+        #wall_dist is decreased by robot-sensor distance
+        wall_dist -= 0.07  
+        
+        
+        #if measured distance is less than wall_dist then assume there's a box
+        if abs(wall_dist - infrared_dist) > 0.05:
+            x, z = box_position(infrared_dist, current_angle, gps.getValues())
+            boxes.append([x, z])
+        
+                
+        if current_angle > initial_angle:
+            swept_angle = current_angle - initial_angle
         else:
-            swept_angle = 360 - initial_angle + bearing()
+            swept_angle = 360 - initial_angle + current_angle
+            
+        
             
     right_wheel.setVelocity(0)
     left_wheel.setVelocity(0)
+    robot.step(TIME_STEP)
     
-    distances = np.array(distances)
-    return distances
+    return np.array(boxes)
 
 
 robot = Robot()
@@ -265,28 +333,20 @@ left_wheel, right_wheel = setup_wheels()
 emitter, receiver = setup_communication()
 gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
+infrared = setup_infrared()
 
-a = 1
 
 while robot.step(TIME_STEP) != -1:
-    # Get sensor values
-    DistanceUltrasonic = dsUltrasonic.getValue()
     
     coord2 = (0.3,0.3)
-    
-    angle = bearing()
-    #print(angle)
     
     #PID_rotation(coord2)
    
     #PID_translation(coord2)
     
-    #right_wheel.setVelocity(1.0)
-    #left_wheel.setVelocity(-1.0)
     
-    
-    distances = sweep(0.5)
-    print(distances)
+    boxes = sweep(0.5)
+    print(boxes)
 
     break  
 
