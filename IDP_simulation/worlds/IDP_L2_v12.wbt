@@ -163,6 +163,7 @@ Robot {
     GPS {
     }
     Receiver {
+      channel 1
     }
     Emitter {
     }
@@ -177,6 +178,7 @@ Robot {
     DEF LEFT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
         position 4.074892064168798e-12
+        axis 0 0 -1
         anchor 0.02 -0.005 0.03
       }
       device [
@@ -185,8 +187,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.02000000391046377 -0.004997452491810772 0.029999999997836695
-        rotation -0.9999999999999999 1.5409908385096986e-09 -1.5409861239445277e-09 1.5708000008383811
+        translation 0.0200000039104638 -0.004997452491810773 0.029999999997836726
+        rotation -1 1.5471032069076624e-09 -1.5470984741820589e-09 1.5708000008261553
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -207,6 +209,7 @@ Robot {
     DEF RIGHT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
         position 4.07847065672431e-12
+        axis 0 0 -1
         anchor 0.02 -0.005 -0.03
       }
       device [
@@ -215,8 +218,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.020000003925813817 -0.004997598386196223 -0.030000000006616453
-        rotation -1 4.113513930961323e-14 -4.209181408159047e-14 1.570799998171056
+        translation 0.020000003925813838 -0.004997598386196223 -0.030000000006616442
+        rotation -1 6.158833637618341e-12 -2.0813121688879315e-12 1.5707999981669776
         children [
           USE WHEEL
         ]
@@ -332,6 +335,4 @@ Robot {
   physics Physics {
   }
   controller "Robot_controller"
-  linearVelocity -5.0311968986947904e-05 -1.2798217436701399e-05 1.0462799196114545e-09
-  angularVelocity 3.4082921430979316e-08 1.27035665812597e-09 0.0016791120368047354
 }

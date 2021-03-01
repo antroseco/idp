@@ -1,5 +1,11 @@
 """Robot_controller controller."""
-from controller import Robot, DistanceSensor
+from controller import Robot
+from controller import Motor
+from controller import DistanceSensor
+from controller import Emitter
+from controller import Receiver
+import numpy as np
+import math
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
@@ -131,14 +137,14 @@ def PID_rotation(coord):
     for i in range(2):
         location = gps.getValues()
         required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
-        robot.step(timestep)
+        robot.step(TIME_STEP)
       
         
     #Q1    
     if (coord[1] <= location[2]) and (coord[0] >= location[0]):
         required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
         required = required *180.0/np.pi
-        print('Q1')
+        #print('Q1')
        
     
 
@@ -146,18 +152,18 @@ def PID_rotation(coord):
     elif (coord[1] > location[2]) and (coord[0] >= location[0]) :
         required = np.arctan2((coord[1]-location[2]),((coord[0]-location[0])))
         required = required *180.0/np.pi +90.0
-        print('Q2')
+        #print('Q2')
         
     #Q3    
     elif (coord[1] <= location[2]) and (coord[0] < location[0]) :
         required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
         required = required *180.0/np.pi 
-        print('Q3')
+        #print('Q3')
     #Q4    
     elif (coord[1] > location[2]) and (coord[0] <= location[0]) :
         required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
         required = required *180.0/np.pi 
-        print('Q4')
+        #print('Q4')
             
     
 
@@ -167,18 +173,18 @@ def PID_rotation(coord):
 
     
     while abs(error) > 0.1:
-        print(required,'required')
-        print(error)
+        #print(required,'required')
+        #print(error)
         v = 6.28*0.01*error
         if v > 6.28:
             v = 6.28
         elif v < -6.28:
             v = -6.28
 
-        left_motor.setVelocity(v)
-        right_motor.setVelocity(-v)
+        left_wheel.setVelocity(v)
+        right_wheel.setVelocity(-v)
         error = required - bearing1()
-        robot.step(timestep)
+        robot.step(TIME_STEP)
     
         if abs(error) < 0.1:
             return
@@ -202,10 +208,10 @@ def PID_translation(coord):
                 
                 
             
-            left_motor.setVelocity(v)
-            right_motor.setVelocity(v)
+            left_wheel.setVelocity(v)
+            right_wheel.setVelocity(v)
             
-        robot.step(timestep)
+        robot.step(TIME_STEP)
         x = (coord[0] - gps.getValues()[0])
         z = (coord[1] - gps.getValues()[2])
         
@@ -231,4 +237,17 @@ dsUltrasonic = setup_ultrasonic()
 while robot.step(TIME_STEP) != -1:
     # Get sensor values
     DistanceUltrasonic = dsUltrasonic.getValue()
+    
+    coord2 = (0.3,0.3)
+    
+    
+    PID_rotation(coord2)
+   
+    PID_translation(coord2)
+    
+    #left_wheel.setVelocity(0.0)
+    #right_wheel.setVelocity(0.0)
 
+    #break
+    
+print('end')
