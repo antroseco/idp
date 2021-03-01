@@ -263,6 +263,13 @@ def sweep(velocity):
     return distances
 
 
+def getDistancesIR():
+     voltage = dsInfraRed.getValue()
+     meter = (0.7611*(voltage)**(-0.9313)) - 0.1252
+     return meter
+
+
+
 robot = Robot()
 
 left_wheel, right_wheel = setup_wheels()
@@ -279,7 +286,8 @@ while robot.step(TIME_STEP) != -1:
     
     # Outputs the most recent reading 
     DistanceUltrasonic = dsUltrasonic.getValue()
-    DistanceInfraRed = dsInfraRed.getValue()
+  
+    DistanceInfraRed = getDistancesIR()
     
     coord2 = (0.3,0.3)
     
@@ -296,7 +304,7 @@ while robot.step(TIME_STEP) != -1:
     
     distances = sweep(0.5)
     print(distances)
-
+    print(DistanceInfraRed)
     break  
 
     
