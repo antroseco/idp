@@ -6,6 +6,7 @@ from controller import Emitter
 from controller import Receiver
 import numpy as np
 import math
+import time
 from matplotlib import pyplot as plt
 
 TIME_STEP = 64
@@ -42,6 +43,17 @@ def setup_wheels():
     
     return left_wheel, right_wheel
 
+def setup_boxclaw(servoName,sensorName):
+    """
+    sets up box claw servo and accompanying position sensor
+    input:name of the RotationalMotor that acts as servo, name of the PositionSensor accompanying that Servo
+    return: box_claw (type RotationalMotor), box_claw_sensor (type PositionSensor)
+    """
+    box_claw = robot.getDevice(servoName)
+    box_claw.setPosition(0.0)
+    box_claw_sensor = robot.getDevice(sensorName)
+    box_claw_sensor.enable(TIME_STEP)
+    return box_claw, box_claw_sensor
 
 def setup_communication():
     """
@@ -393,10 +405,30 @@ def box_position(potential_boxes):
     
     return np.array(locations)
                 
-
-
-
-
+def set_claw(targetAngle, targetClaw, targetSensor):
+    """move the box_claw to the input angle, 
+    input in degrees, use positionSensor to provide feedback
+    input: targetAngle, targetClaw(which claw is used), targetSensor(Accompanying sensor)
+    
+    """
+    desired = targetAngle*np.pi/180
+    error = abs(desired - targetSensor.getValue())
+    accuracy = 5*np.pi/180
+    
+    while error > accuracy:
+        targetClaw.setPosition(desired)
+        robot.step(TIME_STEP)
+        error = abs(desired - targetSensor.getValue())
+    return
+    
+    # box_claw_sensor.
+    # box_claw.setPosition(np.pi/2)
+    
+def withdraw_boxclaw():
+    set_claw(90,box_claw,box_claw_sensor)
+    
+def deploy_boxclaw():
+    set_claw(0,box_claw,box_claw_sensor)
 
 robot = Robot()
 
@@ -405,21 +437,26 @@ emitter, receiver = setup_communication()
 gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 infrared = setup_infrared()
-
+box_claw, box_claw_sensor = setup_boxclaw('box_claw','box_claw_sensor')
 
 while robot.step(TIME_STEP) != -1:
     
     coord2 = (0.3,0.3)
     
-    #PID_rotation(coord2)
+    # #PID_rotation(coord2)
    
-    #PID_translation(coord2)
+    # #PID_translation(coord2)
     
-    boxes = sweep(0.5)
-    #print(boxes)
-    positions = box_position(boxes)
-    print(positions)
-    break  
+    # boxes = sweep(0.5)
+    # #print(boxes)
+    # positions = box_position(boxes)
+    # print(positions)
+    # break
+    withdraw_boxclaw()
+    deploy_boxclaw()
+    PID_translation(coord2)
 
-    
+
+
+
 print('end')
