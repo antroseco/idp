@@ -341,6 +341,9 @@ Robot {
     SharpGP2Y0A02YK0F {
       translation 0.06 0.01 0.01
     }
+    TEPT4400 {
+      translation 0 0.03 0
+    }
   ]
   physics Physics {
   }
