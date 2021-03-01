@@ -45,3 +45,33 @@ class ADCInput:
             reading |= LSBs
 
         return reading
+
+
+class PhototransistorCircuit:
+    def __init__(self, device):
+        """Simulates the circuit connected to the TEPT4400 (i.e. a 24 kΩ resistor connected to the Collector)
+
+
+        Args:
+            device (Webots Device handle): TEPT4400 device, make sure it has been enabled!
+        """
+        # TODO: type checking
+        self.device = device
+
+    def current(self) -> float:
+        """Returns the output current
+
+        Returns:
+            float: output current [A]
+        """
+        # Convert μA to A
+        return self.device.getValue() * 1e-6
+
+    def voltage(self) -> float:
+        """Returns the output voltage
+
+        Returns:
+            float: output voltage [V]
+        """
+        # 24 kΩ resistor
+        return self.current() * 24000
