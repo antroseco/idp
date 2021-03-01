@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.4069165606883995 0.8158223966688971 -0.4109169377513426 6.11681396534556
-  position -0.5640416566582452 0.04819591429222126 0.7731208892272263
+  orientation 0.5376125756122595 -0.6274395097817133 -0.5632871204886863 4.337760591260682
+  position 1.2024862736231856 1.1297415626580734 -0.1757777946067697
 }
 Background {
   skyColor [
@@ -36,6 +36,235 @@ Floor {
   size 2.4 2.4
   appearance Asphalt {
   }
+}
+Robot {
+  translation 0.920291 0.06 -0.248057
+  rotation 0.0012617578396568994 1.3537918758716176e-06 0.9999992039823438 0.0013624617687495327
+  children [
+    Compass {
+    }
+    GPS {
+    }
+    Receiver {
+      channel 1
+    }
+    Emitter {
+    }
+    DEF BODY Shape {
+      appearance PBRAppearance {
+        baseColor 0 0 1
+      }
+      geometry Box {
+        size 0.2 0.1 0.2
+      }
+    }
+    DEF LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.074892064168798e-12
+        axis 0 0 -1
+        anchor 0.04 -0.01 0.11
+      }
+      device [
+        RotationalMotor {
+          name "left_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.01 0.11
+        rotation -1 1.6795372595228404e-09 -1.6795316851372368e-09 1.5708000008261545
+        scale 2 2 2
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+            }
+            geometry Cylinder {
+              height 0.01
+              radius 0.025
+            }
+          }
+        ]
+        name "left_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.07847065672431e-12
+        axis 0 0 -1
+        anchor 0.04 -0.01 -0.11
+      }
+      device [
+        RotationalMotor {
+          name "right_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.01 -0.11
+        rotation -1 1.3870920224795674e-10 -1.3463065841943952e-10 1.570799998166978
+        scale 2 2 2
+        children [
+          USE WHEEL
+        ]
+        name "right_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF BEARING Solid {
+      translation -0.04 -0.035 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.5 0.5 0.5
+          }
+          geometry DEF Ball_bearing Sphere {
+            radius 0.025
+          }
+        }
+      ]
+      name "solid(1)"
+      contactMaterial "ball_bearing"
+      boundingObject USE Ball_bearing
+      physics Physics {
+      }
+    }
+    DEF RIGHT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        position -1.7767973758964217e-09
+        anchor 0.045 0 0.02
+      }
+      device [
+        RotationalMotor {
+          name "right_claw"
+        }
+      ]
+    }
+    DEF LEFT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        position -1.7767982640748414e-09
+        anchor 0.045 0 -0.02
+      }
+      device [
+        RotationalMotor {
+          name "left_claw"
+        }
+      ]
+    }
+    DEF BOX_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.09 -0.03 0
+      }
+      device [
+        RotationalMotor {
+          name "box_claw"
+        }
+        PositionSensor {
+          name "box_claw_sensor"
+        }
+      ]
+      endPoint Solid {
+        translation 6.735556468129289e-08 2.0206451331605813e-07 -5.551115123125783e-17
+        rotation 1.605282590659393e-14 -5.044470241384965e-15 -1 2.2446906936518976e-06
+        children [
+          DEF BOX_CLAW Group {
+            children [
+              Transform {
+                translation 0.15 -0.03 -0.04
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.15 0.01 0.01
+                    }
+                  }
+                ]
+              }
+              Transform {
+                translation 0.15 -0.03 0.04
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.15 0.01 0.01
+                    }
+                  }
+                ]
+              }
+              Transform {
+                translation 0.23 -0.03 0
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.01 0.01 0.09
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+        boundingObject USE BOX_CLAW
+        physics Physics {
+          density 0.001
+        }
+      }
+    }
+    DistanceSensor {
+      translation 0.06 -0.005 0.01
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Group {
+          children [
+            DEF ultrasonicShape Transform {
+              translation 0 0.01 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry Box {
+                    size 0.015 0.045 0.02
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "ultrasonic"
+      boundingObject USE ultrasonicShape
+      lookupTable [
+        0 0 0
+        0.02 0 0
+        0.02 0.02 0
+        1.5 1.5 0
+      ]
+      type "sonar"
+      aperture 0.5236
+      resolution 0.003
+    }
+    SharpGP2Y0A02YK0F {
+      translation 0.11 -0.03 0
+      name "IR Sensor"
+    }
+    TEPT4400 {
+      translation 0 0.03 0
+    }
+  ]
+  physics Physics {
+  }
+  controller "Robot_controller"
 }
 target {
   translation -0.639 0.02497547451951153 0.42
@@ -153,202 +382,4 @@ DEF WALL_4 Solid {
 }
 TexturedBackgroundLight {
   texture "empty_office"
-}
-Robot {
-  translation -0.469221 0.06 -0.00341733
-  rotation 0.0012617578396568994 1.3537918758716176e-06 0.9999992039823438 0.0013624617687495327
-  children [
-    Compass {
-    }
-    GPS {
-    }
-    Receiver {
-      channel 1
-    }
-    Emitter {
-    }
-    DEF BODY Shape {
-      appearance PBRAppearance {
-        baseColor 0 0 1
-      }
-      geometry Box {
-        size 0.2 0.1 0.2
-      }
-    }
-    DEF LEFT_WHEEL HingeJoint {
-      jointParameters HingeJointParameters {
-        position 4.074892064168798e-12
-        axis 0 0 -1
-        anchor 0.04 -0.01 0.11
-      }
-      device [
-        RotationalMotor {
-          name "left_wheel"
-        }
-      ]
-      endPoint Solid {
-        translation 0.04 -0.01 0.11
-        rotation -1 1.5939645261752906e-09 -1.5939592661860123e-09 1.5708000008261545
-        scale 2 2 2
-        children [
-          DEF WHEEL Shape {
-            appearance PBRAppearance {
-              baseColor 1 0 0
-            }
-            geometry Cylinder {
-              height 0.01
-              radius 0.025
-            }
-          }
-        ]
-        name "left_wheel"
-        boundingObject USE WHEEL
-        physics Physics {
-        }
-      }
-    }
-    DEF RIGHT_WHEEL HingeJoint {
-      jointParameters HingeJointParameters {
-        position 4.07847065672431e-12
-        axis 0 0 -1
-        anchor 0.04 -0.01 -0.11
-      }
-      device [
-        RotationalMotor {
-          name "right_wheel"
-        }
-      ]
-      endPoint Solid {
-        translation 0.04 -0.01 -0.11
-        rotation -1 5.3061318456746155e-11 -4.8983089072901e-11 1.570799998166978
-        scale 2 2 2
-        children [
-          USE WHEEL
-        ]
-        name "right_wheel"
-        boundingObject USE WHEEL
-        physics Physics {
-        }
-      }
-    }
-    DEF BEARING Solid {
-      translation -0.04 -0.035 0
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0.5 0.5 0.5
-          }
-          geometry DEF Ball_bearing Sphere {
-            radius 0.025
-          }
-        }
-      ]
-      name "solid(1)"
-      contactMaterial "ball_bearing"
-      boundingObject USE Ball_bearing
-      physics Physics {
-      }
-    }
-    DEF RIGHT_CLAW HingeJoint {
-      jointParameters HingeJointParameters {
-        position -1.7767973758964217e-09
-        anchor 0.045 0 0.02
-      }
-      device [
-        RotationalMotor {
-          name "right_claw"
-        }
-      ]
-      endPoint Solid {
-        translation 0.08999999994309457 -3.9319495846734664e-08 0.02000000000009621
-        rotation 1 0 0 0
-        children [
-          DEF CLAW Shape {
-            appearance PBRAppearance {
-              baseColor 0 0 0
-            }
-            geometry Box {
-              size 0.1 0.01 0.005
-            }
-          }
-        ]
-        name "right_claw"
-        boundingObject USE CLAW
-        physics Physics {
-        }
-      }
-    }
-    DEF LEFT_CLAW HingeJoint {
-      jointParameters HingeJointParameters {
-        position -1.7767982640748414e-09
-        anchor 0.045 0 -0.02
-      }
-      device [
-        RotationalMotor {
-          name "left_claw"
-        }
-      ]
-      endPoint Solid {
-        translation 0.0899999999430946 -3.931949595775697e-08 -0.019999999999903782
-        rotation 1 0 0 0
-        children [
-          DEF CLAW Shape {
-            appearance PBRAppearance {
-              baseColor 0 0 0
-            }
-            geometry Box {
-              size 0.1 0.01 0.005
-            }
-          }
-        ]
-        name "left_claw"
-        boundingObject USE CLAW
-        physics Physics {
-        }
-      }
-    }
-    DistanceSensor {
-      translation 0.06 -0.005 0.01
-      rotation 1 0 0 -1.5707953071795862
-      children [
-        Group {
-          children [
-            DEF ultrasonicShape Transform {
-              translation 0 0.01 0
-              children [
-                Shape {
-                  appearance PBRAppearance {
-                  }
-                  geometry Box {
-                    size 0.015 0.045 0.02
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-      name "ultrasonic"
-      boundingObject USE ultrasonicShape
-      lookupTable [
-        0 0 0
-        0.02 0 0
-        0.02 0.02 0
-        1.5 1.5 0
-      ]
-      type "sonar"
-      aperture 0.5236
-      resolution 0.003
-    }
-    SharpGP2Y0A02YK0F {
-      translation 0.11 -0.03 0
-      name "IR Sensor"
-    }
-    TEPT4400 {
-      translation 0 0.03 0
-    }
-  ]
-  physics Physics {
-  }
-  controller "Robot_controller"
 }
