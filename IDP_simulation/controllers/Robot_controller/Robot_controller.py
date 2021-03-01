@@ -172,28 +172,42 @@ def PID_rotation(coord):
         #print('Q4')
             
     
-
+    
     
     error = required - bearing1()
-    
+   
 
     
-    while abs(error) > 0.1:
+    
+    previous_error = error
+    
+    final_error = 0.8
+        
+        
+ 
+    while abs(error) > final_error:
         #print(required,'required')
         #print(error)
-        v = 6.28*0.01*error
-        if v > 6.28:
-            v = 6.28
-        elif v < -6.28:
-            v = -6.28
-
-        left_wheel.setVelocity(v)
-        right_wheel.setVelocity(-v)
+        kP = 0.001
+        kD = -11.0
+        P = 6.28*kP*error
+        D = (error-previous_error)/(100.0)*kD
+        
+        
+        v = P + D 
+        if v > 6.0:
+            v = 6.0
+        elif v < -6.0:
+            v = -60
+    
+        left_wheel.setVelocity(-v)
+        right_wheel.setVelocity(v)
+        previous_error = error
         error = required - bearing1()
         robot.step(TIME_STEP)
     
-        if abs(error) < 0.1:
-            return
+    return
+
 
 
 
@@ -202,7 +216,9 @@ def PID_rotation(coord):
 def PID_translation(coord):
     error = ((coord[0] - gps.getValues()[0])**2 +(coord[1] - gps.getValues()[2])**2)**(1/2)
     
-    while abs(error) > 0.05 or math.isnan(error):
+    final_error = 0.11
+    
+    while abs(error) > final_error or math.isnan(error):
         if math.isnan(error) :
             pass
             
@@ -221,8 +237,11 @@ def PID_translation(coord):
         x = (coord[0] - gps.getValues()[0])
         z = (coord[1] - gps.getValues()[2])
         
+        previous_error = error
         error = (x**2 + z**2)**0.5
         
+        if previous_error < error:
+            PID_rotation(coord)
         
     return
     
