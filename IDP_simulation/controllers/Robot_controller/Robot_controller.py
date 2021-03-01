@@ -331,7 +331,7 @@ def sweep(velocity = 0.5):
         
         
         #if measured distance is less than wall_dist then assume there's a box
-        #also if wall is more than 1.5 away disregard measurements because it's farther than sensor's range
+        #also if wall is more than 1.5 away disregard measurements because it's further than sensor's range
         if abs(wall_dist - infrared_dist) > 0.06 and wall_dist < 1.5:
             x, z = potential_box_position(infrared_dist + 0.07, current_angle, gps.getValues())
             boxes.append([x, z])
