@@ -15,7 +15,7 @@ MAX_VELOCITY = 6
 
 
 def setup_infrared():
-    infrared = robot.getDevice('IR sensor')
+    infrared = robot.getDevice('IR Sensor')
     infrared.enable(TIME_STEP)
     return infrared
 
@@ -263,33 +263,36 @@ def get_wall_position(angle):
     return dist
     
     
-def box_position(distance, angle, position):
+def potential_box_position(distance, angle, position):
     """
     finds the box position based on the current angle and location of the robot
     and the distance between the robot and box
     """    
-    print(position[0], position[2], distance, angle)
-    x = position[0] + distance * math.cos(angle)
-    z = position[2] + distance * math.sin(angle)
+    x = position[0] + distance * math.cos(math.radians(angle))
+    z = position[2] + distance * math.sin(math.radians(angle))
     
     return x, z
     
     
 
-def sweep(velocity):
+def sweep(velocity = 0.5):
     """
     do a 180 degree spin while collecting data from distance sensor
     input: velocity of wheels/how fast is the rotation
     output: numpy array with stored values from the distance sensor
     """    
     
+    
     #find current rotation [0-360 degrees]
-    initial_angle = bearing()        
+    initial_angle = bearing()   
+    
+    #store potential boxes locations     
     boxes = []    
     
-    #sweep 180 degrees    
+    #sweep 360 degrees    
     swept_angle = 0
-    while swept_angle < 180:
+    
+    while swept_angle < 350:
         
         right_wheel.setVelocity(velocity)
         left_wheel.setVelocity(-velocity)
@@ -303,13 +306,15 @@ def sweep(velocity):
         #distance from robot centre to wall in this direction
         current_angle = bearing()
         wall_dist = get_wall_position(current_angle)
+        
         #wall_dist is decreased by robot-sensor distance
         wall_dist -= 0.07  
         
         
         #if measured distance is less than wall_dist then assume there's a box
-        if abs(wall_dist - infrared_dist) > 0.05:
-            x, z = box_position(infrared_dist, current_angle, gps.getValues())
+        #also if wall is more than 1.5 away disregard measurements because it's farther than sensor's range
+        if abs(wall_dist - infrared_dist) > 0.06 and wall_dist < 1.5:
+            x, z = potential_box_position(infrared_dist + 0.07, current_angle, gps.getValues())
             boxes.append([x, z])
         
                 
@@ -325,6 +330,53 @@ def sweep(velocity):
     robot.step(TIME_STEP)
     
     return np.array(boxes)
+
+
+
+def box_position(potential_boxes):
+    """
+    we will consecutive positions in array that all come from the same box
+    find which belong to the same box and average them out
+    input: an array with potential box locations
+    returns: array of approximated box positions
+    """
+    
+    
+    locations = []
+    
+    same_box_num = 1
+    x_avg = potential_boxes[0][0]
+    z_avg = potential_boxes[0][1]
+    
+    
+    for i in range(1, boxes.shape[0]):
+    
+        change = math.sqrt((potential_boxes[i][0] - potential_boxes[i-1][0])**2 + (potential_boxes[i][1] - potential_boxes[i-1][1])**2)
+        
+        if change < 0.2:
+            x_avg += potential_boxes[i][0]
+            z_avg += potential_boxes[i][1]
+            same_box_num += 1
+        
+        else:
+            x_avg = x_avg / same_box_num
+            z_avg = z_avg / same_box_num
+            locations.append([x_avg, z_avg])
+            
+            x_avg = potential_boxes[i][0]
+            z_avg = potential_boxes[i][1]
+            same_box_num = 1
+            
+            
+    x_avg = x_avg / same_box_num
+    z_avg = z_avg / same_box_num
+    locations.append([x_avg, z_avg])
+    
+    return np.array(locations)
+                
+
+
+
 
 
 robot = Robot()
@@ -344,10 +396,10 @@ while robot.step(TIME_STEP) != -1:
    
     #PID_translation(coord2)
     
-    
     boxes = sweep(0.5)
-    print(boxes)
-
+    #print(boxes)
+    positions = box_position(boxes)
+    print(positions)
     break  
 
     
