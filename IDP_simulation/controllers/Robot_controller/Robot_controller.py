@@ -20,6 +20,10 @@ def setup_ultrasonic():
     dsUltrasonic.enable(TIME_STEP)
     return dsUltrasonic
 
+def setup_infrared():
+    dsInfraRed = robot.getDevice("Sharp's IR sensor GP2Y0A02YK0F")
+    dsInfraRed.enable(TIME_STEP)
+    return dsInfraRed
 
 def setup_wheels():
     """
@@ -265,12 +269,17 @@ left_wheel, right_wheel = setup_wheels()
 emitter, receiver = setup_communication()
 gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
+dsInfraRed = setup_infrared()
 
 a = 1
 
 while robot.step(TIME_STEP) != -1:
     # Get sensor values
+    
+    
+    # Outputs the most recent reading 
     DistanceUltrasonic = dsUltrasonic.getValue()
+    DistanceInfraRed = dsInfraRed.getValue()
     
     coord2 = (0.3,0.3)
     
