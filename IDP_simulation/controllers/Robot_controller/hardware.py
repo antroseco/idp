@@ -51,7 +51,6 @@ class PhototransistorCircuit:
     def __init__(self, device):
         """Simulates the circuit connected to the TEPT4400 (i.e. a 24 kΩ resistor connected to the Collector)
 
-
         Args:
             device (Webots Device handle): TEPT4400 device, make sure it has been enabled!
         """
