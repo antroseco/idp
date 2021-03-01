@@ -1,0 +1,48 @@
+#VRML_SIM R2021a utf8
+# documentation url: https://www.vishay.com/docs/81341/tept4400.pdf
+# Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached.
+# Assumes an Intensity of 1 in Webots is 100 lux.
+# Output is Photo Current in μA at V_CE = 5 V.
+# Photon and phonon noise is negligible compared to the output current.
+
+PROTO TEPT4400 [
+    field   SFVec3f     translation 0 0 0
+    field   SFRotation  rotation    0 1 0 0
+    field   SFString    name        "TETP4400"
+]
+{
+    LightSensor {
+        translation IS translation
+        rotation IS rotation
+        name IS name
+        model "Vishay Semiconductors TEPT4400"
+        description "Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached"
+        children [
+            DEF LIGHTSENSOR_GEOMETRY Transform {
+                translation -0.002 0 0
+                rotation 0 0 1 -1.5708
+                children [
+                    Shape {
+                        appearance PBRAppearance {
+                            transparency 0.8
+                            metalness 0
+                        }
+                        geometry Capsule {
+                            bottom FALSE
+                            height 0.0029
+                            radius 0.0015
+                            subdivision 16
+                        }
+                    }
+                ]
+          }
+        ]
+        boundingObject USE LIGHTSENSOR_GEOMETRY
+        lookupTable [
+            0.1 20 0
+            1 200 0
+        ]
+        colorFilter 1 0.1 0.1
+        occlusion TRUE
+    }
+}

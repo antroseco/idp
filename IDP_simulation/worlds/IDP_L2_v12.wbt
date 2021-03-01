@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.21041725644037362 -0.8965972699279652 -0.3896638471167498 4.214125666307087
-  position 0.9721275137337455 1.098687686123769 -0.10038699179142394
+  orientation 0.15383377625143313 -0.8597631354425371 -0.4869728126068658 3.8051166991606724
+  position 0.46393596151546435 0.831849831249517 -0.6611636557724326
 }
 Background {
   skyColor [
@@ -187,8 +187,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.0200000039104638 -0.004997452491810773 0.029999999997836726
-        rotation -1 1.5471032069076624e-09 -1.5470984741820589e-09 1.5708000008261553
+        translation 0.020000003910463925 -0.004997452491810772 0.029999999997836726
+        rotation -1 1.5715526198223608e-09 -1.5715474421749767e-09 1.5708000008261545
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -218,8 +218,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.020000003925813838 -0.004997598386196223 -0.030000000006616442
-        rotation -1 6.158833637618341e-12 -2.0813121688879315e-12 1.5707999981669776
+        translation 0.020000003925813963 -0.004997598386196222 -0.030000000006616442
+        rotation -1 3.0629729844762447e-11 -2.6551582815474314e-11 1.570799998166978
         children [
           USE WHEEL
         ]
@@ -306,22 +306,32 @@ Robot {
       }
     }
     DistanceSensor {
-      translation 0.06 0 0
+      translation 0.06 -0.005 0.01
       rotation 1 0 0 -1.5707953071795862
       children [
-        DEF ultrasonicShape Shape {
-          appearance PBRAppearance {
-            baseColor 0 1 0.5
-          }
-          geometry Box {
-            size 0.015 0.045 0.02
-          }
+        Group {
+          children [
+            DEF ultrasonicShape Transform {
+              translation 0 0.01 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry Box {
+                    size 0.015 0.045 0.02
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
       name "ultrasonic"
       boundingObject USE ultrasonicShape
       lookupTable [
         0 0 0
+        0.02 0 0
+        0.02 0.02 0
         1.5 1.5 0
       ]
       type "sonar"

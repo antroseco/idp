@@ -130,3 +130,8 @@ dmypy.json
 
 # VS Code
 .vscode/
+
+# LTspice simulations
+LTspice/*.log
+LTspice/*.net
+LTspice/*.raw
