@@ -6,6 +6,7 @@ from controller import Emitter
 from controller import Receiver
 import numpy as np
 import math
+from matplotlib import pyplot as plt
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
@@ -221,9 +222,41 @@ def PID_translation(coord):
     return
     
     
-    
-    
 
+
+def sweep(velocity):
+    """
+    do a 180 degree spin while collecting data from distance sensor
+    input: velocity of wheels/how fast is the rotation
+    output: numpy array with stored values from the distance sensor
+    """    
+    
+    #find current rotation [0-360 degrees]
+    initial_angle = bearing()
+        
+    distances = []    
+        
+    #sweep 180 degrees    
+    swept_angle = 0
+    while swept_angle < 180:
+        
+        right_wheel.setVelocity(velocity)
+        left_wheel.setVelocity(-velocity)
+        
+        distances.append(dsUltrasonic.getValue())
+        print(dsUltrasonic.getValue())
+        robot.step(TIME_STEP)
+        
+        if bearing() > initial_angle:
+            swept_angle = bearing() - initial_angle
+        else:
+            swept_angle = 360 - initial_angle + bearing()
+            
+    right_wheel.setVelocity(0)
+    left_wheel.setVelocity(0)
+    
+    distances = np.array(distances)
+    return distances
 
 
 robot = Robot()
@@ -233,6 +266,7 @@ emitter, receiver = setup_communication()
 gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 
+a = 1
 
 while robot.step(TIME_STEP) != -1:
     # Get sensor values
@@ -240,14 +274,21 @@ while robot.step(TIME_STEP) != -1:
     
     coord2 = (0.3,0.3)
     
+    angle = bearing()
+    #print(angle)
     
-    PID_rotation(coord2)
+    #PID_rotation(coord2)
    
-    PID_translation(coord2)
+    #PID_translation(coord2)
     
-    #left_wheel.setVelocity(0.0)
-    #right_wheel.setVelocity(0.0)
+    #right_wheel.setVelocity(1.0)
+    #left_wheel.setVelocity(-1.0)
+    
+    
+    distances = sweep(0.5)
+    print(distances)
 
-    #break
+    break  
+
     
 print('end')
