@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.15383377625143313 -0.8597631354425371 -0.4869728126068658 3.8051166991606724
-  position 0.699340464206528 1.333653812651437 -0.8776823490915232
+  orientation -0.4069165606883995 0.8158223966688971 -0.4109169377513426 6.11681396534556
+  position -0.5640416566582452 0.04819591429222126 0.7731208892272263
 }
 Background {
   skyColor [
@@ -58,7 +58,7 @@ target {
   name "target(6)"
 }
 target {
-  translation 0.366 0.024975474519511525 0.3654
+  translation 0.0670387 0.0249755 -0.00781176
   rotation 0.5132896048118902 0.06843372636024753 -0.8554826746863458 2.491725747762101e-17
   colour 0 1 0
   name "target(5)"
@@ -155,7 +155,7 @@ TexturedBackgroundLight {
   texture "empty_office"
 }
 Robot {
-  translation 0.019959152523862194 0.02981830482757359 5.1582841893251484e-08
+  translation -0.469221 0.06 -0.00341733
   rotation 0.0012617578396568994 1.3537918758716176e-06 0.9999992039823438 0.0013624617687495327
   children [
     Compass {
@@ -172,14 +172,14 @@ Robot {
         baseColor 0 0 1
       }
       geometry Box {
-        size 0.1 0.03 0.05
+        size 0.2 0.1 0.2
       }
     }
     DEF LEFT_WHEEL HingeJoint {
       jointParameters HingeJointParameters {
         position 4.074892064168798e-12
         axis 0 0 -1
-        anchor 0.02 -0.005 0.03
+        anchor 0.04 -0.01 0.11
       }
       device [
         RotationalMotor {
@@ -187,8 +187,9 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.020000003910463936 -0.004997452491810772 0.029999999997836726
-        rotation -1 1.5735900658544454e-09 -1.5735848807214345e-09 1.5708000008261545
+        translation 0.04 -0.01 0.11
+        rotation -1 1.5939645261752906e-09 -1.5939592661860123e-09 1.5708000008261545
+        scale 2 2 2
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -210,7 +211,7 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.07847065672431e-12
         axis 0 0 -1
-        anchor 0.02 -0.005 -0.03
+        anchor 0.04 -0.01 -0.11
       }
       device [
         RotationalMotor {
@@ -218,8 +219,9 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.020000003925813973 -0.004997598386196222 -0.030000000006616442
-        rotation -1 3.2668965173124604e-11 -2.8590810657058558e-11 1.570799998166978
+        translation 0.04 -0.01 -0.11
+        rotation -1 5.3061318456746155e-11 -4.8983089072901e-11 1.570799998166978
+        scale 2 2 2
         children [
           USE WHEEL
         ]
@@ -230,14 +232,14 @@ Robot {
       }
     }
     DEF BEARING Solid {
-      translation -0.04 -0.02 0
+      translation -0.04 -0.035 0
       children [
         Shape {
           appearance PBRAppearance {
             baseColor 0.5 0.5 0.5
           }
           geometry DEF Ball_bearing Sphere {
-            radius 0.01
+            radius 0.025
           }
         }
       ]
@@ -339,7 +341,7 @@ Robot {
       resolution 0.003
     }
     SharpGP2Y0A02YK0F {
-      translation 0.06 0.01 0.01
+      translation 0.11 -0.03 0
       name "IR Sensor"
     }
     TEPT4400 {
