@@ -4,6 +4,7 @@ from controller import Motor
 from controller import DistanceSensor
 from controller import Emitter
 from controller import Receiver
+from hardware import ADCInput, PhototransistorCircuit
 import numpy as np
 import math
 from matplotlib import pyplot as plt
@@ -24,6 +25,11 @@ def setup_infrared():
     dsInfraRed = robot.getDevice("Sharp's IR sensor GP2Y0A02YK0F")
     dsInfraRed.enable(TIME_STEP)
     return dsInfraRed
+
+def setup_lightsensor():
+    ls = robot.getDevice('TETP4400')
+    ls.enable(TIME_STEP)
+    return ls
 
 def setup_wheels():
     """
@@ -278,11 +284,15 @@ gps, compass = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 dsInfraRed = setup_infrared()
 
+ls = setup_lightsensor()
+lsCircuit = PhototransistorCircuit(ls)
+lsInput = ADCInput(lambda: lsCircuit.voltage(), 5.0, 2)
+
 a = 1
 
 while robot.step(TIME_STEP) != -1:
     # Get sensor values
-    
+    LightSensorValue = lsInput.read()    
     
     # Outputs the most recent reading 
     DistanceUltrasonic = dsUltrasonic.getValue()
