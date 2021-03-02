@@ -84,7 +84,10 @@ def setup_sensors():
     compass = robot.getDevice('compass')
     compass.enable(TIME_STEP)
     
-    return gps, compass
+    compass1 = robot.getDevice('compass1')
+    compass1.enable(TIME_STEP)
+    
+    return gps, compass, compass1
     
 
 
@@ -118,11 +121,12 @@ def get_message():
 
 
 
-def bearing1(): 
+def bearing1(compass_obj): 
     """
     This gives a bearing -180,180
+    input: compass object(type Compass)
     """
-    theta = np.arctan2(compass.getValues()[0],compass.getValues()[2])
+    theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
     theta = (theta-(np.pi /2.0) )*180.0/np.pi
     if theta < -180:
         theta += 360
@@ -133,11 +137,12 @@ def bearing1():
    
    
    
-def bearing(): 
+def bearing(compass_obj): 
     """
     This gives a bearing 0,360
+    input: compass object(type Compass)
     """
-    theta = np.arctan2(compass.getValues()[0],compass.getValues()[2])
+    theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
     theta = (theta-(np.pi /2.0))*180.0/np.pi
     if theta < 0 :
         theta += 360
@@ -186,7 +191,7 @@ def PID_rotation(coord):
     
     
     
-    error = required - bearing1()
+    error = required - bearing1(compass)
    
 
     
@@ -210,12 +215,12 @@ def PID_rotation(coord):
         if v > 6.0:
             v = 6.0
         elif v < -6.0:
-            v = -60
+            v = -6.0
     
         left_wheel.setVelocity(-v)
         right_wheel.setVelocity(v)
         previous_error = error
-        error = required - bearing1()
+        error = required - bearing1(compass)
         robot.step(TIME_STEP)
     
     return
@@ -228,7 +233,7 @@ def PID_rotation(coord):
 def PID_translation(coord):
     error = ((coord[0] - gps.getValues()[0])**2 +(coord[1] - gps.getValues()[2])**2)**(1/2)
     
-    final_error = 0.11
+    final_error = 0.15
     
     while abs(error) > final_error or math.isnan(error):
         if math.isnan(error) :
@@ -254,6 +259,9 @@ def PID_translation(coord):
         
         if previous_error < error:
             PID_rotation(coord)
+        
+    left_wheel.setVelocity(0)
+    right_wheel.setVelocity(0)    
         
     return
     
@@ -294,6 +302,8 @@ def get_wall_position(angle):
     return dist
     
     
+    
+    
 def potential_box_position(distance, angle, position):
     """
     finds the box position based on the current angle and location of the robot
@@ -303,6 +313,8 @@ def potential_box_position(distance, angle, position):
     z = position[2] + distance * math.sin(math.radians(angle))
     
     return x, z
+    
+    
     
     
 
@@ -315,7 +327,7 @@ def sweep(velocity = 0.5):
     
     
     #find current rotation [0-360 degrees]
-    initial_angle = bearing()   
+    initial_angle = bearing(compass1)   
     
     #store potential boxes locations     
     boxes = []    
@@ -335,17 +347,17 @@ def sweep(velocity = 0.5):
         infrared_dist = 0.7611 * math.pow(infrared.getValue(), -0.9313) - 0.1252
         
         #distance from robot centre to wall in this direction
-        current_angle = bearing()
+        current_angle = bearing(compass1)
         wall_dist = get_wall_position(current_angle)
         
         #wall_dist is decreased by robot-sensor distance
-        wall_dist -= 0.07  
+        wall_dist -= 0.11
         
         
         #if measured distance is less than wall_dist then assume there's a box
         #also if wall is more than 1.5 away disregard measurements because it's further than sensor's range
         if abs(wall_dist - infrared_dist) > 0.06 and wall_dist < 1.5:
-            x, z = potential_box_position(infrared_dist + 0.07, current_angle, gps.getValues())
+            x, z = potential_box_position(infrared_dist + 0.11, current_angle, gps.getValues())
             boxes.append([x, z])
         
                 
@@ -434,7 +446,7 @@ robot = Robot()
 
 left_wheel, right_wheel = setup_wheels()
 emitter, receiver = setup_communication()
-gps, compass = setup_sensors()
+gps, compass, compass1 = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 infrared = setup_infrared()
 box_claw, box_claw_sensor = setup_boxclaw('box_claw','box_claw_sensor')
@@ -447,15 +459,28 @@ while robot.step(TIME_STEP) != -1:
    
     # #PID_translation(coord2)
     
-    # boxes = sweep(0.5)
-    # #print(boxes)
-    # positions = box_position(boxes)
-    # print(positions)
-    # break
+    boxes = sweep(0.8)
+    positions = box_position(boxes)
+    print(positions)
+    
+    for i in range(3, positions.size):
+        if i!=2:
+            withdraw_boxclaw()
+            PID_rotation(positions[i])
+            PID_translation(positions[i])
+            deploy_boxclaw()
+            
+            
+            PID_rotation((0,0))
+            PID_translation((0,0))
+        
+    break
+    """
     withdraw_boxclaw()
     deploy_boxclaw()
+    PID_rotation(coord2)
     PID_translation(coord2)
-
+    """
 
 
 
