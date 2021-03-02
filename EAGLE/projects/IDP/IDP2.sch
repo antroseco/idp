@@ -1164,171 +1164,6 @@ Right angle and straight</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="diy-modules">
-<description>&lt;b&gt;DIY Modules for Arduino, Raspberry Pi, CubieBoard etc.&lt;/b&gt;
-&lt;br&gt;&lt;br&gt;
-The library contains a list of symbols and footprints for popular, cheap and easy-to-use electronic modules.&lt;br&gt;
-The modules are intend to work with microprocessor-based platforms such as &lt;a href="http://arduino.cc"&gt;Arduino&lt;/a&gt;, &lt;a href="http://raspberrypi.org/"&gt;Raspberry Pi&lt;/a&gt;, &lt;a href="http://cubieboard.org/"&gt;CubieBoard&lt;/a&gt;, &lt;a href="http://beagleboard.org/"&gt;BeagleBone&lt;/a&gt; and many others. There are many manufacturers of the modules in the world. Almost all of them can be bought on &lt;a href="ebay.com"&gt;ebay.com&lt;/a&gt;.&lt;br&gt;
-&lt;br&gt;
-By using this library, you can design a PCB for devices created with usage of modules. Even if you do not need to create PCB design, you can also use the library to quickly document your work by drawing schematics of devices built by you.&lt;br&gt;
-&lt;br&gt;
-The latest version, examples, photos and much more can be found at: &lt;b&gt;&lt;a href="http://diymodules.org/eagle"&gt;diymodules.org/eagle&lt;/a&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;
-Comments, suggestions and bug reports please send to: &lt;b&gt;&lt;a href="mailto:eagle@diymodules.org"&gt;eagle@diymodules.org&lt;/b&gt;&lt;/a&gt;&lt;br&gt;&lt;br&gt;
-&lt;i&gt;Version: 1.8.0 (2017-Jul-02)&lt;/i&gt;&lt;br&gt;
-&lt;i&gt;Created by: Miroslaw Brudnowski&lt;/i&gt;&lt;br&gt;&lt;br&gt;
-&lt;i&gt;Released under the Creative Commons Attribution 4.0 International License: &lt;a href="http://creativecommons.org/licenses/by/4.0"&gt;http://creativecommons.org/licenses/by/4.0&lt;/a&gt;&lt;/i&gt;
-&lt;br&gt;&lt;br&gt;
-&lt;center&gt;
-&lt;a href="http://diymodules.org/eagle"&gt;&lt;img src="http://www.diymodules.org/img/diymodules-lbr-image.php?v=1.8.0" alt="DIYmodules.org"&gt;&lt;/a&gt;
-&lt;/center&gt;</description>
-<packages>
-<package name="ULTRASONIC-HC-SR04">
-<description>&lt;b&gt;Ultrasonic Ranging Module HC-SR04&lt;/b&gt;</description>
-<wire x1="-22.5" y1="9.8" x2="22.5" y2="9.8" width="0.127" layer="21"/>
-<wire x1="22.5" y1="9.8" x2="22.5" y2="-10.2" width="0.127" layer="21"/>
-<wire x1="22.5" y1="-10.2" x2="-22.5" y2="-10.2" width="0.127" layer="21"/>
-<wire x1="-22.5" y1="-10.2" x2="-22.5" y2="9.8" width="0.127" layer="21"/>
-<hole x="-21.1" y="8.4" drill="1.8"/>
-<hole x="-21.1" y="-8.8" drill="1.8"/>
-<hole x="21.1" y="-8.8" drill="1.8"/>
-<hole x="21.1" y="8.4" drill="1.8"/>
-<circle x="-13" y="0" radius="8" width="0.127" layer="21"/>
-<circle x="13" y="0" radius="8" width="0.127" layer="21"/>
-<pad name="1" x="-3.81" y="-8.89" drill="1" shape="square"/>
-<pad name="2" x="-1.27" y="-8.89" drill="1"/>
-<pad name="3" x="1.27" y="-8.89" drill="1"/>
-<pad name="4" x="3.81" y="-8.89" drill="1"/>
-<wire x1="-5.08" y1="-8.255" x2="-4.445" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="-4.445" y1="-7.62" x2="-3.175" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="-3.175" y1="-7.62" x2="-2.54" y2="-8.255" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-8.255" x2="-1.905" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="-1.905" y1="-7.62" x2="-0.635" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="-0.635" y1="-7.62" x2="0" y2="-8.255" width="0.127" layer="21"/>
-<wire x1="0" y1="-8.255" x2="0.635" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="0.635" y1="-7.62" x2="1.905" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="1.905" y1="-7.62" x2="2.54" y2="-8.255" width="0.127" layer="21"/>
-<wire x1="2.54" y1="-8.255" x2="3.175" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="3.175" y1="-7.62" x2="4.445" y2="-7.62" width="0.127" layer="21"/>
-<wire x1="4.445" y1="-7.62" x2="5.08" y2="-8.255" width="0.127" layer="21"/>
-<wire x1="5.08" y1="-8.255" x2="5.08" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="5.08" y1="-9.525" x2="4.445" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="4.445" y1="-10.16" x2="3.175" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="3.175" y1="-10.16" x2="2.54" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="2.54" y1="-9.525" x2="1.905" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="1.905" y1="-10.16" x2="0.635" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="0.635" y1="-10.16" x2="0" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="0" y1="-9.525" x2="-0.635" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-0.635" y1="-10.16" x2="-1.905" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-1.905" y1="-10.16" x2="-2.54" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="-2.54" y1="-9.525" x2="-3.175" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-3.175" y1="-10.16" x2="-4.445" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-4.445" y1="-10.16" x2="-5.08" y2="-9.525" width="0.127" layer="21"/>
-<wire x1="-5.08" y1="-9.525" x2="-5.08" y2="-8.255" width="0.127" layer="21"/>
-<text x="0" y="10.795" size="1.27" layer="25" align="bottom-center">&gt;NAME</text>
-<text x="0" y="-11.43" size="1.27" layer="27" align="top-center">&gt;VALUE</text>
-</package>
-<package name="ULTRASONIC-HC-SR04#V">
-<description>&lt;b&gt;Ultrasonic Ranging Module HC-SR04&lt;/b&gt; vertically mounted</description>
-<wire x1="-22.5" y1="-4.064" x2="22.5" y2="-4.064" width="0.127" layer="21"/>
-<wire x1="22.5" y1="-4.064" x2="22.5" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="22.5" y1="-5.7" x2="21" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="21" y1="-5.7" x2="5" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="5" y1="-5.7" x2="-5" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="-5" y1="-5.7" x2="-21" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="-21" y1="-5.7" x2="-22.5" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="-22.5" y1="-5.7" x2="-22.5" y2="-4.064" width="0.127" layer="21"/>
-<wire x1="-5.08" y1="-4.064" x2="5.08" y2="-4.064" width="0.127" layer="21"/>
-<pad name="1" x="-3.81" y="0" drill="1" shape="square" rot="R180"/>
-<pad name="2" x="-1.27" y="0" drill="1" rot="R180"/>
-<pad name="3" x="1.27" y="0" drill="1" rot="R180"/>
-<pad name="4" x="3.81" y="0" drill="1" rot="R180"/>
-<text x="0" y="1.905" size="1.27" layer="25" align="bottom-center">&gt;NAME</text>
-<text x="0" y="-18.415" size="1.27" layer="27" align="top-center">&gt;VALUE</text>
-<wire x1="-5.08" y1="-4.064" x2="-5.08" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="-5.08" y1="-1.524" x2="-4.191" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="-4.191" y1="-1.524" x2="-3.429" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="-3.429" y1="-1.524" x2="-1.651" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="-1.651" y1="-1.524" x2="-0.889" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="-0.889" y1="-1.524" x2="0.889" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="0.889" y1="-1.524" x2="1.651" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="1.651" y1="-1.524" x2="3.429" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="3.429" y1="-1.524" x2="4.191" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="4.191" y1="-1.524" x2="5.08" y2="-1.524" width="0.127" layer="21"/>
-<wire x1="5.08" y1="-1.524" x2="5.08" y2="-4.064" width="0.127" layer="21"/>
-<wire x1="4.191" y1="-1.524" x2="4.191" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="3.429" y1="-1.524" x2="3.429" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="1.651" y1="-1.524" x2="1.651" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="-0.889" y1="-1.524" x2="-0.889" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="-3.429" y1="-1.524" x2="-3.429" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="0.889" y1="-1.524" x2="0.889" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="-1.651" y1="-1.524" x2="-1.651" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="-4.191" y1="-1.524" x2="-4.191" y2="-0.889" width="0.127" layer="21"/>
-<wire x1="-21" y1="-5.7" x2="-21" y2="-17.7" width="0.127" layer="21"/>
-<wire x1="-21" y1="-17.7" x2="-5" y2="-17.7" width="0.127" layer="21"/>
-<wire x1="-5" y1="-17.7" x2="-5" y2="-5.7" width="0.127" layer="21"/>
-<wire x1="5" y1="-5.7" x2="5" y2="-17.7" width="0.127" layer="21"/>
-<wire x1="5" y1="-17.7" x2="21" y2="-17.7" width="0.127" layer="21"/>
-<wire x1="21" y1="-17.7" x2="21" y2="-5.7" width="0.127" layer="21"/>
-</package>
-</packages>
-<symbols>
-<symbol name="ULTRASONIC-HC-SR04">
-<description>&lt;b&gt;Ultrasonic Ranging Module HC-SR04&lt;/b&gt;</description>
-<pin name="VCC" x="-2.54" y="-15.24" length="middle" direction="pwr" rot="R90"/>
-<pin name="TRIG" x="0" y="-15.24" length="middle" direction="in" rot="R90"/>
-<pin name="ECHO" x="2.54" y="-15.24" length="middle" direction="out" rot="R90"/>
-<pin name="GND" x="5.08" y="-15.24" length="middle" direction="pwr" rot="R90"/>
-<wire x1="-22.86" y1="-10.16" x2="-22.86" y2="10.16" width="0.254" layer="94"/>
-<wire x1="-22.86" y1="10.16" x2="25.4" y2="10.16" width="0.254" layer="94"/>
-<wire x1="25.4" y1="10.16" x2="25.4" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="25.4" y1="-10.16" x2="-22.86" y2="-10.16" width="0.254" layer="94"/>
-<circle x="-12.7" y="0" radius="7.62" width="0.254" layer="94"/>
-<circle x="15.24" y="0" radius="7.62" width="0.254" layer="94"/>
-<circle x="15.24" y="0" radius="3.81845625" width="0.254" layer="94"/>
-<circle x="-12.7" y="0" radius="3.81845625" width="0.254" layer="94"/>
-<text x="-22.86" y="15.24" size="1.778" layer="95">&gt;NAME</text>
-<text x="-22.86" y="12.7" size="1.778" layer="95">&gt;VALUE</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="ULTRASONIC-HC-SR04">
-<description>&lt;b&gt;Ultrasonic Ranging Module HC-SR04&lt;/b&gt;
-&lt;p&gt;More details available here:&lt;br&gt;
-&lt;a href="http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/"&gt;
-http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;b&gt;&lt;a href="http://www.ebay.com/sch/hc+sr04+ultrasonic"&gt;Click here to find device on ebay.com&lt;/a&gt;&lt;/b&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img alt="photo" src="http://www.diymodules.org/img/device-photo.php?name=ULTRASONIC-HC-SR04"&gt;&lt;/p&gt;</description>
-<gates>
-<gate name="G$1" symbol="ULTRASONIC-HC-SR04" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="ULTRASONIC-HC-SR04">
-<connects>
-<connect gate="G$1" pin="ECHO" pad="3"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="TRIG" pad="2"/>
-<connect gate="G$1" pin="VCC" pad="1"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="#V" package="ULTRASONIC-HC-SR04#V">
-<connects>
-<connect gate="G$1" pin="ECHO" pad="3"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="TRIG" pad="2"/>
-<connect gate="G$1" pin="VCC" pad="1"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1347,21 +1182,20 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <part name="P+1" library="IDP_library" deviceset="+5V" device=""/>
 <part name="+3V1" library="IDP_library" deviceset="+3V3" device=""/>
 <part name="GND1" library="IDP_library" deviceset="GND" device=""/>
-<part name="U$1" library="diy-modules" deviceset="ULTRASONIC-HC-SR04" device=""/>
-<part name="IR_SENSOR_CONNECTOR" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1"/>
+<part name="IR_SENSOR_CONNECTOR" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910"/>
 <part name="C1" library="IDP_library" deviceset="C-EU" device="025-024X044" value="10μ"/>
 <part name="P+2" library="IDP_library" deviceset="+5V" device=""/>
 <part name="GND2" library="IDP_library" deviceset="GND" device=""/>
-<part name="J2" library="IDP_library" deviceset="22-?-04" device="05-7048" package3d_urn="urn:adsk.eagle:package:8078648/1" value="22-05-7048-04"/>
-<part name="J4" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1"/>
+<part name="ULTRASONIC_SENSOR" library="IDP_library" deviceset="22-?-04" device="05-7048" package3d_urn="urn:adsk.eagle:package:8078648/1" value="Rapid 22-1015/22-0915"/>
+<part name="SERVO" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910"/>
 <part name="P+3" library="IDP_library" deviceset="+5V" device=""/>
 <part name="P+4" library="IDP_library" deviceset="VCC" device=""/>
-<part name="VR2" library="IDP_library" deviceset="POT" device=""/>
+<part name="RAPID68-1959" library="IDP_library" deviceset="POT" device="" value="10K"/>
 <part name="P+5" library="IDP_library" deviceset="+5V" device=""/>
 <part name="GND3" library="IDP_library" deviceset="GND" device=""/>
 <part name="GND4" library="IDP_library" deviceset="GND" device=""/>
-<part name="VR1" library="IDP_library" deviceset="POT" device=""/>
-<part name="J1" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1"/>
+<part name="RAPID65-0753" library="IDP_library" deviceset="POT" device="" value="10K"/>
+<part name="PHOTOTRANSISTOR" library="IDP_library" deviceset="22-?-03" device="05-7038" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910"/>
 </parts>
 <sheets>
 <sheet>
@@ -1385,13 +1219,9 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <instance part="GND1" gate="1" x="223.52" y="91.44" smashed="yes" rot="R180">
 <attribute name="VALUE" x="226.06" y="93.98" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="U$1" gate="G$1" x="78.74" y="121.92" smashed="yes">
-<attribute name="NAME" x="55.88" y="137.16" size="1.778" layer="95"/>
-<attribute name="VALUE" x="55.88" y="134.62" size="1.778" layer="95"/>
-</instance>
 <instance part="IR_SENSOR_CONNECTOR" gate="G$1" x="294.64" y="93.98" smashed="yes" rot="R270">
-<attribute name="VALUE" x="287.02" y="95.25" size="1.778" layer="96" rot="R270"/>
-<attribute name="NAME" x="300.482" y="95.25" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="285.75" y="96.52" size="1.778" layer="96"/>
+<attribute name="NAME" x="283.21" y="99.822" size="1.778" layer="95"/>
 </instance>
 <instance part="C1" gate="G$1" x="297.18" y="63.5" smashed="yes" rot="R270">
 <attribute name="NAME" x="297.561" y="61.976" size="1.778" layer="95" rot="R270"/>
@@ -1403,11 +1233,11 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <instance part="GND2" gate="1" x="292.1" y="48.26" smashed="yes">
 <attribute name="VALUE" x="289.56" y="45.72" size="1.778" layer="96"/>
 </instance>
-<instance part="J2" gate="G$1" x="78.74" y="83.82" smashed="yes" rot="R90">
-<attribute name="VALUE" x="88.9" y="82.55" size="1.778" layer="96" rot="R90"/>
-<attribute name="NAME" x="72.898" y="82.55" size="1.778" layer="95" rot="R90"/>
+<instance part="ULTRASONIC_SENSOR" gate="G$1" x="71.12" y="86.36" smashed="yes">
+<attribute name="VALUE" x="74.93" y="76.2" size="1.778" layer="96" rot="R180"/>
+<attribute name="NAME" x="74.93" y="95.758" size="1.778" layer="95" rot="R180"/>
 </instance>
-<instance part="J4" gate="G$1" x="106.68" y="7.62" smashed="yes" rot="R90">
+<instance part="SERVO" gate="G$1" x="106.68" y="7.62" smashed="yes" rot="R90">
 <attribute name="VALUE" x="114.3" y="6.35" size="1.778" layer="96" rot="R90"/>
 <attribute name="NAME" x="100.838" y="6.35" size="1.778" layer="95" rot="R90"/>
 </instance>
@@ -1417,8 +1247,8 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <instance part="P+4" gate="VCC" x="132.08" y="15.24" smashed="yes">
 <attribute name="VALUE" x="129.54" y="12.7" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="VR2" gate="G$1" x="83.82" y="25.4" smashed="yes" rot="R90">
-<attribute name="NAME" x="81.2658" y="15.232890625" size="1.784990625" layer="95" rot="R90"/>
+<instance part="RAPID68-1959" gate="G$1" x="83.82" y="25.4" smashed="yes" rot="R90">
+<attribute name="NAME" x="91.4258" y="17.772890625" size="1.784990625" layer="95" rot="R90"/>
 <attribute name="VALUE" x="89.674590625" y="20.053409375" size="1.7824" layer="96" rot="R90"/>
 </instance>
 <instance part="P+5" gate="1" x="83.82" y="40.64" smashed="yes">
@@ -1430,13 +1260,13 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <instance part="GND4" gate="1" x="200.66" y="139.7" smashed="yes" rot="R90">
 <attribute name="VALUE" x="203.2" y="137.16" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="VR1" gate="G$1" x="190.5" y="139.7" smashed="yes" rot="R180">
-<attribute name="NAME" x="200.667109375" y="137.1458" size="1.784990625" layer="95" rot="R180"/>
+<instance part="RAPID65-0753" gate="G$1" x="190.5" y="139.7" smashed="yes" rot="R180">
+<attribute name="NAME" x="198.127109375" y="134.6058" size="1.784990625" layer="95" rot="R180"/>
 <attribute name="VALUE" x="195.846590625" y="145.554590625" size="1.7824" layer="96" rot="R180"/>
 </instance>
-<instance part="J1" gate="G$1" x="147.32" y="139.7" smashed="yes">
-<attribute name="VALUE" x="146.05" y="132.08" size="1.778" layer="96"/>
-<attribute name="NAME" x="146.05" y="145.542" size="1.778" layer="95"/>
+<instance part="PHOTOTRANSISTOR" gate="G$1" x="147.32" y="139.7" smashed="yes">
+<attribute name="VALUE" x="128.27" y="132.08" size="1.778" layer="96"/>
+<attribute name="NAME" x="128.27" y="145.542" size="1.778" layer="95"/>
 </instance>
 </instances>
 <busses>
@@ -1459,23 +1289,23 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <pinref part="GND2" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
-<pinref part="J2" gate="G$1" pin="1"/>
-<wire x1="83.82" y1="91.44" x2="83.82" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="ULTRASONIC_SENSOR" gate="G$1" pin="1"/>
+<wire x1="78.74" y1="81.28" x2="93.98" y2="81.28" width="0.1524" layer="91"/>
+<label x="86.36" y="81.28" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J4" gate="G$1" pin="1"/>
+<pinref part="SERVO" gate="G$1" pin="1"/>
 <wire x1="109.22" y1="15.24" x2="109.22" y2="25.4" width="0.1524" layer="91"/>
 <label x="109.22" y="17.78" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<pinref part="VR2" gate="G$1" pin="CCW"/>
+<pinref part="RAPID68-1959" gate="G$1" pin="CCW"/>
 <wire x1="83.82" y1="17.78" x2="83.82" y2="10.16" width="0.1524" layer="91"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 </segment>
 <segment>
 <pinref part="GND4" gate="1" pin="GND"/>
-<pinref part="VR1" gate="G$1" pin="CCW"/>
+<pinref part="RAPID65-0753" gate="G$1" pin="CCW"/>
 </segment>
 </net>
 <net name="+3V3" class="0">
@@ -1507,9 +1337,9 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <pinref part="P+2" gate="1" pin="+5V"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="VCC"/>
-<pinref part="J2" gate="G$1" pin="4"/>
-<wire x1="76.2" y1="91.44" x2="76.2" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="ULTRASONIC_SENSOR" gate="G$1" pin="4"/>
+<wire x1="78.74" y1="88.9" x2="93.98" y2="88.9" width="0.1524" layer="91"/>
+<label x="86.36" y="88.9" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="P+3" gate="1" pin="+5V"/>
@@ -1519,12 +1349,12 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <wire x1="132.08" y1="7.62" x2="132.08" y2="12.7" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="VR2" gate="G$1" pin="CW"/>
+<pinref part="RAPID68-1959" gate="G$1" pin="CW"/>
 <wire x1="83.82" y1="33.02" x2="83.82" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="P+5" gate="1" pin="+5V"/>
 </segment>
 <segment>
-<pinref part="J1" gate="G$1" pin="1"/>
+<pinref part="PHOTOTRANSISTOR" gate="G$1" pin="1"/>
 <wire x1="154.94" y1="137.16" x2="175.26" y2="137.16" width="0.1524" layer="91"/>
 <label x="157.48" y="137.16" size="1.778" layer="95"/>
 </segment>
@@ -1605,7 +1435,7 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <label x="223.52" y="104.14" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J1" gate="G$1" pin="3"/>
+<pinref part="PHOTOTRANSISTOR" gate="G$1" pin="3"/>
 <label x="177.8" y="144.78" size="1.778" layer="95" rot="R180"/>
 <wire x1="154.94" y1="142.24" x2="175.26" y2="142.24" width="0.1524" layer="91"/>
 </segment>
@@ -1617,9 +1447,9 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <label x="109.22" y="88.9" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="ECHO"/>
-<pinref part="J2" gate="G$1" pin="2"/>
-<wire x1="81.28" y1="91.44" x2="81.28" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="ULTRASONIC_SENSOR" gate="G$1" pin="2"/>
+<wire x1="78.74" y1="83.82" x2="93.98" y2="83.82" width="0.1524" layer="91"/>
+<label x="86.36" y="83.82" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="TRIG" class="0">
@@ -1629,9 +1459,9 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <label x="109.22" y="91.44" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="TRIG"/>
-<pinref part="J2" gate="G$1" pin="3"/>
-<wire x1="78.74" y1="91.44" x2="78.74" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="ULTRASONIC_SENSOR" gate="G$1" pin="3"/>
+<wire x1="78.74" y1="86.36" x2="93.98" y2="86.36" width="0.1524" layer="91"/>
+<label x="86.36" y="86.36" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SERVO_ANALOG" class="0">
@@ -1641,7 +1471,7 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <label x="223.52" y="106.68" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="VR2" gate="G$1" pin="WIPER"/>
+<pinref part="RAPID68-1959" gate="G$1" pin="WIPER"/>
 <wire x1="78.74" y1="25.4" x2="73.66" y2="25.4" width="0.1524" layer="91"/>
 <label x="78.74" y="25.4" size="1.778" layer="95" rot="R180"/>
 </segment>
@@ -1653,22 +1483,22 @@ http://randomnerdtutorials.com/complete-guide-for-ultrasonic-sensor-hc-sr04/&lt;
 <label x="109.22" y="78.74" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="J4" gate="G$1" pin="2"/>
+<pinref part="SERVO" gate="G$1" pin="2"/>
 <wire x1="106.68" y1="15.24" x2="106.68" y2="25.4" width="0.1524" layer="91"/>
 <label x="106.68" y="17.78" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="VCC" class="0">
 <segment>
-<pinref part="J4" gate="G$1" pin="3"/>
+<pinref part="SERVO" gate="G$1" pin="3"/>
 <wire x1="104.14" y1="15.24" x2="104.14" y2="25.4" width="0.1524" layer="91"/>
 <label x="104.14" y="17.78" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="N$1" class="0">
 <segment>
-<pinref part="J1" gate="G$1" pin="2"/>
-<pinref part="VR1" gate="G$1" pin="CW"/>
+<pinref part="PHOTOTRANSISTOR" gate="G$1" pin="2"/>
+<pinref part="RAPID65-0753" gate="G$1" pin="CW"/>
 <wire x1="154.94" y1="139.7" x2="182.88" y2="139.7" width="0.1524" layer="91"/>
 </segment>
 </net>
