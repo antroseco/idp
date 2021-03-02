@@ -198,14 +198,14 @@ def PID_rotation(coord):
     
     previous_error = error
     
-    final_error = 0.8
+    final_error = 0.5
         
         
  
     while abs(error) > final_error:
         #print(required,'required')
         #print(error)
-        kP = 0.001
+        kP = 0.004
         kD = -11.0
         P = 6.28*kP*error
         D = (error-previous_error)/(100.0)*kD
@@ -462,17 +462,31 @@ while robot.step(TIME_STEP) != -1:
     boxes = sweep(0.8)
     positions = box_position(boxes)
     print(positions)
+    first_pass = True
     
     for i in range(3, positions.size):
         if i!=2:
+            if first_pass == False:
+                for i in range(5 ):
+                    right_wheel.setVelocity(-6.0)
+                    left_wheel.setVelocity(-6.0)
+                    robot.step(TIME_STEP)
+            first_pass = False
+                
+        
             withdraw_boxclaw()
             PID_rotation(positions[i])
             PID_translation(positions[i])
             deploy_boxclaw()
+                        
             
             
-            PID_rotation((0,0))
-            PID_translation((0,0))
+            
+            PID_rotation((0,0.4))
+            PID_translation((0,0.4))
+            
+
+            
         
     break
     """

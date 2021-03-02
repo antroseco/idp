@@ -75,7 +75,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.01 0.11
-        rotation -1 1.6815747055549249e-09 -1.6815691236836944e-09 1.5708000008261545
+        rotation -1 1.7447355325495448e-09 -1.7447297186238833e-09 1.5708000008261545
         scale 2 2 2
         children [
           DEF WHEEL Shape {
@@ -107,7 +107,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.01 -0.11
-        rotation -1 1.4074843757631889e-10 -1.3666988626102377e-10 1.570799998166978
+        rotation -1 2.0396473275554572e-10 -1.9988594935013563e-10 1.570799998166978
         scale 2 2 2
         children [
           USE WHEEL
