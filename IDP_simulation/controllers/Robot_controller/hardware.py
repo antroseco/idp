@@ -51,6 +51,32 @@ class ADCInput:
         return clamp(reading, 0, 1023)
 
 
+class DigitalInput:
+    def __init__(self, voltage_callback: Callable[[], float], Vref: float):
+        """Emulates a comparator connected to a digital input of the ATmega4809.
+
+        Args:
+            voltage_callback (Callable[[], float]): returns the current voltage at the input pin
+            Vref (float): reference voltage, normally set with a potentiometer
+        """
+        assert callable(voltage_callback)
+        assert Vref > 0
+
+        self.voltage_callback = voltage_callback
+        self.Vref = Vref
+
+    def read(self) -> bool:
+        """Read a voltage and emulate the comparator.
+
+        Returns:
+            bool: true if voltage > Vref
+        """
+        voltage = self.voltage_callback()
+
+        # Emulate comparator
+        return voltage > self.Vref
+
+
 class PhototransistorCircuit:
     def __init__(self, device):
         """Simulates the circuit connected to the TEPT4400 (i.e. a 5 kΩ resistor connected to the Collector).
