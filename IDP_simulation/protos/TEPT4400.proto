@@ -2,8 +2,9 @@
 # documentation url: https://www.vishay.com/docs/81341/tept4400.pdf
 # Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached.
 # Assumes an Intensity of 1 in Webots is 100 lux.
-# Output is Photo Current in μA at V_CE = 5 V.
-# Photon and phonon noise is negligible compared to the output current.
+# Output is illuminance in lux.
+# Only the 10 to 100 lux range has been implemented.
+# Photon and phonon noise is negligible.
 
 PROTO TEPT4400 [
     field   SFVec3f     translation 0 0 0
@@ -39,8 +40,8 @@ PROTO TEPT4400 [
         ]
         boundingObject USE LIGHTSENSOR_GEOMETRY
         lookupTable [
-            0.1 20 0
-            1 200 0
+            0.1 10  0 #  10 lux at I = 0.1
+            1   100 0 # 100 lux at I = 1.0
         ]
         colorFilter 1 0.1 0.1
         occlusion TRUE

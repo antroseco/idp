@@ -5,8 +5,12 @@ from random import randint
 from typing import Callable
 
 
+def clamp(value, low, high):
+    return max(low, min(value, high))
+
+
 class ADCInput:
-    def __init__(self, voltage_callback: Callable[[], float], Vref: float, accuracy: int):
+    def __init__(self, voltage_callback: Callable[[], float], Vref: float = 0.55, accuracy: int = 2):
         """Emulates a 10-bit ADC input connected to the ATmega4809
 
         Args:
@@ -23,14 +27,13 @@ class ADCInput:
         self.accuracy = accuracy
 
     def read(self) -> int:
-        """Read a voltage and emulate noise
+        """Read a voltage and emulate noise.
+        Voltages below 0 V are mapped to 0 and volatages above Vref are mapped to 1023.
 
         Returns:
             int: 10-bit voltage, [0, 1023]
         """
         voltage = self.voltage_callback()
-
-        assert 0 <= voltage <= self.Vref
 
         # As per datasheet
         reading = int(voltage * 1023 / self.Vref)
@@ -44,18 +47,21 @@ class ADCInput:
             # Superpose inaccuracies
             reading |= LSBs
 
-        return reading
+        # Clamp to 10 bits
+        return clamp(reading, 0, 1023)
 
 
 class PhototransistorCircuit:
     def __init__(self, device):
-        """Simulates the circuit connected to the TEPT4400 (i.e. a 24 kΩ resistor connected to the Collector)
+        """Simulates the circuit connected to the TEPT4400 (i.e. a 5 kΩ resistor connected to the Collector).
+        Outputs ~400 mV at 40 lux so the internal 550 mV ADC Vref is recommended.
 
         Args:
             device (Webots Device handle): TEPT4400 device, make sure it has been enabled!
         """
         # TODO: type checking
         self.device = device
+        self.r_load = 5000  # 5 kΩ load resistor
 
     def current(self) -> float:
         """Returns the output current
@@ -72,5 +78,7 @@ class PhototransistorCircuit:
         Returns:
             float: output voltage [V]
         """
-        # 24 kΩ resistor
-        return self.current() * 24000
+        illuminance = self.device.getValue()  # in lux
+
+        # Approximate relationship derived from the datasheet
+        return (2e-6 * self.r_load * illuminance) / (1 + 1.04e-7 * self.r_load * illuminance)
