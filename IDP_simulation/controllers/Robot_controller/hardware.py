@@ -1,5 +1,22 @@
-"""Emulate hardware connected to the ATmega4809 microprocessor"""
+"""Emulate hardware connected to the ATmega4809 microprocessor
 
+Usage:
+
+# Initialize sensor
+device = robot.getDevice('TETP4400')
+device.enable(TIME_STEP)
+
+# Initialize circuit and inputs
+circuit = PhototransistorCircuit(device)
+analogue_input = ADCInput(lambda: circuit.voltage())
+digital_input  = DigitalInput(lambda: circuit.voltage(), 0.45)
+
+# Get sensor values
+while robot.step(TIME_STEP) != -1:
+    analogue_value = analogue_input.read()
+    digital_value  = digital_input.read()
+
+"""
 
 from random import randint
 from typing import Callable
