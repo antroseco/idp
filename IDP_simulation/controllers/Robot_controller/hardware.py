@@ -45,7 +45,7 @@ class ADCInput:
 
     def read(self) -> int:
         """Read a voltage and emulate noise.
-        Voltages below 0 V are mapped to 0 and volatages above Vref are mapped to 1023.
+        Voltages below 0 V are mapped to 0 and voltages above Vref are mapped to 1023.
 
         Returns:
             int: 10-bit voltage, [0, 1023]
