@@ -109,7 +109,7 @@ def get_message():
     """
     gets the first message in receiver's queue and pops it from queue
     input: /
-    return: string message
+    return: string message, if there aren't any messages returns ""
     """
     
     if receiver.getQueueLength() > 0:
@@ -117,7 +117,8 @@ def get_message():
         message = data.decode('utf-8')
         receiver.nextPacket()
         return message
-
+    
+    return ""
 
 
 
