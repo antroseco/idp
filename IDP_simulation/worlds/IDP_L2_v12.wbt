@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.06159905465699075 -0.866338053557258 -0.4956449671125359 3.4854106173701775
-  position 1.2086528291479677 3.5615491790598677 -2.109845175480387
+  orientation 0.8838052995934044 0.3199857351108607 0.3413170399147611 4.35115913403488
+  position 0.8382435146190126 3.3403571735629605 0.04333465047066809
 }
 Background {
   skyColor [
@@ -38,8 +38,8 @@ Floor {
   }
 }
 Robot {
-  translation 0 0.06 0
-  rotation 0.0012617578396568994 1.3537918758716176e-06 0.9999992039823438 0.0013624617687495327
+  translation 0.00351179 0.06 -0.000971959
+  rotation 0.0012602096334339466 0.0022346393499947104 0.9999967091239128 0.00136247
   children [
     Compass {
       name "compass1"
@@ -54,12 +54,20 @@ Robot {
     }
     Emitter {
     }
-    DEF BODY Shape {
-      appearance PBRAppearance {
-        baseColor 0 0 1
-      }
-      geometry Box {
-        size 0.2 0.1 0.2
+    DEF BODY Solid {
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 1
+          }
+          geometry DEF SOLIDBOX Box {
+            size 0.2 0.1 0.2
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE SOLIDBOX
+      physics Physics {
       }
     }
     DEF LEFT_WHEEL HingeJoint {
@@ -75,7 +83,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.01 0.11
-        rotation -1 1.7508478706457985e-09 -1.7508420342632565e-09 1.5708000008261545
+        rotation -1 1.8344494257292592e-09 -1.834443282192552e-09 1.5708000008261545
         scale 2 2 2
         children [
           DEF WHEEL Shape {
@@ -107,7 +115,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.01 -0.11
-        rotation -1 2.1008243874063217e-10 -2.060036328748884e-10 1.570799998166978
+        rotation -1 2.5280509753282176e-10 -2.4872613481658937e-10 1.570799998166978
         scale 2 2 2
         children [
           USE WHEEL
@@ -172,8 +180,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 6.735556468129289e-08 2.0206451331605813e-07 -5.551115123125783e-17
-        rotation 1.605282590659393e-14 -5.044470241384965e-15 -1 2.2446906635345858e-06
+        translation 6.73555664854053e-08 2.0206451874921205e-07 -5.551115123125783e-17
+        rotation 1.6052825474672984e-14 -5.044470105657846e-15 -1 2.2446906635345858e-06
         children [
           DEF BOX_CLAW Group {
             children [
@@ -263,7 +271,8 @@ Robot {
       name "IR Sensor"
     }
     TEPT4400 {
-      translation 0 0.03 0
+      translation 0.16 0.03 0
+      rotation 0 0 1 1.01503e-06
     }
   ]
   physics Physics {
