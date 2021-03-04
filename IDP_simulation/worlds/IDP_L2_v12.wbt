@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.8838052995934044 0.3199857351108607 0.3413170399147611 4.35115913403488
-  position 0.8382435146190126 3.3403571735629605 0.04333465047066809
+  orientation 0.5006593316334031 -0.721335883284775 -0.4785548841399152 4.575059872455368
+  position 0.5032724893579688 0.5852931569567505 0.01933433814412048
 }
 Background {
   skyColor [
@@ -186,7 +186,7 @@ Robot {
           DEF BOX_CLAW Group {
             children [
               Transform {
-                translation 0.15 -0.03 -0.04
+                translation 0.15 -0.03 -0.05
                 children [
                   Shape {
                     appearance PBRAppearance {
@@ -199,7 +199,7 @@ Robot {
                 ]
               }
               Transform {
-                translation 0.15 -0.03 0.04
+                translation 0.15 -0.03 0.05
                 children [
                   Shape {
                     appearance PBRAppearance {
@@ -219,7 +219,7 @@ Robot {
                       baseColor 0.1 0.1 0.1
                     }
                     geometry Box {
-                      size 0.01 0.01 0.09
+                      size 0.01 0.01 0.11
                     }
                   }
                 ]
