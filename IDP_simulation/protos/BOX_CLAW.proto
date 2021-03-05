@@ -1,0 +1,58 @@
+PROTO BOX_CLAW [
+
+]
+{
+Solid {
+        translation 6.741597737003335e-08 2.0224543839306164e-07 0
+        rotation 0 0 -1 2.2383508361132597e-06
+        children [
+          DEF BOX_CLAW Group {
+            children [
+              Transform {
+                translation 0.15 -0.03 -0.05
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.15 0.01 0.01
+                    }
+                  }
+                ]
+              }
+              Transform {
+                translation 0.15 -0.03 0.05
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.15 0.01 0.01
+                    }
+                  }
+                ]
+              }
+              Transform {
+                translation 0.23 -0.03 0
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                      baseColor 0.1 0.1 0.1
+                    }
+                    geometry Box {
+                      size 0.01 0.01 0.11
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+        boundingObject USE BOX_CLAW
+        physics Physics {
+          density 0.001
+        }
+      }
+}

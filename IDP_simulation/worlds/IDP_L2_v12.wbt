@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.5006593316334031 -0.721335883284775 -0.4785548841399152 4.575059872455368
-  position 0.5032724893579688 0.5852931569567505 0.01933433814412048
+  orientation -0.41957929318168546 -0.8244192380388328 -0.3798501503022314 1.8208406560289503
+  position 0.5389263464797691 0.6248315501665145 0.1888221669955893
 }
 Background {
   skyColor [
@@ -38,8 +38,8 @@ Floor {
   }
 }
 Robot {
-  translation 0.00351179 0.06 -0.000971959
-  rotation 0.0012602096334339466 0.0022346393499947104 0.9999967091239128 0.00136247
+  translation 0.935424 0.07 0.0657684
+  rotation 0 1 0 -1.5707953071795862
   children [
     Compass {
       name "compass1"
@@ -55,6 +55,7 @@ Robot {
     Emitter {
     }
     DEF BODY Solid {
+      rotation 0 1 0 4.692820414042842e-06
       children [
         Shape {
           appearance PBRAppearance {
@@ -74,7 +75,7 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.074892064168798e-12
         axis 0 0 -1
-        anchor 0.04 -0.01 0.11
+        anchor 0.04 -0.02 0.11
       }
       device [
         RotationalMotor {
@@ -82,9 +83,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.04 -0.01 0.11
-        rotation -1 1.8344494257292592e-09 -1.834443282192552e-09 1.5708000008261545
-        scale 2 2 2
+        translation 0.04 -0.02 0.11
+        rotation 1 -6.112338096893731e-12 -6.112315645006495e-12 1.5707999999999982
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -92,7 +92,7 @@ Robot {
             }
             geometry Cylinder {
               height 0.01
-              radius 0.025
+              radius 0.05
             }
           }
         ]
@@ -106,7 +106,7 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.07847065672431e-12
         axis 0 0 -1
-        anchor 0.04 -0.01 -0.11
+        anchor 0.04 -0.02 -0.11
       }
       device [
         RotationalMotor {
@@ -114,9 +114,8 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation 0.04 -0.01 -0.11
-        rotation -1 2.5280509753282176e-10 -2.4872613481658937e-10 1.570799998166978
-        scale 2 2 2
+        translation 0.04 -0.02 -0.11
+        rotation -0.9999999999999999 6.117705986200253e-12 -6.117712223193079e-12 1.570795307179576
         children [
           USE WHEEL
         ]
@@ -127,14 +126,14 @@ Robot {
       }
     }
     DEF BEARING Solid {
-      translation -0.04 -0.035 0
+      translation -0.06 -0.035 0
       children [
         Shape {
           appearance PBRAppearance {
             baseColor 0.5 0.5 0.5
           }
           geometry DEF Ball_bearing Sphere {
-            radius 0.025
+            radius 0.035
           }
         }
       ]
@@ -153,6 +152,9 @@ Robot {
         RotationalMotor {
           name "right_claw"
         }
+        PositionSensor {
+          name "right_claw_sensor"
+        }
       ]
     }
     DEF LEFT_CLAW HingeJoint {
@@ -163,6 +165,9 @@ Robot {
       device [
         RotationalMotor {
           name "left_claw"
+        }
+        PositionSensor {
+          name "left_claw_sensor"
         }
       ]
     }
@@ -179,58 +184,7 @@ Robot {
           name "box_claw_sensor"
         }
       ]
-      endPoint Solid {
-        translation 6.73555664854053e-08 2.0206451874921205e-07 -5.551115123125783e-17
-        rotation 1.6052825474672984e-14 -5.044470105657846e-15 -1 2.2446906635345858e-06
-        children [
-          DEF BOX_CLAW Group {
-            children [
-              Transform {
-                translation 0.15 -0.03 -0.05
-                children [
-                  Shape {
-                    appearance PBRAppearance {
-                      baseColor 0.1 0.1 0.1
-                    }
-                    geometry Box {
-                      size 0.15 0.01 0.01
-                    }
-                  }
-                ]
-              }
-              Transform {
-                translation 0.15 -0.03 0.05
-                children [
-                  Shape {
-                    appearance PBRAppearance {
-                      baseColor 0.1 0.1 0.1
-                    }
-                    geometry Box {
-                      size 0.15 0.01 0.01
-                    }
-                  }
-                ]
-              }
-              Transform {
-                translation 0.23 -0.03 0
-                children [
-                  Shape {
-                    appearance PBRAppearance {
-                      baseColor 0.1 0.1 0.1
-                    }
-                    geometry Box {
-                      size 0.01 0.01 0.11
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-        boundingObject USE BOX_CLAW
-        physics Physics {
-          density 0.001
-        }
+      endPoint BOX_CLAW {
       }
     }
     DistanceSensor {
@@ -270,9 +224,13 @@ Robot {
       translation 0.11 -0.03 0
       name "IR Sensor"
     }
-    TEPT4400 {
-      translation 0.16 0.03 0
-      rotation 0 0 1 1.01503e-06
+    TEPT4400_RED {
+      translation 0.16 0.04 -0.005
+      rotation 0 0 1 -1.5707953071795862
+    }
+    TEPT4400_GREEN {
+      translation 0.16 0.04 0
+      rotation 0 0 1 -1.5707953071795862
     }
   ]
   physics Physics {
