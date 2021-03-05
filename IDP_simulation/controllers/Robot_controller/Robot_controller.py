@@ -112,9 +112,6 @@ def send_message(message):
     emitter.send(data)
     
     
-    
-    
-    
 def get_message():
     """
     gets the first message in receiver's queue and pops it from queue
@@ -458,8 +455,7 @@ def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2
     error = abs(desired - targetSensor1.getValue())
     accuracy = 1*np.pi/180
     previous = 100 #arbitrary value just serves as placeholder
-    count = 0
-    
+    count = 0    
     while error > accuracy:
         measurement = targetSensor1.getValue()
         targetClaw1.setPosition(desired)
@@ -474,6 +470,73 @@ def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2
         previous = measurement
         robot.step(TIME_STEP)
         
+def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
+    """function to make the dual-claw go from open to closed, detect colour of the block it holds in this process
+    return 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both
+    """
+
+    desired = -5*np.pi/180 #minus value will not be reached, break loop when count reaches 3
+    error = abs(desired - targetSensor1.getValue())
+    accuracy = 1*np.pi/180 #accuracy value in degrees
+    previous = 100 #arbitrary value just serves as placeholder
+    count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
+    red = False
+    green = False
+    detectLowerBound = 41 #(environment is 40),one reading above this value turns red or green to True
+    
+    while error > accuracy:
+        redValue = measureLight()[0]
+        greenValue = measureLight()[1]
+        if redValue > detectLowerBound:
+            red = True
+        if greenValue > detectLowerBound:
+            green = True
+        measurement = targetSensor1.getValue()
+        targetClaw1.setPosition(desired) #both claw move synchronously in different direction
+        targetClaw2.setPosition(-desired)
+        if abs(measurement - previous) < accuracy: #compare measurement from previous time frame to current, add 1 to count if same
+            count += 1
+        else:
+            count = 0
+            
+        if count >= 3:
+            break
+        previous = measurement 
+        robot.step(TIME_STEP)
+        error = abs(desired - targetSensor1.getValue())
+    
+    if red and not green:
+        print('red')
+        return 0
+    elif green and not red:
+        print('green')
+        return 1
+    elif not green and not red:
+        print('not detected')
+        return 2
+    if red and green:
+        print('bad result')
+        return 3
+        
+def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
+    """function to make the dual-claw go from closed to open
+    
+    """
+
+    desired = 40*np.pi/180 #arbitrary value
+    error = abs(desired - targetSensor1.getValue())
+    accuracy = 1*np.pi/180 #accuracy value in degrees
+    while error > accuracy:
+        measurement = targetSensor1.getValue()
+        targetClaw1.setPosition(desired) #both claw move synchronously in different direction
+        targetClaw2.setPosition(-desired)
+        robot.step(TIME_STEP)
+        error = abs(desired - targetSensor1.getValue())
+        
+
+def measureLight():
+    # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
+    return [lightsensorRed.getValue(),lightsensorGreen.getValue()]
 
 robot = Robot()
 
@@ -488,17 +551,20 @@ right_claw, right_claw_sensor = setup_claw('right_claw','right_claw_sensor')
 lightsensorRed = setup_lightsensor('TEPT4400_RED')
 lightsensorGreen = setup_lightsensor('TEPT4400_GREEN')
 
+
 robot.step(TIME_STEP)
-# set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
-# set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
-set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+withdraw_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
-PID_translation((0,0))
+PID_translation((0.3,0.7))
 
-set_dualclaw(-5,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+deploy_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+robot.step(TIME_STEP)
+withdraw_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
-PID_translation((0.3,0.3))
+PID_translation((0.3,0))
+deploy_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+
 
 print('end')
 while robot.step(TIME_STEP) != -1:
