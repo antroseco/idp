@@ -43,17 +43,27 @@ def setup_wheels():
     
     return left_wheel, right_wheel
 
-def setup_boxclaw(servoName,sensorName):
+def setup_claw(servoName,sensorName):
     """
-    sets up box claw servo and accompanying position sensor
+    sets up claw servo and accompanying position sensor
     input:name of the RotationalMotor that acts as servo, name of the PositionSensor accompanying that Servo
-    return: box_claw (type RotationalMotor), box_claw_sensor (type PositionSensor)
+    return: claw (type RotationalMotor), claw_sensor (type PositionSensor)
     """
-    box_claw = robot.getDevice(servoName)
-    box_claw.setPosition(0.0)
-    box_claw_sensor = robot.getDevice(sensorName)
-    box_claw_sensor.enable(TIME_STEP)
-    return box_claw, box_claw_sensor
+    claw = robot.getDevice(servoName)
+    claw.setPosition(0.0)
+    claw_sensor = robot.getDevice(sensorName)
+    claw_sensor.enable(TIME_STEP)
+    return claw, claw_sensor
+    
+def setup_lightsensor(sensorName):
+    """
+    sets up lightSensor
+    input:name of the LightSensor default TETP4400
+    return: lightSensor (type LightSensor)
+    """
+    lightSensor = robot.getDevice(sensorName)
+    lightSensor.enable(TIME_STEP)
+    return lightSensor
 
 def setup_communication():
     """
@@ -443,6 +453,28 @@ def withdraw_boxclaw():
 def deploy_boxclaw():
     set_claw(0,box_claw,box_claw_sensor)
 
+def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2):
+    desired = targetAngle*np.pi/180
+    error = abs(desired - targetSensor1.getValue())
+    accuracy = 1*np.pi/180
+    previous = 100 #arbitrary value just serves as placeholder
+    count = 0
+    
+    while error > accuracy:
+        measurement = targetSensor1.getValue()
+        targetClaw1.setPosition(desired)
+        targetClaw2.setPosition(-desired)
+        if abs(measurement - previous) < accuracy:
+            count += 1
+        else:
+            count = 0
+            
+        if count >= 3:
+            break
+        previous = measurement
+        robot.step(TIME_STEP)
+        
+
 robot = Robot()
 
 left_wheel, right_wheel = setup_wheels()
@@ -450,53 +482,25 @@ emitter, receiver = setup_communication()
 gps, compass, compass1 = setup_sensors()
 dsUltrasonic = setup_ultrasonic()
 infrared = setup_infrared()
-box_claw, box_claw_sensor = setup_boxclaw('box_claw','box_claw_sensor')
+box_claw, box_claw_sensor = setup_claw('box_claw','box_claw_sensor')
+left_claw, left_claw_sensor = setup_claw('left_claw','left_claw_sensor')
+right_claw, right_claw_sensor = setup_claw('right_claw','right_claw_sensor')
+lightsensorRed = setup_lightsensor('TEPT4400_RED')
+lightsensorGreen = setup_lightsensor('TEPT4400_GREEN')
 
-while robot.step(TIME_STEP) != -1:
-    
-    coord2 = (0.3,0.3)
-    
-    # #PID_rotation(coord2)
-   
-    # #PID_translation(coord2)
-    
-    boxes = sweep(0.8)
-    positions = box_position(boxes)
-    print(positions)
-    first_pass = True
-    
-    for i in range(3, positions.size):
-        if i!=2:
-            if first_pass == False:
-                for i in range(5 ):
-                    right_wheel.setVelocity(-6.0)
-                    left_wheel.setVelocity(-6.0)
-                    robot.step(TIME_STEP)
-            first_pass = False
-                
-        
-            withdraw_boxclaw()
-            PID_rotation(positions[i])
-            PID_translation(positions[i])
-            deploy_boxclaw()
-                        
-            
-            
-            
-            PID_rotation((0,0.4))
-            PID_translation((0,0.4))
-            
+robot.step(TIME_STEP)
+# set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
-            
-        
-    break
-    """
-    withdraw_boxclaw()
-    deploy_boxclaw()
-    PID_rotation(coord2)
-    PID_translation(coord2)
-    """
+# set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+set_dualclaw(30,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
+PID_translation((0,0))
 
+set_dualclaw(-5,left_claw,left_claw_sensor,right_claw,right_claw_sensor)
+
+PID_translation((0.3,0.3))
 
 print('end')
+while robot.step(TIME_STEP) != -1:
+    pass
+# print('end')
