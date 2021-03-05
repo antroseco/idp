@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.41957929318168546 -0.8244192380388328 -0.3798501503022314 1.8208406560289503
-  position 0.5389263464797691 0.6248315501665145 0.1888221669955893
+  orientation 0.6686992549940066 0.6846630946633431 0.2899616408707791 4.962793366184651
+  position 0.4256072444381827 0.6732149826368446 0.47455075927383117
 }
 Background {
   skyColor [
@@ -38,7 +38,7 @@ Floor {
   }
 }
 Robot {
-  translation 0.935424 0.07 0.0657684
+  translation 0.860141 0.07 0.00840846
   rotation 0 1 0 -1.5707953071795862
   children [
     Compass {
@@ -84,7 +84,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -6.112338096893731e-12 -6.112315645006495e-12 1.5707999999999982
+        rotation 1 -2.648679841773773e-11 -2.6486701126416355e-11 1.5707999999999982
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -115,7 +115,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 6.117705986200253e-12 -6.117712223193079e-12 1.570795307179576
+        rotation -0.9999999999999999 2.6510059269821814e-11 -2.6510086299181077e-11 1.570795307179576
         children [
           USE WHEEL
         ]
@@ -145,8 +145,8 @@ Robot {
     }
     DEF RIGHT_CLAW HingeJoint {
       jointParameters HingeJointParameters {
-        position -1.7767973758964217e-09
-        anchor 0.045 0 0.02
+        axis 0 1 0
+        anchor 0.09 0 0.03
       }
       device [
         RotationalMotor {
@@ -156,11 +156,14 @@ Robot {
           name "right_claw_sensor"
         }
       ]
+      endPoint SINGLE_CLAW {
+        translation 0.15499999999999997 -0.03500000092667645 0.02999999675663185
+      }
     }
     DEF LEFT_CLAW HingeJoint {
       jointParameters HingeJointParameters {
-        position -1.7767982640748414e-09
-        anchor 0.045 0 -0.02
+        axis 0 1 0
+        anchor 0.09 0 -0.03
       }
       device [
         RotationalMotor {
@@ -170,6 +173,9 @@ Robot {
           name "left_claw_sensor"
         }
       ]
+      endPoint SINGLE_CLAW {
+        translation 0.155 -0.035 -0.030000000062187938
+      }
     }
     DEF BOX_CLAW HingeJoint {
       jointParameters HingeJointParameters {
@@ -184,8 +190,6 @@ Robot {
           name "box_claw_sensor"
         }
       ]
-      endPoint BOX_CLAW {
-      }
     }
     DistanceSensor {
       translation 0.06 -0.005 0.01
@@ -270,7 +274,7 @@ target {
   name "target(1)"
 }
 target {
-  translation 0.8205 0.024975474519511525 0.4842
+  translation 0.8405 0.0249755 0.4842
   rotation 0.5276696975222741 0.3083589524073046 0.7915045462832297 1.6158807051378174e-17
   colour 0 1 0
   name "target(2)"
