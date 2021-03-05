@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.9973252924213274 0.07303684925544107 0.0028070888037174425 4.802843107028915
-  position 0.4104676531504651 2.3692959831326337 0.7271156719986724
+  orientation 0.20542612718352457 0.9517056362964949 0.22815890977970163 4.305055158998478
+  position -1.0780656047595478 1.3362748559853914 -0.36768036793282094
 }
 Background {
   skyColor [
@@ -38,7 +38,7 @@ Floor {
   }
 }
 Robot {
-  translation 0.823681 0.07 0.336023
+  translation 0.435605 0.07 0.155348
   rotation 0 1 0 -1.5707953071795862
   children [
     Compass {
@@ -84,7 +84,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -8.353528733623215e-11 -8.353498048933818e-11 1.5707999999999938
+        rotation 1 -1.548458984591863e-10 -1.5484532967427338e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -115,7 +115,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 8.360864845676159e-11 -8.360873370645718e-11 1.5707953071795449
+        rotation -0.9999999999999999 1.5498188494943736e-10 -1.549820429724177e-10 1.5707953071795449
         children [
           USE WHEEL
         ]
@@ -229,11 +229,11 @@ Robot {
       name "IR Sensor"
     }
     TEPT4400_RED {
-      translation 0.16 0.04 -0.005
+      translation 0.17 0.04 -0.005
       rotation 0 0 1 -1.5707953071795862
     }
     TEPT4400_GREEN {
-      translation 0.16 0.04 0
+      translation 0.17 0.04 0
       rotation 0 0 1 -1.5707953071795862
     }
   ]
@@ -252,6 +252,7 @@ target {
   name "target(8)"
 }
 target {
+  translation 0.342 0.025 0
   rotation -0.03896321197617513 0.9898912831673099 -0.13637124191660205 2.1883495730114342e-16
   name "target(7)"
 }
@@ -261,8 +262,8 @@ target {
   name "target(6)"
 }
 target {
-  translation 0.347039 0.0249755 0.812188
-  rotation 0.5132896048118902 0.06843372636024753 -0.8554826746863458 2.491725747762101e-17
+  translation 0.441663 0.0249755 0.783157
+  rotation -1.32079e-17 1 4.61716e-17 -0.523595307179586
   colour 0 1 0
   name "target(5)"
 }
@@ -273,7 +274,7 @@ target {
   name "target(1)"
 }
 target {
-  translation 0.297911 0.0249755 0.681503
+  translation 0.742444 0.025 0.79595
   rotation 0.5276696975222741 0.3083589524073046 0.7915045462832297 1.6158807051378174e-17
   colour 0 1 0
   name "target(2)"
