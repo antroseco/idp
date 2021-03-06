@@ -42,6 +42,29 @@ def bearing(compass_obj):
 
 
 
+def collision_prevention():
+    self_location = (gps.getValues()[0],gps.getValues()[2])
+    send_location()
+    other_location = get_location()
+    robot.step(TIME_STEP)
+    print(other_location,'other location')
+    print(self_location,'self location')
+    
+    if not other_location:
+        pass
+    else:
+        x = (self_location[0] - other_location[0])**2
+        z = (self_location[1] - other_location[1])**2
+        
+        distance = (x**2 + z**2)**0.5
+        print(distance)
+        threshold = 0.2
+        
+        if distance < threshold:
+            left_wheel.setVelocity(0)
+            right_wheel.setVelocity(0)
+            return 'stop'
+
 
 def PID_rotation(coord, final_error = 0.5):
 
