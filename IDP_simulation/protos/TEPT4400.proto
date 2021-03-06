@@ -54,12 +54,16 @@ PROTO TEPT4400 [
             filter = {r=1, g=1, b=1}
 
             if red_filter then
-                filter.g = filter.g * 0.1
-                filter.b = filter.b * 0.1
+                -- 106 Primary Red by LEE Filters
+                filter.r = filter.r * 0.75
+                filter.g = filter.g * 0.0001
+                filter.b = filter.b * 0.02
             end
 
             if green_filter then
-                filter.r = filter.r * 0.1
+                -- 139 Primary Green by LEE Filters
+                filter.r = filter.r * 0.001
+                filter.g = filter.g * 0.24
                 filter.b = filter.b * 0.1
             end
 
