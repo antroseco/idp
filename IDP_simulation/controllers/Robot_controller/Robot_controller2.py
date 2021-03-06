@@ -101,9 +101,10 @@ def send_message(message):
     data = message.encode('utf-8')
     emitter.send(data)
     
-
     
-
+    
+    
+    
 def get_message():
     """
     gets the first message in receiver's queue and pops it from queue
@@ -118,7 +119,7 @@ def get_message():
         return message
     
     return ""
-    
+
 
 
 def bearing1(compass_obj): 
@@ -149,45 +150,6 @@ def bearing(compass_obj):
         
     
     return  theta
-    
-    
-def send_location():
-    location = gps.getValues()
-    message = "{},{}".format(location[0],location[2])
-    send_message(message)
-    
-    
-def get_location():
-    message = get_message()
-    message = tuple(map(str, message.split(',')))  
-    try: 
-        message = [float(message[0]),float(message[1])]
-        return message  
-    except:
-        return []
-        
-        
-def collision_prevention():
-    self_location = (gps.getValues()[0],gps.getValues()[2])
-    send_location()
-    other_location = get_location()
-    robot.step(TIME_STEP)
-    
-    if not other_location:
-        pass
-    else:
-        x = (self_location[0] - other_location[0])**2
-        z = (self_location[1] - other_location[1])**2
-        
-        distance = (x**2 + z**2)**0.5
-        print(distance)
-        threshold = 0.2
-        
-        if distance < threshold:
-            left_wheel.setVelocity(0)
-            right_wheel.setVelocity(0)
-        
-                               
 
 
 
@@ -244,7 +206,6 @@ def PID_rotation(coord):
     while abs(error) > final_error:
         #print(required,'required')
         #print(error)
-        
         kP = 0.004
         kD = -11.0
         P = 6.28*kP*error
@@ -261,7 +222,6 @@ def PID_rotation(coord):
         right_wheel.setVelocity(v)
         previous_error = error
         error = required - bearing1(compass)
-        send_location()
         robot.step(TIME_STEP)
     
     return
@@ -291,9 +251,6 @@ def PID_translation(coord):
             left_wheel.setVelocity(v)
             right_wheel.setVelocity(v)
             
-            #collision_prevention()
-            
-            
         robot.step(TIME_STEP)
         x = (coord[0] - gps.getValues()[0])
         z = (coord[1] - gps.getValues()[2])
@@ -309,14 +266,7 @@ def PID_translation(coord):
         
     return
     
-                      
-        
-        
     
-
-
-    
-
     
     
 def get_wall_position(angle):
@@ -503,33 +453,7 @@ infrared = setup_infrared()
 box_claw, box_claw_sensor = setup_boxclaw('box_claw','box_claw_sensor')
 
 while robot.step(TIME_STEP) != -1:
-
-    coord = (0.0,0.0)
-    send_location()
-    
-    PID_rotation(coord)
-    PID_translation(coord)
-    
-    
-    """
-    try:
-        other_location = get_location()
-        x = (self_location[0] - other_location[0])**2
-        z = (self_location[1] - other_location[1])**2
-        distance = (x**2 + z**2)**0.5
-        #print(distance)
-    
-    
-        if distance < 0.2:
-            left_wheel.setVelocity(6)
-            right_wheel.setVelocity(6)
-    except:
-        pass
-        
-    send_location()
-    self_location = (gps.getValues()[0],gps.getValues()[2])
-    """
-    
+    print(get_message()
     
 
     
@@ -566,7 +490,7 @@ while robot.step(TIME_STEP) != -1:
 
             
         
-    #break
+    break
     """
     withdraw_boxclaw()
     deploy_boxclaw()
