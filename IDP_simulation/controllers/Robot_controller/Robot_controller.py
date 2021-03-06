@@ -42,6 +42,23 @@ def bearing(compass_obj):
 
 
 
+def send_location():
+    location = gps.getValues()
+    message = "{},{}".format(location[0],location[2])
+    send_message(message)
+    
+    
+def get_location():
+    message = get_message()
+    message = tuple(map(str, message.split(',')))  
+    try: 
+        message = [float(message[0]),float(message[1])]
+        return message  
+    except:
+        return []
+
+
+
 def collision_prevention():
     self_location = (gps.getValues()[0],gps.getValues()[2])
     send_location()
