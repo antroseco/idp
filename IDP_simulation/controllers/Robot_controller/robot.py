@@ -30,11 +30,11 @@ class Robot:
     
     def __init__(self, robot: controller.Robot, colour = 'red'):
         """
-        initialize robot and its components, colour can be blue or red
+        initialize robot and its components, colour can be green or red
         
         """
         self._robot = robot
-        self.colour = colour #blue or green
+        self.colour = colour
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -115,8 +115,25 @@ class Robot:
         # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
         return [self.lightsensorRed.getValue(), self.lightsensorGreen.getValue()]
 
-
-
+    
+    def field_position(self):
+        """
+        returns x, z coordinates of a field where the boxes should be put
+        field is by default a 0.4x0.4 square and x, z marks the centre of the square
+        """
+        if self.colour == 'red':
+            return (0, 0.4)
+        return (0, -0.4)
+        
+        
+    def return_box_positions(self):
+        """
+        returns a set of 4 locations in a red/green field to put the boxes 
+        """
+        x = self.field_position()[0]
+        z = self.field_position()[1]
+        
+        return [(x - 0.15, z - 0.15), (x - 0.15, z + 0.15), (x + 0.15, z + 0.15), (x + 0.15, z - 0.15)]
 
         
 

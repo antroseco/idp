@@ -325,13 +325,15 @@ def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
 
 
 
-robot = Robot(controller.Robot())
+robot = Robot(controller.Robot(), 'red')
 
 robot.step(TIME_STEP)
 
 positions = sweep(0.6)
 print(positions)
 
+final_positions = robot.return_box_positions()
+i = 0
 for pos in positions:
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
@@ -340,25 +342,20 @@ for pos in positions:
     deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
     robot.step(TIME_STEP)
-    PID_translation((0.9, -0.9))
+    PID_translation(final_positions[i])
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    i+=1
     
+    robot.left_wheel.setVelocity(-5)
+    robot.right_wheel.setVelocity(-5)
+    #reverse a little bit
+    for j in range(30):
+        robot.step(TIME_STEP)
+    robot.left_wheel.setVelocity(0)
+    robot.right_wheel.setVelocity(0)
     robot.step(TIME_STEP)
-    PID_translation((0, 0))
-    
 
-    
 
-#withdraw_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
-
-#PID_translation((0.3,0.7))
-
-#deploy_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
-#robot.step(TIME_STEP)
-#withdraw_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
-
-#PID_translation((0.3,0))
-#deploy_dualclaw(left_claw,left_claw_sensor,right_claw,right_claw_sensor)
 
 
 while robot.step(TIME_STEP) != -1:

@@ -83,7 +83,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -1.8133269687628364e-10 -1.8133203080010645e-10 1.5707999999999938
+        rotation 1 -2.9950456673717975e-10 -2.995034665922845e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -114,7 +114,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 1.8149194421814554e-10 -1.8149212927120313e-10 1.5707953071795449
+        rotation -0.9999999999999999 2.9976759326315235e-10 -2.997678989119388e-10 1.5707953071795449
         children [
           USE WHEEL
         ]
@@ -241,7 +241,7 @@ Robot {
   controller "Robot_controller"
 }
 target {
-  translation -0.639 0.02497547451951153 0.42
+  translation -0.639 0.0249755 0.21
   rotation -0.0757765602233323 0.6481120312050156 -0.7577656022333216 -5.626088597840589e-17
   name "target(9)"
 }
@@ -261,7 +261,7 @@ target {
   name "target(6)"
 }
 target {
-  translation 0.11881 0.0249755 0.862344
+  translation 1.29866 0.0249755 1.35878
   rotation -1.32079e-17 1 4.61716e-17 -0.523595307179586
   colour 0 1 0
   name "target(5)"
