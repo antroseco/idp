@@ -22,7 +22,7 @@ PROTO TEPT4400 [
         model "Vishay Semiconductors TEPT4400"
         description "Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached"
         children [
-            DEF LIGHTSENSOR_GEOMETRY Transform {
+            Transform {
                 translation -0.004 0 0
                 rotation 0 0 1 -1.5708
                 children [
@@ -41,7 +41,6 @@ PROTO TEPT4400 [
                 ]
           }
         ]
-        boundingObject USE LIGHTSENSOR_GEOMETRY
         lookupTable [
             0.1 10  0 #  10 lux at I = 0.1
             1   100 0 # 100 lux at I = 1.0
