@@ -39,29 +39,16 @@ def bearing(compass_obj):
         
     
     return  theta
-    
-    
-def send_location():
-    location = gps.getValues()
-    message = "{},{}".format(location[0],location[2])
-    send_message(message)
-    
-    
-def get_location():
-    message = get_message()
-    message = tuple(map(str, message.split(',')))  
-    try: 
-        message = [float(message[0]),float(message[1])]
-        return message  
-    except:
-        return []
-        
-        
+
+
+
 def collision_prevention():
     self_location = (gps.getValues()[0],gps.getValues()[2])
     send_location()
     other_location = get_location()
     robot.step(TIME_STEP)
+    print(other_location,'other location')
+    print(self_location,'self location')
     
     if not other_location:
         pass
@@ -76,16 +63,11 @@ def collision_prevention():
         if distance < threshold:
             left_wheel.setVelocity(0)
             right_wheel.setVelocity(0)
-        
-                               
+            return 'stop'
 
 
+def PID_rotation(coord, final_error = 0.5):
 
-
-def PID_rotation(coord):
-    
-    
-    
     for i in range(2):
         location = robot.gps.getValues()
         required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
@@ -118,20 +100,17 @@ def PID_rotation(coord):
         #print('Q4')
 
     error = required - bearing1(robot.compass)
-
-    previous_error = error
     
-    final_error = 0.5
+    previous_error = error
+
  
     while abs(error) > final_error:
         #print(required,'required')
         #print(error)
-        
-        kP = 0.004
+        kP = 0.003
         kD = -11.0
         P = 6.28*kP*error
         D = (error-previous_error)/(100.0)*kD
-        
         
         v = P + D 
         if v > 6.0:
@@ -141,10 +120,11 @@ def PID_rotation(coord):
     
         robot.left_wheel.setVelocity(-v)
         robot.right_wheel.setVelocity(v)
+        
         previous_error = error
         error = required - bearing1(robot.compass)
+        
         robot.step(TIME_STEP)
-    
     return
 
 
@@ -152,10 +132,8 @@ def PID_rotation(coord):
 
 
 
-def PID_translation(coord):
+def PID_translation(coord, final_error = 0.15):
     error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
-    
-    final_error = 0.15
     
     while abs(error) > final_error or math.isnan(error):
         if math.isnan(error) :
@@ -167,13 +145,8 @@ def PID_translation(coord):
             if v > 6.28:
                 v = 6.28
                 
-                
-            
             robot.left_wheel.setVelocity(v)
             robot.right_wheel.setVelocity(v)
-            
-            #collision_prevention()
-            
             
         robot.step(TIME_STEP)
         x = (coord[0] - robot.gps.getValues()[0])
@@ -186,12 +159,10 @@ def PID_translation(coord):
             PID_rotation(coord)
         
     robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)    
+    robot.right_wheel.setVelocity(0) 
         
     return
-    
-    
-    
+  
 
 def sweep(velocity = 0.5):
     """
@@ -210,7 +181,7 @@ def sweep(velocity = 0.5):
     #sweep 360 degrees    
     swept_angle = 0
     
-    while swept_angle < 350:
+    while swept_angle < 355:
         
         robot.right_wheel.setVelocity(velocity)
         robot.left_wheel.setVelocity(-velocity)
@@ -365,28 +336,14 @@ def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
         error = abs(desired - targetSensor1.getValue())
         
 
-
-
-robot = Robot(controller.Robot(), 'red')
-
-robot.step(TIME_STEP)
-
-positions = sweep(0.6)
-print(positions)
-
-final_positions = robot.return_box_positions()
-i = 0
-for pos in positions:
+def return_box_field(coord):
+    intermediate, final = robot.field.get_to_field(coord)
     
+    PID_rotation(intermediate)
+    PID_translation(intermediate)
+    PID_rotation(final)
+    PID_translation(final)
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    
-    PID_translation(pos)
-    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    
-    robot.step(TIME_STEP)
-    PID_translation(final_positions[i])
-    withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    i+=1
     
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
@@ -396,10 +353,30 @@ for pos in positions:
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
     robot.step(TIME_STEP)
+    return 
+
+
+
+robot = Robot(controller.Robot(), 'green')
+
+robot.step(TIME_STEP)
+
+
+positions = sweep(0.6)
+print(positions)
+
+for pos in positions:
+    
+    withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    
+    PID_rotation(pos)
+    PID_translation(pos)
+    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+
+    robot.step(TIME_STEP)
+    return_box_field(robot.gps.getValues())
 
 
 
 
-while robot.step(TIME_STEP) != -1:
-    pass
-print('end')
+

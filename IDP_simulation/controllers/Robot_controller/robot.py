@@ -1,4 +1,5 @@
 import controller
+from field import Field
 import numpy as np
 
 
@@ -35,6 +36,7 @@ class Robot:
         """
         self._robot = robot
         self.colour = colour
+        self.field = Field(colour)
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -126,15 +128,12 @@ class Robot:
         return (0, -0.4)
         
         
-    def return_box_positions(self):
+    def return_box_to_field(self, coord):
         """
         returns a set of 4 locations in a red/green field to put the boxes 
+        input 3d coordinates of robot
         """
-        x = self.field_position()[0]
-        z = self.field_position()[1]
-        
-        return [(x - 0.15, z - 0.15), (x - 0.15, z + 0.15), (x + 0.15, z + 0.15), (x + 0.15, z - 0.15)]
-
-        
+        intermediate, final = self.field.get_to_field(coord)
+        return intermediate, final
 
 
