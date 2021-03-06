@@ -1,0 +1,25 @@
+PROTO SINGLE_CLAW [
+    field   SFVec3f     translation 0 0 0
+    field   SFRotation  rotation    0 1 0 0
+#	field   SFNode      size        0.15 0.02 0.01
+]
+{
+      Solid {
+        translation IS translation
+		rotation IS rotation
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0 0 0
+            }
+            geometry DEF SINGLE_CLAW Box {
+              size 0.15 0.02 0.01
+            }
+          }
+        ]
+        name "single_claw"
+        boundingObject USE SINGLE_CLAW
+        physics Physics {
+        }
+      }
+}
