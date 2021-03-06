@@ -5,6 +5,7 @@ from searchCalculations import *
 import numpy as np
 import math
 import time
+import hardware
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
@@ -288,27 +289,36 @@ def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2
         previous = measurement
         robot.step(TIME_STEP)
     
+def measureLight(lightSensor):
+    """ Function to return voltage values based on the sensors input, use the filters for TEPT4400 as the ones in proto
+    
+    """
+    circuit = hardware.PhototransistorCircuit(robot.lightSensor)
+    analogue_input = hardware.ADCInput(lambda:circuit.voltage())
+    return analogue_input.read()
+    
         
 def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
     """function to make the dual-claw go from open to closed, detect colour of the block it holds in this process
     return 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both
     """
 
-    desired = -5*np.pi/180 #minus value will not be reached, break loop when count reaches 3
+    desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
     error = abs(desired - targetSensor1.getValue())
     accuracy = 1*np.pi/180 #accuracy value in degrees
     previous = 100 #arbitrary value just serves as placeholder
     count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
     red = False
     green = False
-    detectLowerBound = 41 #(environment is 40),one reading above this value turns red or green to True
+    redLowerBound = 500 #(environment is 470),one reading above this value turns red to True
+    greenLowerBound = 220 # (environment is 210), Value obtained by experiment, and is arbitrary
     
     while error > accuracy:
-        redValue = robot.measureLight()[0]
-        greenValue = robot.measureLight()[1]
-        if redValue > detectLowerBound:
+        redValue = robot.red_analogue.read()
+        greenValue = robot.green_analogue.read()
+        if redValue > redLowerBound:
             red = True
-        if greenValue > detectLowerBound:
+        if greenValue > greenLowerBound:
             green = True
         measurement = targetSensor1.getValue()
         targetClaw1.setPosition(desired) #both claw move synchronously in different direction
@@ -373,7 +383,6 @@ def return_box_field(coord):
     return 
 
 
-
 robot = Robot(controller.Robot(), 'green')
 
 robot.step(TIME_STEP)
@@ -381,15 +390,16 @@ robot.step(TIME_STEP)
 
 positions = sweep(0.6)
 print(positions)
-
+    
+    
 for pos in positions:
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
     PID_rotation(pos)
     PID_translation(pos)
-    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-
+    a = deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    print(a)
     robot.step(TIME_STEP)
     return_box_field(robot.gps.getValues())
 

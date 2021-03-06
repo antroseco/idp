@@ -1,7 +1,7 @@
 import controller
 from field import Field
 import numpy as np
-
+import hardware
 
 class Robot:
     
@@ -81,6 +81,8 @@ class Robot:
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setPosition(float('inf'))
         self.right_wheel.setVelocity(0.0)
+        self.green_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
+        self.red_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
     
     def step(self, TIME_STEP):
         self._robot.step(TIME_STEP)
