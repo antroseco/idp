@@ -224,7 +224,7 @@ Robot {
       aperture 0.5236
       resolution 0.003
     }
-    SharpGP2Y0A02YK0F {
+    IRSensor {
       translation 0.11 -0.03 0
       name "IR Sensor"
     }
