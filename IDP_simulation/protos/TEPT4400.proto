@@ -64,8 +64,6 @@ PROTO TEPT4400 [
             end
 
             filter_string = filter.r .. " " .. filter.g .. " " .. filter.b
-
-            print(filter_string)
         }%
         colorFilter %{=filter_string}%
         occlusion TRUE
