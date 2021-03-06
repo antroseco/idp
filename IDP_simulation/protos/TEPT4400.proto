@@ -10,7 +10,7 @@
 PROTO TEPT4400 [
     field   SFVec3f     translation     0 0 0
     field   SFRotation  rotation        0 1 0 0
-    field   SFString    name            "TETP4400"
+    field   SFString    name            "TEPT4400"
     field   SFBool      red_filter      FALSE
     field   SFBool      green_filter    FALSE
 ]
