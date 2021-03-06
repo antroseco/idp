@@ -51,6 +51,10 @@ PROTO TEPT4400 [
             red_filter = fields.red_filter.value
             green_filter = fields.green_filter.value
 
+            if red_filter and green_filter then
+                io.stderr:write("Both colour filters have been applied. Are you sure about this?")
+            end
+
             filter = {r=1, g=1, b=1}
 
             if red_filter then
