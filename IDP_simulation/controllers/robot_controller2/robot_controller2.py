@@ -500,10 +500,10 @@ infrared = setup_infrared()
 box_claw, box_claw_sensor = setup_boxclaw('box_claw','box_claw_sensor')
 
 while robot.step(TIME_STEP) != -1:
-    coord = (1.0,0.4)
+    #coord = (1.0,0.4)
     
-    PID_rotation(coord)
-    PID_translation(coord)
+    #PID_rotation(coord)
+    #PID_translation(coord)
     
     break
     
