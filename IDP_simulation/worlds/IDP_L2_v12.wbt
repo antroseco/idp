@@ -80,11 +80,13 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -3.7285262389221886e-10 -3.728512543253611e-10 1.5707999999999938
+        rotation 1 -3.789649619884721e-10 -3.789635699697842e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -111,11 +113,13 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 3.7318006508419125e-10 -3.731804455854994e-10 1.5707953071795442
+        rotation -0.9999999999999999 3.792977710692778e-10 -3.792981578082961e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -226,7 +230,6 @@ Robot {
     }
     IRSensor {
       translation 0.11 -0.03 0
-      name "IR Sensor"
     }
     TEPT4400 {
       translation 0.155 0.03 0.005
