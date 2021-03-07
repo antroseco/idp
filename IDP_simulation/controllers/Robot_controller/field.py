@@ -16,15 +16,15 @@ class Field:
         
         if colour == 'green':
             self.y = -0.4
-            self.box_positions.append((self.x + 0.15, self.y + 0.05))
-            self.box_positions.append((self.x + 0.15, self.y + 0.15))
-            self.box_positions.append((self.x - 0.15, self.y + 0.05))
-            self.box_positions.append((self.x - 0.15, self.y + 0.15))
+            self.box_positions.append((self.x + 0.1, self.y ))
+            self.box_positions.append((self.x + 0.1, self.y + 0.2))
+            self.box_positions.append((self.x - 0.1, self.y))
+            self.box_positions.append((self.x - 0.1, self.y + 0.2))
         else:#box red
-            self.box_positions.append((self.x + 0.15, self.y - 0.05))
-            self.box_positions.append((self.x + 0.15, self.y - 0.15))
-            self.box_positions.append((self.x - 0.15, self.y - 0.05))
-            self.box_positions.append((self.x - 0.15, self.y - 0.15))
+            self.box_positions.append((self.x + 0.1, self.y))
+            self.box_positions.append((self.x + 0.1, self.y - 0.2))
+            self.box_positions.append((self.x - 0.1, self.y))
+            self.box_positions.append((self.x - 0.1, self.y - 0.2))
             
         self.box_positions = np.array(self.box_positions)
          
@@ -47,16 +47,10 @@ class Field:
                 min_index = i
         
         pos = self.box_positions[min_index]
-        print(self.box_positions)
-        print('***')
-
-
-        
+     
         #remove this place from array, it becomes unavailable
         self.box_positions = np.delete(self.box_positions, min_index, axis=0)        
-        
-        print(self.box_positions)
-        print('***')
+
         return pos        
         
             
@@ -70,9 +64,9 @@ class Field:
         
         #if x value is positive
         if final_pos[0] > 0:
-            intermediate_pos = (self.x + self.sizex / 2 + 0.1, final_pos[1])
+            intermediate_pos = (self.x + self.sizex / 2 + 0.2, final_pos[1])
         else:
-            intermediate_pos = (self.x - self.sizex / 2 - 0.1, final_pos[1])
+            intermediate_pos = (self.x - self.sizex / 2 - 0.2, final_pos[1])
             
         return intermediate_pos, final_pos
 

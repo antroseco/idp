@@ -5,6 +5,7 @@ from searchCalculations import *
 import numpy as np
 import math
 import time
+import hardware
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
@@ -16,6 +17,7 @@ def bearing1(compass_obj):
     This gives a bearing -180,180
     input: compass object(type Compass)
     """
+    
     theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
     theta = (theta-(np.pi /2.0) )*180.0/np.pi
     if theta < -180:
@@ -39,6 +41,24 @@ def bearing(compass_obj):
         
     
     return  theta
+
+
+def send_location():
+    location = gps.getValues()
+    message = "{},{}".format(location[0],location[2])
+    send_message(message)
+    
+    
+def get_location():
+    message = get_message()
+    message = tuple(map(str, message.split(',')))  
+    try: 
+        message = [float(message[0]),float(message[1])]
+        return message  
+    except:
+        return []
+
+
 
 
 
@@ -66,8 +86,13 @@ def collision_prevention():
             return 'stop'
 
 
-def PID_rotation(coord, final_error = 0.5):
 
+
+def required_bearing(coord):
+    """
+    helper function for PID_rotation
+    returns a bearing angle to turn to
+    """
     for i in range(2):
         location = robot.gps.getValues()
         required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
@@ -98,6 +123,12 @@ def PID_rotation(coord, final_error = 0.5):
         required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
         required = required *180.0/np.pi 
         #print('Q4')
+    return required    
+    
+    
+    
+
+def PID_rotation(required, final_error = 0.5):
 
     error = required - bearing1(robot.compass)
     
@@ -126,9 +157,36 @@ def PID_rotation(coord, final_error = 0.5):
         
         robot.step(TIME_STEP)
     return
+    
 
 
-
+def PID_translation_reverse(coord, final_error = 0.05):
+    error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
+    
+    while abs(error) > final_error or math.isnan(error):
+        if math.isnan(error) :
+            pass
+            
+        else:
+        
+            v = error*6.28*10
+            if v > 6.28:
+                v = 6.28
+                
+            robot.left_wheel.setVelocity(-v)
+            robot.right_wheel.setVelocity(-v)
+            
+        robot.step(TIME_STEP)
+        x = (coord[0] - robot.gps.getValues()[0])
+        z = (coord[1] - robot.gps.getValues()[2])
+        
+        previous_error = error
+        error = (x**2 + z**2)**0.5
+        
+    robot.left_wheel.setVelocity(0)
+    robot.right_wheel.setVelocity(0) 
+        
+    return
 
 
 
@@ -162,7 +220,23 @@ def PID_translation(coord, final_error = 0.15):
     robot.right_wheel.setVelocity(0) 
         
     return
+
+
   
+
+def move(coord):
+    """
+    move to location coord
+    """
+    required_angle = required_bearing(coord)
+    PID_rotation(required_angle)
+    PID_translation(coord)
+    return
+    
+    
+    
+    
+    
 
 def sweep(velocity = 0.5):
     """
@@ -196,9 +270,11 @@ def sweep(velocity = 0.5):
         #wall_dist is decreased by robot-sensor distance
         wall_dist -= 0.11
         
-          
+
+        #get quantized infrared level and convert to volts
+        infrared_volts = robot.infrared_analogue.read() * robot.infrared_vref / 1023
         #get infrared reading and convert to meters
-        infrared_dist = 0.7611 * math.pow(robot.infrared.getValue(), -0.9313) - 0.1252
+        infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
  
         
         #print(infrared_dist, wall_dist)
@@ -271,27 +347,39 @@ def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2
         previous = measurement
         robot.step(TIME_STEP)
     
+    
+    
+    
+def measureLight(lightSensor):
+    """ Function to return voltage values based on the sensors input, use the filters for TEPT4400 as the ones in proto
+    
+    """
+    circuit = hardware.PhototransistorCircuit(robot.lightSensor)
+    analogue_input = hardware.ADCInput(lambda:circuit.voltage())
+    return analogue_input.read()
+    
         
 def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
     """function to make the dual-claw go from open to closed, detect colour of the block it holds in this process
     return 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both
     """
 
-    desired = -5*np.pi/180 #minus value will not be reached, break loop when count reaches 3
+    desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
     error = abs(desired - targetSensor1.getValue())
     accuracy = 1*np.pi/180 #accuracy value in degrees
     previous = 100 #arbitrary value just serves as placeholder
     count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
     red = False
     green = False
-    detectLowerBound = 41 #(environment is 40),one reading above this value turns red or green to True
+    redLowerBound = 500 #(environment is 470),one reading above this value turns red to True
+    greenLowerBound = 220 # (environment is 210), Value obtained by experiment, and is arbitrary
     
     while error > accuracy:
-        redValue = robot.measureLight()[0]
-        greenValue = robot.measureLight()[1]
-        if redValue > detectLowerBound:
+        redValue = robot.red_analogue.read()
+        greenValue = robot.green_analogue.read()
+        if redValue > redLowerBound:
             red = True
-        if greenValue > detectLowerBound:
+        if greenValue > greenLowerBound:
             green = True
         measurement = targetSensor1.getValue()
         targetClaw1.setPosition(desired) #both claw move synchronously in different direction
@@ -320,6 +408,9 @@ def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
         print('bad result')
         return 3
         
+        
+        
+        
 def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
     """function to make the dual-claw go from closed to open
     
@@ -337,14 +428,19 @@ def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
         
 
 def return_box_field(coord):
+    """
+    function that makes robot return a box in the specified field without it clashing with
+    other boxes that are already in the field
+    input 3D coordinates of the robot
+    """
+    
     intermediate, final = robot.field.get_to_field(coord)
+
+    move(intermediate)
+    move(final)
     
-    PID_rotation(intermediate)
-    PID_translation(intermediate)
-    PID_rotation(final)
-    PID_translation(final)
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    
+
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
     #reverse a little bit
@@ -357,26 +453,60 @@ def return_box_field(coord):
 
 
 
-robot = Robot(controller.Robot(), 'green')
+
+def finish_in_field():
+    """
+    for the ending of the task, robot goes and stays in its field 
+    """
+    
+    if robot.colour == 'red':
+        intermediate = (0, 1)
+        final = (0, 0.4)
+    else:
+        intermediate = (0, -1)
+        final = (0, -0.4)
+        
+    move(intermediate)
+    
+    if robot.colour == 'red':
+        PID_rotation(180)
+    else:
+        PID_rotation(0)
+        
+       
+    PID_translation_reverse(final)
+    
+    return
+    
+    
+    
+    
+
+#This part is executed
+
+robot = Robot(controller.Robot(), 'red')
 
 robot.step(TIME_STEP)
 
 
 positions = sweep(0.6)
 print(positions)
-
+    
+    
 for pos in positions:
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
-    PID_rotation(pos)
-    PID_translation(pos)
+    move(pos)
+
     deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+
 
     robot.step(TIME_STEP)
     return_box_field(robot.gps.getValues())
+    
 
-
-
+robot.step(TIME_STEP)
+finish_in_field()
 
 

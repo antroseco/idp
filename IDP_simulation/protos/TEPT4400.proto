@@ -1,15 +1,18 @@
 #VRML_SIM R2021a utf8
 # documentation url: https://www.vishay.com/docs/81341/tept4400.pdf
-# Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached.
+# tags: static
+# Vishay Semiconductors TEPT4400 ambient light sensor with an optional colour filter attached.
 # Assumes an Intensity of 1 in Webots is 100 lux.
 # Output is illuminance in lux.
 # Only the 10 to 100 lux range has been implemented.
 # Photon and phonon noise is negligible.
 
 PROTO TEPT4400 [
-    field   SFVec3f     translation 0 0 0
-    field   SFRotation  rotation    0 1 0 0
-    field   SFString    name        "TETP4400"
+    field   SFVec3f     translation     0 0 0
+    field   SFRotation  rotation        0 1 0 0
+    field   SFString    name            "TEPT4400"
+    field   SFBool      red_filter      FALSE
+    field   SFBool      green_filter    FALSE
 ]
 {
     LightSensor {
@@ -19,7 +22,7 @@ PROTO TEPT4400 [
         model "Vishay Semiconductors TEPT4400"
         description "Vishay Semiconductors TEPT4400 ambient light sensor with a red filter attached"
         children [
-            DEF LIGHTSENSOR_GEOMETRY Transform {
+            Transform {
                 translation -0.004 0 0
                 rotation 0 0 1 -1.5708
                 children [
@@ -38,12 +41,38 @@ PROTO TEPT4400 [
                 ]
           }
         ]
-        boundingObject USE LIGHTSENSOR_GEOMETRY
         lookupTable [
             0.1 10  0 #  10 lux at I = 0.1
             1   100 0 # 100 lux at I = 1.0
         ]
-        colorFilter 1 0.1 0.1
+        %{
+            -- Generate colorFilter value
+            red_filter = fields.red_filter.value
+            green_filter = fields.green_filter.value
+
+            if red_filter and green_filter then
+                io.stderr:write("Both colour filters have been applied. Are you sure about this?")
+            end
+
+            filter = {r=1, g=1, b=1}
+
+            if red_filter then
+                -- 106 Primary Red by LEE Filters
+                filter.r = filter.r * 0.75
+                filter.g = filter.g * 0.0001
+                filter.b = filter.b * 0.02
+            end
+
+            if green_filter then
+                -- 139 Primary Green by LEE Filters
+                filter.r = filter.r * 0.001
+                filter.g = filter.g * 0.24
+                filter.b = filter.b * 0.1
+            end
+
+            filter_string = filter.r .. " " .. filter.g .. " " .. filter.b
+        }%
+        colorFilter %{=filter_string}%
         occlusion TRUE
     }
 }

@@ -1,7 +1,7 @@
 import controller
 from field import Field
 import numpy as np
-
+import hardware
 
 class Robot:
     
@@ -37,6 +37,7 @@ class Robot:
         self._robot = robot
         self.colour = colour
         self.field = Field(colour)
+        self.infrared_vref = 4.3
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -81,7 +82,10 @@ class Robot:
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setPosition(float('inf'))
         self.right_wheel.setVelocity(0.0)
-    
+        self.green_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
+        self.red_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
+        self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
+
     def step(self, TIME_STEP):
         self._robot.step(TIME_STEP)
     
