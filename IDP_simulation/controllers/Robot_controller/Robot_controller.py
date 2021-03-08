@@ -503,8 +503,8 @@ def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
     count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
     red = False
     green = False
-    redLowerBound = 500 #(environment is 470),one reading above this value turns red to True
-    greenLowerBound = 220 # (environment is 210), Value obtained by experiment, and is arbitrary
+    redLowerBound = 948 # (environment is 930),one reading above this value turns red to True
+    greenLowerBound = 436 # (environment is 418), values are about 0.5 lux above ambient
     
     while error > accuracy:
         redValue = robot.red_analogue.read()

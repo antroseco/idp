@@ -96,15 +96,17 @@ class DigitalInput:
 
 class PhototransistorCircuit:
     def __init__(self, device):
-        """Simulates the circuit connected to the TEPT4400 (i.e. a 5 kΩ resistor connected to the Collector).
-        Outputs ~400 mV at 40 lux so the internal 550 mV ADC Vref is recommended.
+        """Simulates the circuit connected to the TEPT4400 (i.e. a 10 kΩ resistor connected to the Collector).
+        Outputs ~500 mV at 26 lux so the internal 550 mV ADC Vref is recommended.
+        Red   filter --> ~25 lux (ambient)
+        Green filter --> ~11 lux (ambient)
 
         Args:
             device (Webots Device handle): TEPT4400 device, make sure it has been enabled!
         """
         # TODO: type checking
         self.device = device
-        self.r_load = 5000  # 5 kΩ load resistor
+        self.r_load = 10000  # 10 kΩ load resistor
 
     def current(self) -> float:
         """Returns the output current
