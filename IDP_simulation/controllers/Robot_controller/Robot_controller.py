@@ -70,6 +70,31 @@ def collision_prevention():
             return 'stop'
 
 
+def field_collision(coord):
+    location = robot.gps.getValues()
+    location = (location[0],location[2])
+    
+    m = (coord[1] - location[1])/(coord[0]-location[0])
+    c = coord[1] - m*coord[0]
+    print(m)
+    print(c)
+   #c1 = location[1] - m*location[0]
+    x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
+    z = m*x + c
+    z1 = [i for i in z if i > -0.6]
+    z2 = [i for i in z1 if i < -0.2]
+    x1 = [i for i in x if i > -0.2]
+    x2 = [i for i in x1 if i < 0.2]
+
+    print(z2)
+    if z2 and x2:
+        print(coord)
+        print(location)
+        return 'will collide with field'
+    else:
+        return 'no collision'
+   
+
 
 
 def required_bearing(coord):
@@ -213,6 +238,7 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
     """
     move to location coord
     """
+
     required_angle = required_bearing(coord)
     PID_rotation(required_angle, error_rotation)
     PID_translation(coord, error_translation)
@@ -471,7 +497,10 @@ def finish_in_field():
     
     return
     
-    
+ 
+
+
+
     
     
 
@@ -485,6 +514,26 @@ else:
 
 
 robot.step(TIME_STEP)
+"""
+coord1 = (0.5,-.4)
+
+PID_rotation(required_bearing(coord1))
+PID_translation(coord1)
+
+coord1 = (0.5,-.4)
+
+
+print(bearing1(robot.compass))
+print(robot.gps.getValues())
+
+PID_rotation(180)
+
+for i in range(50):
+    robot.left_wheel.setVelocity(3.0)
+    robot.right_wheel.setVelocity(5.0)
+    
+    robot.step(TIME_STEP)
+"""
 
 
 positions = sweep(0.6)
