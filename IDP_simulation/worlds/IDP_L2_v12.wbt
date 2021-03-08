@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.185430204438424 0.8075786493764995 0.5598503053077251 3.5523956960880305
-  position -0.6177397805717222 4.831248019765118 -1.8298530111088671
+  orientation 0.1688785641991959 0.8430806218853387 0.5105830936835343 3.5629672947355897
+  position -0.43093968402410976 2.3599893045006213 -1.3627655685860107
 }
 Background {
   skyColor [
@@ -80,13 +80,13 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.3038
+          maxVelocity 2.93
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -5.297359683627197e-10 -5.297340225322213e-10 1.5707999999999938
+        rotation 1 -5.317734143948041e-10 -5.317714610803624e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -113,13 +113,13 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.3038
+          maxVelocity 2.93
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 5.302011853680818e-10 -5.302017259706169e-10 1.5707953071795442
+        rotation -0.9999999999999999 5.32240420696444e-10 -5.322409633782158e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -292,13 +292,13 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.3038
+          maxVelocity 2.93
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -5.297358868252895e-10 -5.297343127629627e-10 1.5707999999999942
+        rotation 1 -5.317733328573739e-10 -5.317717513111038e-10 1.5707999999999942
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -325,13 +325,13 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.3038
+          maxVelocity 2.93
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 5.302011632222534e-10 -5.302017204119718e-10 1.5707953071795426
+        rotation -0.9999999999999999 5.322403985506156e-10 -5.322409578195708e-10 1.5707953071795426
         children [
           USE WHEEL
         ]
