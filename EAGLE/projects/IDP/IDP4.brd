@@ -632,6 +632,34 @@ type 0204, grid 2.5 mm</description>
 <text x="1.905" y="0.381" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="1.905" y="-1.651" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 </package>
+<package name="0204/7" urn="urn:adsk.eagle:footprint:22998/1" locally_modified="yes">
+<description>&lt;b&gt;RESISTOR&lt;/b&gt;&lt;p&gt;
+type 0204, grid 7.5 mm</description>
+<wire x1="7.62" y1="0" x2="6.731" y2="0" width="0.508" layer="51"/>
+<wire x1="0" y1="0" x2="0.889" y2="0" width="0.508" layer="51"/>
+<wire x1="1.27" y1="0.762" x2="1.524" y2="1.016" width="0.1524" layer="21" curve="-90"/>
+<wire x1="1.27" y1="-0.762" x2="1.524" y2="-1.016" width="0.1524" layer="21" curve="90"/>
+<wire x1="6.096" y1="-1.016" x2="6.35" y2="-0.762" width="0.1524" layer="21" curve="90"/>
+<wire x1="6.096" y1="1.016" x2="6.35" y2="0.762" width="0.1524" layer="21" curve="-90"/>
+<wire x1="1.27" y1="-0.762" x2="1.27" y2="0.762" width="0.1524" layer="21"/>
+<wire x1="1.524" y1="1.016" x2="1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="2.032" y1="0.889" x2="1.905" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="1.524" y1="-1.016" x2="1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="2.032" y1="-0.889" x2="1.905" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="5.588" y1="0.889" x2="5.715" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="5.588" y1="0.889" x2="2.032" y2="0.889" width="0.1524" layer="21"/>
+<wire x1="5.588" y1="-0.889" x2="5.715" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="5.588" y1="-0.889" x2="2.032" y2="-0.889" width="0.1524" layer="21"/>
+<wire x1="6.096" y1="1.016" x2="5.715" y2="1.016" width="0.1524" layer="21"/>
+<wire x1="6.096" y1="-1.016" x2="5.715" y2="-1.016" width="0.1524" layer="21"/>
+<wire x1="6.35" y1="-0.762" x2="6.35" y2="0.762" width="0.1524" layer="21"/>
+<pad name="1" x="0" y="0" drill="0.8128" shape="octagon"/>
+<pad name="2" x="7.62" y="0" drill="0.8128" shape="octagon"/>
+<text x="1.27" y="1.2954" size="0.9906" layer="25" ratio="10">&gt;NAME</text>
+<text x="2.1844" y="-0.4826" size="0.9906" layer="27" ratio="10">&gt;VALUE</text>
+<rectangle x1="6.35" y1="-0.254" x2="6.731" y2="0.254" layer="21"/>
+<rectangle x1="0.889" y1="-0.254" x2="1.27" y2="0.254" layer="21"/>
+</package>
 </packages>
 <packages3d>
 <package3d name="7395-03" urn="urn:adsk.eagle:package:8078646/1" type="box">
@@ -677,6 +705,13 @@ grid 2.5 mm, outline 2.4 x 4.4 mm</description>
 3 mm, round</description>
 <packageinstances>
 <packageinstance name="LED3MM"/>
+</packageinstances>
+</package3d>
+<package3d name="0204/7" urn="urn:adsk.eagle:package:23498/2" type="model">
+<description>RESISTOR
+type 0204, grid 7.5 mm</description>
+<packageinstances>
+<packageinstance name="0204/7"/>
 </packageinstances>
 </package3d>
 </packages3d>
@@ -903,20 +938,20 @@ design rules under a new name.</description>
 </autorouter>
 <elements>
 <element name="M1" library="IDP_library" package="IDP_PROTO" value="IDP_PROTOBOARD" x="11.43" y="12.7" smashed="yes"/>
-<element name="IR_SENSOR_CONNECTOR" library="IDP_library" package="7395-03" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910" x="64.77" y="22.86" smashed="yes">
-<attribute name="MF" value="MOLEX" x="64.77" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="" x="64.77" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="43.0799" y="21.1821" size="1.016" layer="25" ratio="10"/>
-<attribute name="OC_FARNELL" value="unknown" x="64.77" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="OC_NEWARK" value="unknown" x="64.77" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="POPULARITY" value="0" x="64.77" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="70.7121" y="25.5001" size="0.8128" layer="27" ratio="10" rot="R270"/>
+<element name="IR_SENSOR_CONNECTOR" library="IDP_library" package="7395-03" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910" x="59.69" y="22.86" smashed="yes">
+<attribute name="MF" value="MOLEX" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
+<attribute name="NAME" x="37.9999" y="21.1821" size="1.016" layer="25" ratio="10"/>
+<attribute name="OC_FARNELL" value="unknown" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
+<attribute name="OC_NEWARK" value="unknown" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
+<attribute name="POPULARITY" value="0" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="65.6321" y="25.5001" size="0.8128" layer="27" ratio="10" rot="R270"/>
 </element>
-<element name="C1" library="IDP_library" package="C025-024X044" package3d_urn="urn:adsk.eagle:package:23630/1" value="10μ" x="62.23" y="30.48" smashed="yes">
-<attribute name="NAME" x="61.722" y="31.877" size="1.27" layer="25" ratio="10"/>
-<attribute name="POPULARITY" value="56" x="62.23" y="30.48" size="1.778" layer="27" display="off"/>
-<attribute name="SPICEPREFIX" value="C" x="62.23" y="30.48" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="61.722" y="27.813" size="1.27" layer="27" ratio="10"/>
+<element name="C1" library="IDP_library" package="C025-024X044" package3d_urn="urn:adsk.eagle:package:23630/1" value="10μ" x="57.15" y="29.21" smashed="yes">
+<attribute name="NAME" x="56.642" y="30.607" size="1.27" layer="25" ratio="10"/>
+<attribute name="POPULARITY" value="56" x="57.15" y="29.21" size="1.778" layer="27" display="off"/>
+<attribute name="SPICEPREFIX" value="C" x="57.15" y="29.21" size="1.778" layer="27" display="off"/>
+<attribute name="VALUE" x="56.642" y="26.543" size="1.27" layer="27" ratio="10"/>
 </element>
 <element name="ULTRASONIC_SENSOR" library="IDP_library" package="7395-04" package3d_urn="urn:adsk.eagle:package:8078648/1" value="Rapid 22-1015/22-0915" x="60.96" y="55.88" smashed="yes" rot="R180">
 <attribute name="MF" value="MOLEX" x="60.96" y="55.88" size="1.778" layer="27" rot="R180" display="off"/>
@@ -936,15 +971,15 @@ design rules under a new name.</description>
 <attribute name="POPULARITY" value="0" x="52.07" y="55.88" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="53.7479" y="41.8099" size="0.8128" layer="27" ratio="10" rot="R90"/>
 </element>
-<element name="RAPID68-1959" library="IDP_library" package="TRIM_3296W-1-250" value="10K" x="69.85" y="30.48" smashed="yes" rot="R90">
-<attribute name="AVAILABILITY" value="Unavailable" x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MF" value="Bourns" x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MP" value="3296W-1-250" x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="72.862859375" y="35.501440625" size="1.275440625" layer="25" rot="R270"/>
-<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="PRICE" value="None" x="69.85" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="76.650390625" y="25.46778125" size="1.273109375" layer="27" rot="R90"/>
+<element name="RAPID68-1959" library="IDP_library" package="TRIM_3296W-1-250" value="10K" x="69.85" y="31.75" smashed="yes" rot="R90">
+<attribute name="AVAILABILITY" value="Unavailable" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="Bourns" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MP" value="3296W-1-250" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="72.862859375" y="36.771440625" size="1.275440625" layer="25" rot="R270"/>
+<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PRICE" value="None" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VALUE" x="76.650390625" y="26.73778125" size="1.273109375" layer="27" rot="R90"/>
 </element>
 <element name="RAPID65-0753" library="IDP_library" package="TRIM_3296W-1-250" value="5K" x="16.51" y="50.8" smashed="yes" rot="R180">
 <attribute name="AVAILABILITY" value="Unavailable" x="16.51" y="50.8" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1017,6 +1052,18 @@ design rules under a new name.</description>
 <attribute name="NAME" x="71.755" y="42.291" size="1.27" layer="25" ratio="10"/>
 <attribute name="POPULARITY" value="97" x="69.85" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
+<element name="R4" library="IDP_library" package="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="10k" x="64.77" y="33.02" smashed="yes" rot="R270">
+<attribute name="NAME" x="66.0654" y="31.75" size="0.9906" layer="25" ratio="10" rot="R270"/>
+<attribute name="POPULARITY" value="79" x="64.77" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="SPICEPREFIX" value="R" x="64.77" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VALUE" x="64.2874" y="30.8356" size="0.9906" layer="27" ratio="10" rot="R270"/>
+</element>
+<element name="C3" library="IDP_library" package="C025-024X044" package3d_urn="urn:adsk.eagle:package:23630/1" value="100n" x="62.23" y="33.02" smashed="yes" rot="R90">
+<attribute name="NAME" x="60.833" y="32.512" size="1.27" layer="25" ratio="10" rot="R90"/>
+<attribute name="POPULARITY" value="56" x="62.23" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="SPICEPREFIX" value="C" x="62.23" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VALUE" x="64.897" y="32.512" size="1.27" layer="27" ratio="10" rot="R90"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -1082,9 +1129,7 @@ design rules under a new name.</description>
 <wire x1="49.53" y1="55.88" x2="49.53" y2="40.64" width="0.1524" layer="16"/>
 <contactref element="ULTRASONIC_SENSOR" pad="3"/>
 <wire x1="62.23" y1="55.88" x2="62.23" y2="40.64" width="0.1524" layer="16"/>
-<wire x1="69.85" y1="27.94" x2="69.85" y2="20.32" width="0.1524" layer="16"/>
-<wire x1="64.77" y1="22.86" x2="64.77" y2="20.32" width="0.1524" layer="16"/>
-<wire x1="64.77" y1="30.48" x2="64.77" y2="22.86" width="0.1524" layer="16"/>
+<wire x1="69.85" y1="29.21" x2="69.85" y2="20.32" width="0.1524" layer="16"/>
 <wire x1="29.21" y1="53.34" x2="29.21" y2="43.18" width="0.1524" layer="16"/>
 <via x="16.51" y="48.26" extent="1-16" drill="0.35"/>
 <via x="19.05" y="48.26" extent="1-16" drill="0.35"/>
@@ -1096,6 +1141,12 @@ design rules under a new name.</description>
 <contactref element="LED3" pad="K"/>
 <wire x1="67.31" y1="48.26" x2="67.31" y2="40.64" width="0.1524" layer="16"/>
 <wire x1="69.85" y1="43.18" x2="69.85" y2="40.64" width="0.1524" layer="16"/>
+<contactref element="C3" pad="2"/>
+<wire x1="59.69" y1="22.86" x2="59.69" y2="29.21" width="0.1524" layer="16"/>
+<wire x1="59.69" y1="29.21" x2="59.69" y2="35.56" width="0.1524" layer="16"/>
+<via x="59.69" y="35.56" extent="1-16" drill="0.35"/>
+<wire x1="59.69" y1="35.56" x2="62.23" y2="35.56" width="0.1524" layer="1"/>
+<wire x1="59.69" y1="20.32" x2="59.69" y2="22.86" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="+3V3">
 <contactref element="M1" pad="3V"/>
@@ -1159,11 +1210,9 @@ design rules under a new name.</description>
 <wire x1="46.99" y1="38.1" x2="46.99" y2="35.4" width="0.1524" layer="16"/>
 <wire x1="54.61" y1="55.88" x2="54.61" y2="58.42" width="0.1524" layer="16"/>
 <wire x1="64.77" y1="55.88" x2="64.77" y2="58.42" width="0.1524" layer="16"/>
-<wire x1="62.23" y1="22.86" x2="62.23" y2="30.48" width="0.1524" layer="16"/>
-<wire x1="62.23" y1="38.1" x2="62.23" y2="30.48" width="0.1524" layer="16"/>
-<wire x1="69.85" y1="38.1" x2="69.85" y2="35.56" width="0.1524" layer="16"/>
-<wire x1="69.85" y1="35.56" x2="69.85" y2="33.02" width="0.1524" layer="16"/>
-<wire x1="69.85" y1="35.56" x2="69.85" y2="35.56" width="0.1524" layer="16"/>
+<wire x1="69.85" y1="38.1" x2="69.85" y2="34.29" width="0.1524" layer="16"/>
+<wire x1="57.15" y1="38.1" x2="57.15" y2="29.21" width="0.1524" layer="16"/>
+<wire x1="57.15" y1="29.21" x2="57.15" y2="22.86" width="0.1524" layer="16"/>
 </signal>
 <signal name="MOTOR_CHANNEL_A_DIRECTION">
 <contactref element="M1" pad="D12"/>
@@ -1191,8 +1240,16 @@ design rules under a new name.</description>
 </signal>
 <signal name="IR_SENSOR_VALUES">
 <contactref element="M1" pad="A2"/>
-<contactref element="IR_SENSOR_CONNECTOR" pad="1"/>
 <via x="67.31" y="17.78" extent="1-16" drill="0.35"/>
+<contactref element="R4" pad="1"/>
+<contactref element="C3" pad="1"/>
+<wire x1="62.23" y1="33.02" x2="64.77" y2="33.02" width="0.1524" layer="1"/>
+<via x="64.77" y="35.56" extent="1-16" drill="0.35"/>
+<via x="67.31" y="35.56" extent="1-16" drill="0.35"/>
+<wire x1="64.77" y1="33.02" x2="64.77" y2="35.56" width="0.1524" layer="16"/>
+<wire x1="64.77" y1="35.56" x2="67.31" y2="35.56" width="0.1524" layer="1"/>
+<wire x1="67.31" y1="35.56" x2="67.31" y2="22.86" width="0.1524" layer="16"/>
+<via x="67.31" y="22.86" extent="1-16" drill="0.35"/>
 <wire x1="67.31" y1="22.86" x2="67.31" y2="17.78" width="0.1524" layer="1"/>
 </signal>
 <signal name="ECHO">
@@ -1211,7 +1268,8 @@ design rules under a new name.</description>
 <contactref element="M1" pad="A4"/>
 <contactref element="RAPID68-1959" pad="2"/>
 <via x="72.39" y="30.48" extent="1-16" drill="0.35"/>
-<wire x1="69.85" y1="30.48" x2="72.39" y2="30.48" width="0.1524" layer="1"/>
+<wire x1="71.12" y1="31.75" x2="69.85" y2="31.75" width="0.1524" layer="1"/>
+<wire x1="71.12" y1="31.75" x2="72.39" y2="30.48" width="0.1524" layer="1"/>
 <via x="72.39" y="17.78" extent="1-16" drill="0.35"/>
 <wire x1="72.39" y1="17.78" x2="72.39" y2="30.48" width="0.1524" layer="1"/>
 </signal>
@@ -1330,6 +1388,15 @@ design rules under a new name.</description>
 <wire x1="69.85" y1="60.96" x2="68.58" y2="60.96" width="0.1524" layer="1"/>
 <wire x1="68.58" y1="60.96" x2="68.58" y2="55.88" width="0.1524" layer="1"/>
 <wire x1="68.58" y1="55.88" x2="67.31" y2="55.88" width="0.1524" layer="1"/>
+</signal>
+<signal name="N$5">
+<contactref element="IR_SENSOR_CONNECTOR" pad="1"/>
+<contactref element="R4" pad="2"/>
+<via x="62.23" y="25.4" extent="1-16" drill="0.35"/>
+<wire x1="64.77" y1="25.4" x2="62.23" y2="25.4" width="0.1524" layer="1"/>
+<wire x1="62.23" y1="22.86" x2="62.23" y2="25.4" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$7">
 </signal>
 </signals>
 <mfgpreviewcolors>

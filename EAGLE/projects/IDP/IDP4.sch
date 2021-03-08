@@ -2050,6 +2050,8 @@ Right angle and straight</description>
 <part name="LED3" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
 <part name="GND5" library="IDP_library" deviceset="GND" device=""/>
 <part name="GND6" library="IDP_library" deviceset="GND" device=""/>
+<part name="R4" library="IDP_library" deviceset="R-EU_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="10k"/>
+<part name="C3" library="IDP_library" deviceset="C-EU" device="025-024X044" package3d_urn="urn:adsk.eagle:package:23630/1" value="100n"/>
 </parts>
 <sheets>
 <sheet>
@@ -2084,8 +2086,8 @@ Right angle and straight</description>
 <instance part="P+2" gate="1" x="299.72" y="45.72" smashed="yes" rot="R180">
 <attribute name="VALUE" x="302.26" y="50.8" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="GND2" gate="1" x="292.1" y="48.26" smashed="yes">
-<attribute name="VALUE" x="289.56" y="45.72" size="1.778" layer="96"/>
+<instance part="GND2" gate="1" x="292.1" y="30.48" smashed="yes">
+<attribute name="VALUE" x="289.56" y="27.94" size="1.778" layer="96"/>
 </instance>
 <instance part="ULTRASONIC_SENSOR" gate="G$1" x="76.2" y="60.96" smashed="yes">
 <attribute name="VALUE" x="80.01" y="50.8" size="1.778" layer="96" rot="R180"/>
@@ -2173,6 +2175,14 @@ Right angle and straight</description>
 <instance part="GND6" gate="1" x="190.5" y="-2.54" smashed="yes">
 <attribute name="VALUE" x="187.96" y="-5.08" size="1.778" layer="96"/>
 </instance>
+<instance part="R4" gate="G$1" x="281.94" y="50.8" smashed="yes" rot="R90">
+<attribute name="NAME" x="280.4414" y="46.99" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="285.242" y="46.99" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="C3" gate="G$1" x="287.02" y="38.1" smashed="yes" rot="R90">
+<attribute name="NAME" x="286.639" y="39.624" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="291.719" y="39.624" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -2189,9 +2199,12 @@ Right angle and straight</description>
 <pinref part="C1" gate="G$1" pin="2"/>
 <wire x1="292.1" y1="63.5" x2="292.1" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="292.1" y1="71.12" x2="294.64" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="292.1" y1="63.5" x2="292.1" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="292.1" y1="63.5" x2="292.1" y2="38.1" width="0.1524" layer="91"/>
 <junction x="292.1" y="63.5"/>
 <pinref part="GND2" gate="1" pin="GND"/>
+<pinref part="C3" gate="G$1" pin="2"/>
+<wire x1="292.1" y1="38.1" x2="292.1" y2="33.02" width="0.1524" layer="91"/>
+<junction x="292.1" y="38.1"/>
 </segment>
 <segment>
 <pinref part="SERVO" gate="G$1" pin="1"/>
@@ -2365,10 +2378,13 @@ Right angle and straight</description>
 <label x="223.52" y="76.2" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="IR_SENSOR_CONNECTOR" gate="G$1" pin="1"/>
-<wire x1="292.1" y1="86.36" x2="289.56" y2="73.66" width="0.1524" layer="91"/>
-<wire x1="289.56" y1="73.66" x2="289.56" y2="50.8" width="0.1524" layer="91"/>
-<label x="289.56" y="50.8" size="1.778" layer="95" rot="R90"/>
+<pinref part="R4" gate="G$1" pin="1"/>
+<wire x1="281.94" y1="45.72" x2="281.94" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="281.94" y1="38.1" x2="271.78" y2="38.1" width="0.1524" layer="91"/>
+<pinref part="C3" gate="G$1" pin="1"/>
+<wire x1="281.94" y1="38.1" x2="284.48" y2="38.1" width="0.1524" layer="91"/>
+<junction x="281.94" y="38.1"/>
+<label x="251.46" y="38.1" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ECHO" class="0">
@@ -2540,6 +2556,19 @@ Right angle and straight</description>
 <pinref part="LED2" gate="G$1" pin="A"/>
 <wire x1="162.56" y1="7.62" x2="162.56" y2="15.24" width="0.1524" layer="91"/>
 <label x="142.24" y="15.24" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="IR_SENSOR_CONNECTOR" gate="G$1" pin="1"/>
+<wire x1="292.1" y1="86.36" x2="281.94" y2="86.36" width="0.1524" layer="91"/>
+<pinref part="R4" gate="G$1" pin="2"/>
+<wire x1="281.94" y1="86.36" x2="281.94" y2="55.88" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$7" class="0">
+<segment>
+<junction x="292.1" y="38.1"/>
 </segment>
 </net>
 </nets>
