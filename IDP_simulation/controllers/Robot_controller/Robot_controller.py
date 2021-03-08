@@ -69,14 +69,13 @@ def collision_prevention():
             right_wheel.setVelocity(0)
             return 'stop'
 
-def field_collision(coord):
+def field_collision_green(coord):
+    robot.step(TIME_STEP)
     location = robot.gps.getValues()
     location = (location[0],location[2])
     
     m = (coord[1] - location[1])/(coord[0]-location[0])
     c = coord[1] - m*coord[0]
-    print(m)
-    print(c)
    #c1 = location[1] - m*location[0]
     x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
     z = m*x + c
@@ -85,13 +84,128 @@ def field_collision(coord):
     x1 = [i for i in x if i > -0.2]
     x2 = [i for i in x1 if i < 0.2]
 
-    print(z2)
     if z2 and x2:
         print(coord)
         print(location)
-        return 'will collide with field'
+        return True
     else:
-        return 'no collision'
+        return False
+        
+def field_collision_red(coord):
+    robot.step(TIME_STEP)
+    location = robot.gps.getValues()
+    location = (location[0],location[2])
+    
+    m = (coord[1] - location[1])/(coord[0]-location[0])
+    c = coord[1] - m*coord[0]
+   #c1 = location[1] - m*location[0]
+    x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
+    z = m*x + c
+    z1 = [i for i in z if i > 0.2]
+    z2 = [i for i in z1 if i < 0.6]
+    x1 = [i for i in x if i > -0.2]
+    x2 = [i for i in x1 if i < 0.2]
+
+    if z2 and x2:
+        print(coord)
+        print(location)
+        return True
+    else:
+        return False
+
+
+
+def find_closest_point_green():
+    robot.step(TIME_STEP)
+    location = robot.gps.getValues()
+    location = (location[0],location[2])
+    p1 = (0.0,0.0)
+    p2 = (0.0,-0.8)
+    p3 = (0.5,-0.4)
+    p4 = (-0.5,-0.4)
+    points = [p1,p2,p3,p4]
+    bearings = [180.0,0.0,90.0,-90.0]
+    distances = []
+    
+    for point in points:
+        x = (point[0] - location[0])
+        z = (point[1] - location[1])
+        distance = (x**2 + z**2)**0.5
+        distances.append(distance)
+    i = distances.index(min(distances))
+    checkpoint = points[i]
+    bearing = bearings[i]
+    return checkpoint,bearing
+    
+
+def find_closest_point_red():
+    robot.step(TIME_STEP)
+    location = robot.gps.getValues()
+    location = (location[0],location[2])
+    p1 = (0.0,0.8)
+    p2 = (0.0,0.0)
+    p3 = (0.5,0.4)
+    p4 = (-0.5,0.4)
+    points = [p1,p2,p3,p4]
+    bearings = [180.0,0.0,90.0,-90.0]
+    distances = []
+    
+    for point in points:
+        x = (point[0] - location[0])
+        z = (point[1] - location[1])
+        distance = (x**2 + z**2)**0.5
+        distances.append(distance)
+    i = distances.index(min(distances))
+    checkpoint = points[i]
+    bearing = bearings[i]
+    return checkpoint,bearing
+
+
+
+def encircle_green(coord):
+    if not field_collision_green(coord):
+        pass
+    else:
+        checkpoint,bearing = find_closest_point_green()
+        move(checkpoint,error_translation = 0.05)
+        bearing += 90
+        if bearing > 180:
+            bearing -= 360
+        PID_rotation(bearing)
+        collision = field_collision_green(coord)        
+        while collision:
+            robot.left_wheel.setVelocity(1.37)
+            robot.right_wheel.setVelocity(5.0)
+            robot.step(TIME_STEP)
+            collision = field_collision_green(coord)
+    return
+    
+    
+def encircle_red(coord):
+    if not field_collision_red(coord):
+        pass
+    else:
+        checkpoint,bearing = find_closest_point_red()
+        move(checkpoint,error_translation = 0.05)
+        bearing += 90
+        if bearing > 180:
+            bearing -= 360
+        PID_rotation(bearing)
+        collision = field_collision_red(coord)        
+        while collision:
+            robot.left_wheel.setVelocity(1.36)
+            robot.right_wheel.setVelocity(5.0)
+            robot.step(TIME_STEP)
+            collision = field_collision_red(coord)
+    return
+            
+            
+
+            
+        
+    
+
+         
    
 
 
@@ -162,6 +276,7 @@ def PID_rotation(required, final_error = 0.5):
         
         previous_error = error
         error = required - bearing1(robot.compass)
+     
         
         robot.step(TIME_STEP)
     return
@@ -239,6 +354,11 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
     """
     required_angle = required_bearing(coord)
     PID_rotation(required_angle, error_rotation)
+    if r.getName() == 'robot_red':
+        pass
+    else:
+        print(field_collision_green(coord))
+        print(find_closest_point_green())
     PID_translation(coord, error_translation)
     return
     
@@ -447,6 +567,8 @@ def return_box_field(coord):
     """
     
     intermediate, final = robot.field.get_to_field(coord)
+    encircle_red(intermediate)
+    encircle_green(intermediate)
  
     move(intermediate, error_translation = 0.15)
     if final[0] > 0:
@@ -522,16 +644,31 @@ robot.step(TIME_STEP)
 robot.get_sweep_locations()
 
 print(positions)
-
+initial_pass = True
     
 
 while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
+    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+        
+    if initial_pass:
+        intial_pass = False
+
+        pass
+    else:
+        
+        encircle_green(pos)
+        encircle_red(pos)
+
+
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
+    
+    
     move(pos)
+    
 
     deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
