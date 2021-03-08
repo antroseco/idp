@@ -76,6 +76,7 @@ def field_collision_green(coord):
     
     m = (coord[1] - location[1])/(coord[0]-location[0])
     c = coord[1] - m*coord[0]
+
    #c1 = location[1] - m*location[0]
     x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
     z = m*x + c
@@ -84,9 +85,8 @@ def field_collision_green(coord):
     x1 = [i for i in x if i > -0.2]
     x2 = [i for i in x1 if i < 0.2]
 
+
     if z2 and x2:
-        print(coord)
-        print(location)
         return True
     else:
         return False
@@ -107,8 +107,6 @@ def field_collision_red(coord):
     x2 = [i for i in x1 if i < 0.2]
 
     if z2 and x2:
-        print(coord)
-        print(location)
         return True
     else:
         return False
@@ -354,11 +352,7 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
     """
     required_angle = required_bearing(coord)
     PID_rotation(required_angle, error_rotation)
-    if r.getName() == 'robot_red':
-        pass
-    else:
-        print(field_collision_green(coord))
-        print(find_closest_point_green())
+
     PID_translation(coord, error_translation)
     return
     
@@ -591,6 +585,16 @@ def return_box_field(coord):
     return 
 
 
+def reverse():
+    robot.left_wheel.setVelocity(-5)
+    robot.right_wheel.setVelocity(-5)
+    #reverse a little bit
+    for j in range(30):
+        robot.step(TIME_STEP)
+    robot.left_wheel.setVelocity(0)
+    robot.right_wheel.setVelocity(0)
+    robot.step(TIME_STEP)
+
 
 
 def finish_in_field():
@@ -605,6 +609,8 @@ def finish_in_field():
         intermediate = (0, -1)
         final = (0, -0.4)
         
+    encircle_green(intermediate)
+    encircle_red(intermediate)    
     move(intermediate)
     
     if robot.colour == 'red':
@@ -633,7 +639,7 @@ else:
 robot.step(TIME_STEP)
 
 
-positions = sweep(0.6)
+positions = sweep(0.4)
 
 robot.step(TIME_STEP)
 robot.send_sweep_locations(positions)
@@ -644,39 +650,55 @@ robot.step(TIME_STEP)
 robot.get_sweep_locations()
 
 print(positions)
-initial_pass = True
-    
+
+initial_pass = True   
 
 while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
-    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-        
-    if initial_pass:
-        intial_pass = False
-
-        pass
+    
+    if initial_pass == True:
+        initial_pass = False
     else:
-        
         encircle_green(pos)
         encircle_red(pos)
 
 
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    
-    
-    
-    move(pos)
-    
 
-    deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-
+    move(pos, error_translation=0.1)
 
     robot.step(TIME_STEP)
-    return_box_field(robot.gps.getValues())
+    c = deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    robot.step(TIME_STEP)
+    robot.step(TIME_STEP)
+
+    
+    colour = ''
+    if c == 0:
+        colour = 'red'
+    elif c == 1:
+        colour = 'green'
+        
+    robot.step(TIME_STEP)
+    
+    
+           
+    if colour == robot.colour:
+        return_box_field(robot.gps.getValues())
+    else:
+        withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+        reverse()
+        
+        if c == 0 or c == 1: 
+            robot.step(TIME_STEP)
+            robot.send_box_location(pos)
+        
+    robot.read_all_locations()
     
 
+print('parking')
 robot.step(TIME_STEP)
 finish_in_field()
 

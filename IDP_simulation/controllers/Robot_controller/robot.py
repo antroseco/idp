@@ -195,6 +195,35 @@ class Robot:
                 self.box_queue.put(pos)
         return
                    
+                   
+    def send_box_location(self, location):
+        message = "{},{}".format(location[0],location[1])
+        self.send_message(message)
+        return
+    
+        
+    def read_box_location(self):
+        message = self.get_message()
+        s = message.split(',')
+        coord = np.array([float(x) for x in s])
+        return coord
+    
+    
+    
+    
+    def read_all_locations(self):
+        
+        locations = []
+        
+        while self.receiver.getQueueLength() > 0:
+            self.step(Robot.TIME_STEP)
+            coord = self.read_box_location()
+            locations.append(coord)
+            self.step(Robot.TIME_STEP)
+            self.box_queue.put(coord)
+            
+        return locations        
+    
     
     
     def send_location(self):
