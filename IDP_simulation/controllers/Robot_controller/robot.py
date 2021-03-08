@@ -1,7 +1,8 @@
 import controller
 from field import Field
 import numpy as np
-import hardware
+import queue
+
 
 class Robot:
     
@@ -38,6 +39,8 @@ class Robot:
         self.colour = colour
         self.field = Field(colour)
         self.infrared_vref = 4.3
+        self.box_queue = queue.Queue()
+
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -82,9 +85,13 @@ class Robot:
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setPosition(float('inf'))
         self.right_wheel.setVelocity(0.0)
+
         self.green_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
         self.red_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
+
+
+
 
     def step(self, TIME_STEP):
         self._robot.step(TIME_STEP)
@@ -115,12 +122,57 @@ class Robot:
             return message
         
         return ""
+    
+    
+    def send_sweep_locations(self, locations):
+    
+        message = ""
+        for pos in locations:
+            stringpos = "{},{}".format(pos[0], pos[1])
+            message += stringpos + ','
+            
+        self.send_message(message)
+        
+    
+    def get_sweep_locations(self):
+        message = self.get_message()
+        
+        other_robot_locations = []
+        
+        if message != '':
+            coordinates = np.array(map(str, message.split(','))) 
+            
+            for i in range(1, coordinates.size):
+                other_robot_locations.append((float(coordinates[i-1]), float(coordinates[i])))
+                
+        return other_robot_locations
+        
+        
+    
+    def send_location(self):
+        location = self.gps.getValues()
+        message = "{},{}".format(location[0],location[2])
+        self.send_message(message)
+        
+        
+    def get_location(self):
+        message = self.get_message()
+        message = tuple(map(str, message.split(',')))  
+        try: 
+            message = [float(message[0]),float(message[1])]
+            return message  
+        except:
+            return []
         
         
     def measureLight(self):
         # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
         return [self.lightsensorRed.getValue(), self.lightsensorGreen.getValue()]
 
+    
+    def add_locations_to_queue(self, locations):
+        return
+    
     
     def field_position(self):
         """
