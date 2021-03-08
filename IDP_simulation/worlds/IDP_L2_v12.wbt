@@ -80,6 +80,8 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
         }
       ]
       endPoint Solid {
@@ -111,6 +113,8 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
         }
       ]
       endPoint Solid {
@@ -288,6 +292,9 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
+
         }
       ]
       endPoint Solid {
@@ -319,6 +326,8 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
+          maxVelocity 2.3038
+          maxTorque 0.4
         }
       ]
       endPoint Solid {
