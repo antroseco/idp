@@ -80,13 +80,13 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.93
+          maxVelocity 3.35
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -5.317734143948041e-10 -5.317714610803624e-10 1.5707999999999938
+        rotation 1 -5.338108604268885e-10 -5.338088996285035e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -113,13 +113,13 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.93
+          maxVelocity 3.35
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 5.32240420696444e-10 -5.322409633782158e-10 1.5707953071795442
+        rotation -0.9999999999999999 5.342796560248062e-10 -5.342802007858147e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -292,13 +292,13 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.93
+          maxVelocity 3.35
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -5.317733328573739e-10 -5.317717513111038e-10 1.5707999999999942
+        rotation 1 -5.338107788894583e-10 -5.338091898592448e-10 1.5707999999999942
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -325,13 +325,13 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.93
+          maxVelocity 3.35
           maxTorque 0.4
         }
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 5.322403985506156e-10 -5.322409578195708e-10 1.5707953071795426
+        rotation -0.9999999999999999 5.342796338789778e-10 -5.342801952271697e-10 1.5707953071795426
         children [
           USE WHEEL
         ]
