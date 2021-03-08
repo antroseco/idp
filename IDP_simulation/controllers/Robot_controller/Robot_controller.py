@@ -69,7 +69,6 @@ def collision_prevention():
             right_wheel.setVelocity(0)
             return 'stop'
 
-
 def field_collision(coord):
     location = robot.gps.getValues()
     location = (location[0],location[2])
@@ -238,7 +237,6 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
     """
     move to location coord
     """
-
     required_angle = required_bearing(coord)
     PID_rotation(required_angle, error_rotation)
     PID_translation(coord, error_translation)
@@ -497,10 +495,7 @@ def finish_in_field():
     
     return
     
- 
-
-
-
+    
     
     
 
@@ -514,26 +509,6 @@ else:
 
 
 robot.step(TIME_STEP)
-"""
-coord1 = (0.5,-.4)
-
-PID_rotation(required_bearing(coord1))
-PID_translation(coord1)
-
-coord1 = (0.5,-.4)
-
-
-print(bearing1(robot.compass))
-print(robot.gps.getValues())
-
-PID_rotation(180)
-
-for i in range(50):
-    robot.left_wheel.setVelocity(3.0)
-    robot.right_wheel.setVelocity(5.0)
-    
-    robot.step(TIME_STEP)
-"""
 
 
 positions = sweep(0.6)
@@ -556,7 +531,7 @@ while not robot.box_queue.empty() and robot.field.available():
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
-    move(pos, error_translation = 0.1)
+    move(pos)
 
     deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
