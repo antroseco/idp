@@ -479,18 +479,22 @@ if r.getName() == 'robot_red':
 else:
     robot = Robot(r, 'red')
 
+
 robot.step(TIME_STEP)
 
-robot.send_message('nfajsnfsa')
 
 positions = sweep(0.6)
 robot.step(TIME_STEP)
 robot.send_sweep_locations(positions)
+robot.step(TIME_STEP)
+print(robot.get_sweep_locations())
+#print(robot.get_message())
+"""
 while(robot.step(TIME_STEP)):
     #other_positions = robot.get_sweep_locations()
     
     print(robot.get_message())
-
+"""
 
 
 print('***')

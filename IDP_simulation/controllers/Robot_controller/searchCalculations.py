@@ -64,7 +64,7 @@ def potential_box_position(distance, angle, position):
     
 def box_position(potential_boxes):
     """
-    we will consecutive positions in array that all come from the same box
+    we will have consecutive positions in array that all come from the same box
     find which belong to the same box and average them out
     input: an array with potential box locations
     returns: array of approximated box positions

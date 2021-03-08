@@ -2,6 +2,7 @@ import controller
 from field import Field
 import numpy as np
 import queue
+import hardware
 
 
 class Robot:
@@ -54,8 +55,8 @@ class Robot:
 
         self.infrared = robot.getDevice(Robot.infrared_name)
         self.dsUltrasonic = robot.getDevice(Robot.dsUltrasonic_name)
-        self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
-        self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
+        #self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
+        #self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
         self.emitter = robot.getDevice(Robot.emitter_name)
         self.receiver = robot.getDevice(Robot.receiver_name)
         self.gps = robot.getDevice(Robot.gps_name)
@@ -68,8 +69,8 @@ class Robot:
         self.box_claw_sensor.enable(TIME_STEP)
         self.left_claw_sensor.enable(TIME_STEP)
         self.right_claw_sensor.enable(TIME_STEP)
-        self.lightsensorRed.enable(TIME_STEP)
-        self.lightsensorGreen.enable(TIME_STEP)
+        #self.lightsensorRed.enable(TIME_STEP)
+        #self.lightsensorGreen.enable(TIME_STEP)
         self.receiver.enable(TIME_STEP)
         self.gps.enable(TIME_STEP)
         self.compass.enable(TIME_STEP)
@@ -95,6 +96,7 @@ class Robot:
 
     def step(self, TIME_STEP):
         self._robot.step(TIME_STEP)
+        return True
     
         
     def send_message(self, message: str):
@@ -131,21 +133,23 @@ class Robot:
             stringpos = "{},{}".format(pos[0], pos[1])
             message += stringpos + ','
             
-        self.send_message(message)
+        self.send_message(message[:-1])
         
     
     def get_sweep_locations(self):
+    
         message = self.get_message()
         
-        other_robot_locations = []
-        
         if message != '':
-            coordinates = np.array(map(str, message.split(','))) 
-            
+            s = message.split(',')
+            coordinates = np.array([float(x) for x in s])
+            coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
+            """
+            print(coordinates.size)
             for i in range(1, coordinates.size):
-                other_robot_locations.append((float(coordinates[i-1]), float(coordinates[i])))
-                
-        return other_robot_locations
+                other_robot_locations.append([float(coordinates[i-1]), float(coordinates[i])])
+            """    
+        return coordinates
         
         
     
