@@ -7,6 +7,8 @@ import math
 import time
 import hardware
 
+np.set_printoptions(suppress=True)
+
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6
@@ -266,8 +268,9 @@ def sweep(velocity = 0.5, swept_angle =355):
         #if measured distance is less than wall_dist then assume there's a box
         #also if wall is more than 1.5 away disregard measurements because it's further than sensor's range   
         if abs(wall_dist - infrared_dist) > 0.1 and wall_dist < 1.4:
-            x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
-            boxes.append([x, z])
+            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
+            if(valid):
+                boxes.append([x, z])
         
                 
         if current_angle > initial_angle:
@@ -281,7 +284,7 @@ def sweep(velocity = 0.5, swept_angle =355):
     robot.left_wheel.setVelocity(0)
     robot.step(TIME_STEP)
 
-    
+    robot.sweep_locations = locations
     
     return locations
 
@@ -420,7 +423,7 @@ def return_box_field(coord):
     """
     
     intermediate, final = robot.field.get_to_field(coord)
-
+ 
     move(intermediate, error_translation = 0.15)
     if final[0] > 0:
         PID_rotation(-90)
@@ -477,36 +480,34 @@ r = controller.Robot()
 if r.getName() == 'robot_red':
     robot = Robot(r, 'red')
 else:
-    robot = Robot(r, 'red')
+    robot = Robot(r, 'green')
+
 
 
 robot.step(TIME_STEP)
 
 
 positions = sweep(0.6)
+
 robot.step(TIME_STEP)
 robot.send_sweep_locations(positions)
+
 robot.step(TIME_STEP)
-print(robot.get_sweep_locations())
-#print(robot.get_message())
-"""
-while(robot.step(TIME_STEP)):
-    #other_positions = robot.get_sweep_locations()
-    
-    print(robot.get_message())
-"""
+#after we get locations from other robot, all boxes that each robot needs
+#to visit are saved in robot.box_queue
+robot.get_sweep_locations()
 
-
-print('***')
 print(positions)
 
     
-"""    
-for pos in positions:
+
+while not robot.box_queue.empty() and robot.field.available():
+    
+    pos = robot.box_queue.get()
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
     
-    move(pos)
+    move(pos, error_translation = 0.1)
 
     deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
@@ -518,4 +519,5 @@ for pos in positions:
 robot.step(TIME_STEP)
 finish_in_field()
 
-"""
+
+

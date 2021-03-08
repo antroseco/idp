@@ -42,23 +42,18 @@ def potential_box_position(distance, angle, position):
     """
     finds the box position based on the current angle and location of the robot
     and the distance between the robot and box
+    if measurement invalid it returns False
+    returns: valid [Bool], x[int], y[int]
     """    
     x = position[0] + distance * math.cos(math.radians(angle))
     z = position[2] + distance * math.sin(math.radians(angle))
     
        #if x or z are out of the bounds
     
-    if x >= 1.15:
-        x = 1.15
-    elif x <= -1.15:
-        x = -1.15
-    if z >= 1.15:
-        z = 1.15
-    elif z <= -1.15:
-        z = -1.15
-
-    
-    return x, z
+    if abs(x) >= 1.15 or abs(z) >= 1.15:
+        return False, 0, 0
+ 
+    return True, x, z
     
     
     

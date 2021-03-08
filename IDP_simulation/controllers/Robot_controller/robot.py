@@ -41,6 +41,8 @@ class Robot:
         self.field = Field(colour)
         self.infrared_vref = 4.3
         self.box_queue = queue.Queue()
+        self.sweep_locations = []
+        self.other_sweep_locations = []
 
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
@@ -55,8 +57,8 @@ class Robot:
 
         self.infrared = robot.getDevice(Robot.infrared_name)
         self.dsUltrasonic = robot.getDevice(Robot.dsUltrasonic_name)
-        #self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
-        #self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
+        self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
+        self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
         self.emitter = robot.getDevice(Robot.emitter_name)
         self.receiver = robot.getDevice(Robot.receiver_name)
         self.gps = robot.getDevice(Robot.gps_name)
@@ -69,8 +71,8 @@ class Robot:
         self.box_claw_sensor.enable(TIME_STEP)
         self.left_claw_sensor.enable(TIME_STEP)
         self.right_claw_sensor.enable(TIME_STEP)
-        #self.lightsensorRed.enable(TIME_STEP)
-        #self.lightsensorGreen.enable(TIME_STEP)
+        self.lightsensorRed.enable(TIME_STEP)
+        self.lightsensorGreen.enable(TIME_STEP)
         self.receiver.enable(TIME_STEP)
         self.gps.enable(TIME_STEP)
         self.compass.enable(TIME_STEP)
@@ -98,6 +100,8 @@ class Robot:
         self._robot.step(TIME_STEP)
         return True
     
+        
+
         
     def send_message(self, message: str):
         """
@@ -144,14 +148,54 @@ class Robot:
             s = message.split(',')
             coordinates = np.array([float(x) for x in s])
             coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
-            """
-            print(coordinates.size)
-            for i in range(1, coordinates.size):
-                other_robot_locations.append([float(coordinates[i-1]), float(coordinates[i])])
-            """    
+        
+        self.other_sweep_locations = coordinates
+        self.compare_sweep_results()
+
         return coordinates
         
         
+    def compare_sweep_results(self):
+        """
+        check sweep results from both robots, remove duplicate locations
+        save locations on robot's half of the table to queue starting from the closest one to the robot
+        """
+        
+        
+        duplicates = []
+        
+        for i in range(self.sweep_locations.shape[0]):
+            for j in range(self.other_sweep_locations.shape[1]):
+                
+                loc1 = np.array(self.sweep_locations[i])
+                loc2 = np.array(self.other_sweep_locations[j])
+                
+                #check if loc1 and loc2 are the same or very close
+                dist = np.linalg.norm(loc1 - loc2)
+                if dist < 0.03:
+                    duplicates.append(j)
+                    
+        unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis = 0)
+        self.add_boxes_to_queue(unique)
+        return    
+                     
+        
+        
+        
+            
+        
+    def add_boxes_to_queue(self, positions):
+        """
+        assigns boxes that are in one half of the field to this robot, the other one will check the rest
+        """  
+        for pos in positions:
+            if self.colour == 'red' and pos[1] > 0:
+                self.box_queue.put(pos)
+            elif self.colour == 'green' and pos[1] <= 0:
+                self.box_queue.put(pos)
+        return
+                   
+    
     
     def send_location(self):
         location = self.gps.getValues()
@@ -172,10 +216,8 @@ class Robot:
     def measureLight(self):
         # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
         return [self.lightsensorRed.getValue(), self.lightsensorGreen.getValue()]
-
     
-    def add_locations_to_queue(self, locations):
-        return
+    
     
     
     def field_position(self):

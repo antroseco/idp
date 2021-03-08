@@ -30,13 +30,17 @@ class Field:
          
         return   
          
-         
+    def available(self):
+        if self.box_positions.size == 0:
+            return False
+        return True     
             
     def closest_box_position(self, coord):
         """
         returns closest available box position
         input are 3D coordinates of the robot
         """
+
         min_dist = float('inf')
         min_index = 0
         
@@ -59,7 +63,7 @@ class Field:
         gives a few coordinates that should be followed to get to the specific location
         in the field without moving the boxes that are already in there
         """
-    
+        
         final_pos = self.closest_box_position(coord)
         
         #if x value is positive

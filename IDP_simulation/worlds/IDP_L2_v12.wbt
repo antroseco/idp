@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.24329952817445225 0.8323867943889024 0.4979332928385651 3.7895374671365394
-  position -1.201942255311096 3.221267407532087 -1.481449386646505
+  orientation 0.17989512752994355 0.8124738249974094 0.5545484891198103 3.5439975998422737
+  position -0.6173886701057326 6.550298592479887 -1.5941012148002416
 }
 Background {
   skyColor [
@@ -84,7 +84,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -2.2350244802345023e-10 -2.2350162891628225e-10 1.5707999999999942
+        rotation 1 -3.7489006992430324e-10 -3.7488869287350214e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -115,7 +115,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 2.5356760380360465e-10 -2.5356780082475977e-10 1.5707953071795449
+        rotation -0.9999999999999999 3.7521930041255344e-10 -3.752196829930983e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -157,7 +157,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000014 -0.03500000092667596 0.02999999675663184
+        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -174,7 +174,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187934
+        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187927
       }
     }
     DEF BOX_CLAW HingeJoint {
@@ -224,17 +224,20 @@ Robot {
       aperture 0.5236
       resolution 0.003
     }
-    SharpGP2Y0A02YK0F {
+    IRSensor {
       translation 0.11 -0.03 0
-      name "IR Sensor"
     }
-    TEPT4400_RED {
-      translation 0.17 0.04 -0.005
+    TEPT4400 {
+      translation 0.155 0.03 0.005
       rotation 0 0 1 -1.5707953071795862
+      name "TEPT4400_RED"
+      red_filter TRUE
     }
-    TEPT4400_GREEN {
-      translation 0.17 0.04 0
+    TEPT4400 {
+      translation 0.155 0.03 -0.005
       rotation 0 0 1 -1.5707953071795862
+      name "TEPT4400_GREEN"
+      green_filter TRUE
     }
   ]
   name "robot_green"
@@ -289,7 +292,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -2.2350244802345023e-10 -2.2350162891628225e-10 1.5707999999999942
+        rotation 1 -3.7489006992430324e-10 -3.7488869287350214e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -320,7 +323,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 2.5356760380360465e-10 -2.5356780082475977e-10 1.5707953071795449
+        rotation -0.9999999999999999 3.7521930041255344e-10 -3.752196829930983e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -362,7 +365,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000014 -0.03500000092667596 0.02999999675663184
+        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -379,7 +382,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187934
+        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187927
       }
     }
     DEF BOX_CLAW HingeJoint {
@@ -429,17 +432,20 @@ Robot {
       aperture 0.5236
       resolution 0.003
     }
-    SharpGP2Y0A02YK0F {
+    IRSensor {
       translation 0.11 -0.03 0
-      name "IR Sensor"
     }
-    TEPT4400_RED {
-      translation 0.17 0.04 -0.005
+    TEPT4400 {
+      translation 0.155 0.03 0.005
       rotation 0 0 1 -1.5707953071795862
+      name "TEPT4400_RED"
+      red_filter TRUE
     }
-    TEPT4400_GREEN {
-      translation 0.17 0.04 0
+    TEPT4400 {
+      translation 0.155 0.03 -0.005
       rotation 0 0 1 -1.5707953071795862
+      name "TEPT4400_GREEN"
+      green_filter TRUE
     }
   ]
   name "robot_red"
@@ -448,45 +454,45 @@ Robot {
   controller "Robot_controller"
 }
 target {
-  translation -0.639 0.0249755 0.21
+  translation -0.829 0.0249755 0.04
   rotation -0.0757765602233323 0.6481120312050156 -0.7577656022333216 -5.626088597840589e-17
   name "target(9)"
 }
 target {
-  translation 0.667897 0.0249755 0.84292
+  translation 0.796205 0.0249755 0.7207
   rotation -3.08321e-17 -1 -5.14243e-17 0.523596
   name "target(8)"
 }
 target {
-  translation 0.802 0.025 0.29
+  translation -0.708 0.025 0.73
   rotation -0.03896321197617513 0.9898912831673099 -0.13637124191660205 2.1883495730114342e-16
   name "target(7)"
 }
 target {
-  translation 0.8198 0.0249755 -0.2533
+  translation 0.798964 0.0249755 -0.57264
   rotation 0.8059109309098598 0.24868508169517867 -0.537273953939948 6.347981521601662e-17
   name "target(6)"
 }
 target {
-  translation -0.607402 0.0249755 0.720185
+  translation 0.709347 0.0249755 0.279535
   rotation -1.32079e-17 1 4.61716e-17 -0.523595307179586
   colour 0 1 0
   name "target(5)"
 }
 target {
-  translation -0.7611 0.0249755 -0.5127
+  translation -0.7611 0.0249755 -0.7427
   rotation -0.543436796603501 0.8394500867218522 4.124367488403013e-15 -2.3534970991322053e-17
   colour 0 1 0
   name "target(1)"
 }
 target {
-  translation -0.03756 0.025 0.94595
+  translation 0.09244 0.025 1.00595
   rotation 0.5276696975222741 0.3083589524073046 0.7915045462832297 1.6158807051378174e-17
   colour 0 1 0
   name "target(2)"
 }
 target {
-  translation -0.0001 0.0249755 -0.8502
+  translation -0.0001 0.0249755 -0.9202
   rotation -0.47936571947404333 0.8442515227948549 0.23968285973698936 3.55741450952181e-17
   colour 0 1 0
   name "target(3)"
