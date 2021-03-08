@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.9917858211895733 -0.06271455539381372 -0.11147990594308857 5.044401258387043
-  position 0.19630546583812625 3.8388041378146247 1.2456183291191376
+  orientation 0.24329952817445225 0.8323867943889024 0.4979332928385651 3.7895374671365394
+  position -1.201942255311096 3.221267407532087 -1.481449386646505
 }
 Background {
   skyColor [
@@ -38,7 +38,7 @@ Floor {
   }
 }
 Robot {
-  translation 0.025605 0.07 -0.014652
+  translation 0 0.07 -0.4
   children [
     Compass {
       name "compass1"
@@ -84,7 +84,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 0.11
-        rotation 1 -4.5638791120768003e-10 -4.563862347991432e-10 1.5707999999999938
+        rotation 1 -2.2350244802345023e-10 -2.2350162891628225e-10 1.5707999999999942
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -115,7 +115,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 4.5678871354704257e-10 -4.567891792970548e-10 1.5707953071795442
+        rotation -0.9999999999999999 2.5356760380360465e-10 -2.5356780082475977e-10 1.5707953071795449
         children [
           USE WHEEL
         ]
@@ -157,7 +157,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
+        translation 0.15500000000000014 -0.03500000092667596 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -174,7 +174,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187927
+        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187934
       }
     }
     DEF BOX_CLAW HingeJoint {
@@ -224,22 +224,224 @@ Robot {
       aperture 0.5236
       resolution 0.003
     }
-    IRSensor {
+    SharpGP2Y0A02YK0F {
       translation 0.11 -0.03 0
     }
-    TEPT4400 {
-      translation 0.155 0.03 0.005
+    TEPT4400_RED {
+      translation 0.17 0.04 -0.005
       rotation 0 0 1 -1.5707953071795862
-      name "TEPT4400_RED"
-      red_filter TRUE
     }
-    TEPT4400 {
-      translation 0.155 0.03 -0.005
+    TEPT4400_GREEN {
+      translation 0.17 0.04 0
       rotation 0 0 1 -1.5707953071795862
-      name "TEPT4400_GREEN"
-      green_filter TRUE
     }
   ]
+  name "robot_green"
+  physics Physics {
+  }
+  controller "Robot_controller"
+}
+Robot {
+  translation 0 0.07 0.4
+  children [
+    Compass {
+      name "compass1"
+    }
+    Compass {
+      rotation 0 1 0 -1.5708
+    }
+    GPS {
+    }
+    Receiver {
+      channel 1
+    }
+    Emitter {
+      channel 1
+    }
+    DEF BODY Solid {
+      rotation 0 1 0 4.692820414042842e-06
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 1
+          }
+          geometry DEF SOLIDBOX Box {
+            size 0.2 0.1 0.2
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE SOLIDBOX
+      physics Physics {
+      }
+    }
+    DEF LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.074892064168798e-12
+        axis 0 0 -1
+        anchor 0.04 -0.02 0.11
+      }
+      device [
+        RotationalMotor {
+          name "left_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.02 0.11
+        rotation 1 -2.2350244802345023e-10 -2.2350162891628225e-10 1.5707999999999942
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+            }
+            geometry Cylinder {
+              height 0.01
+              radius 0.05
+            }
+          }
+        ]
+        name "left_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.07847065672431e-12
+        axis 0 0 -1
+        anchor 0.04 -0.02 -0.11
+      }
+      device [
+        RotationalMotor {
+          name "right_wheel"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.02 -0.11
+        rotation -0.9999999999999999 2.5356760380360465e-10 -2.5356780082475977e-10 1.5707953071795449
+        children [
+          USE WHEEL
+        ]
+        name "right_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF BEARING Solid {
+      translation -0.06 -0.035 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.5 0.5 0.5
+          }
+          geometry DEF Ball_bearing Sphere {
+            radius 0.035
+          }
+        }
+      ]
+      name "solid(1)"
+      contactMaterial "ball_bearing"
+      boundingObject USE Ball_bearing
+      physics Physics {
+      }
+    }
+    DEF RIGHT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 0.03
+      }
+      device [
+        RotationalMotor {
+          name "right_claw"
+        }
+        PositionSensor {
+          name "right_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.15500000000000014 -0.03500000092667596 0.02999999675663184
+      }
+    }
+    DEF LEFT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 -0.03
+      }
+      device [
+        RotationalMotor {
+          name "left_claw"
+        }
+        PositionSensor {
+          name "left_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187934
+      }
+    }
+    DEF BOX_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.09 -0.03 0
+      }
+      device [
+        RotationalMotor {
+          name "box_claw"
+        }
+        PositionSensor {
+          name "box_claw_sensor"
+        }
+      ]
+    }
+    DistanceSensor {
+      translation 0.06 -0.005 0.01
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Group {
+          children [
+            DEF ultrasonicShape Transform {
+              translation 0 0.01 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry Box {
+                    size 0.015 0.045 0.02
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "ultrasonic"
+      boundingObject USE ultrasonicShape
+      lookupTable [
+        0 0 0
+        0.02 0 0.002
+        0.02 0.02 0.002
+        1.5 1.5 0.002
+      ]
+      type "sonar"
+      aperture 0.5236
+      resolution 0.003
+    }
+    SharpGP2Y0A02YK0F {
+      translation 0.11 -0.03 0
+      name "IR Sensor"
+    }
+    TEPT4400_RED {
+      translation 0.17 0.04 -0.005
+      rotation 0 0 1 -1.5707953071795862
+    }
+    TEPT4400_GREEN {
+      translation 0.17 0.04 0
+      rotation 0 0 1 -1.5707953071795862
+    }
+  ]
+  name "robot_red"
   physics Physics {
   }
   controller "Robot_controller"
@@ -250,22 +452,22 @@ target {
   name "target(9)"
 }
 target {
-  translation 1.45437 0.0249755 1.1007
+  translation 0.667897 0.0249755 0.84292
   rotation -3.08321e-17 -1 -5.14243e-17 0.523596
   name "target(8)"
 }
 target {
-  translation 1.342 0.025 1.14
+  translation 0.802 0.025 0.29
   rotation -0.03896321197617513 0.9898912831673099 -0.13637124191660205 2.1883495730114342e-16
   name "target(7)"
 }
 target {
-  translation 0.458964 0.0249755 0.41736
+  translation 0.8198 0.0249755 -0.2533
   rotation 0.8059109309098598 0.24868508169517867 -0.537273953939948 6.347981521601662e-17
   name "target(6)"
 }
 target {
-  translation 1.29866 0.0249755 1.35878
+  translation -0.607402 0.0249755 0.720185
   rotation -1.32079e-17 1 4.61716e-17 -0.523595307179586
   colour 0 1 0
   name "target(5)"
@@ -277,13 +479,13 @@ target {
   name "target(1)"
 }
 target {
-  translation 1.44244 0.025 1.12595
+  translation -0.03756 0.025 0.94595
   rotation 0.5276696975222741 0.3083589524073046 0.7915045462832297 1.6158807051378174e-17
   colour 0 1 0
   name "target(2)"
 }
 target {
-  translation -0.0001 0.0249755 -0.7402
+  translation -0.0001 0.0249755 -0.8502
   rotation -0.47936571947404333 0.8442515227948549 0.23968285973698936 3.55741450952181e-17
   colour 0 1 0
   name "target(3)"

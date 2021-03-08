@@ -1,7 +1,9 @@
 import controller
 from field import Field
 import numpy as np
+import queue
 import hardware
+
 
 class Robot:
     
@@ -38,6 +40,8 @@ class Robot:
         self.colour = colour
         self.field = Field(colour)
         self.infrared_vref = 4.3
+        self.box_queue = queue.Queue()
+
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -51,8 +55,8 @@ class Robot:
 
         self.infrared = robot.getDevice(Robot.infrared_name)
         self.dsUltrasonic = robot.getDevice(Robot.dsUltrasonic_name)
-        self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
-        self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
+        #self.lightsensorRed = robot.getDevice(Robot.lightSensorRed_name)
+        #self.lightsensorGreen = robot.getDevice(Robot.lightSensorGreen_name)
         self.emitter = robot.getDevice(Robot.emitter_name)
         self.receiver = robot.getDevice(Robot.receiver_name)
         self.gps = robot.getDevice(Robot.gps_name)
@@ -65,8 +69,8 @@ class Robot:
         self.box_claw_sensor.enable(TIME_STEP)
         self.left_claw_sensor.enable(TIME_STEP)
         self.right_claw_sensor.enable(TIME_STEP)
-        self.lightsensorRed.enable(TIME_STEP)
-        self.lightsensorGreen.enable(TIME_STEP)
+        #self.lightsensorRed.enable(TIME_STEP)
+        #self.lightsensorGreen.enable(TIME_STEP)
         self.receiver.enable(TIME_STEP)
         self.gps.enable(TIME_STEP)
         self.compass.enable(TIME_STEP)
@@ -82,12 +86,17 @@ class Robot:
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setPosition(float('inf'))
         self.right_wheel.setVelocity(0.0)
+
         self.green_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
         self.red_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
+
+
+
     def step(self, TIME_STEP):
         self._robot.step(TIME_STEP)
+        return True
     
         
     def send_message(self, message: str):
@@ -115,12 +124,59 @@ class Robot:
             return message
         
         return ""
+    
+    
+    def send_sweep_locations(self, locations):
+    
+        message = ""
+        for pos in locations:
+            stringpos = "{},{}".format(pos[0], pos[1])
+            message += stringpos + ','
+            
+        self.send_message(message[:-1])
+        
+    
+    def get_sweep_locations(self):
+    
+        message = self.get_message()
+        
+        if message != '':
+            s = message.split(',')
+            coordinates = np.array([float(x) for x in s])
+            coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
+            """
+            print(coordinates.size)
+            for i in range(1, coordinates.size):
+                other_robot_locations.append([float(coordinates[i-1]), float(coordinates[i])])
+            """    
+        return coordinates
+        
+        
+    
+    def send_location(self):
+        location = self.gps.getValues()
+        message = "{},{}".format(location[0],location[2])
+        self.send_message(message)
+        
+        
+    def get_location(self):
+        message = self.get_message()
+        message = tuple(map(str, message.split(',')))  
+        try: 
+            message = [float(message[0]),float(message[1])]
+            return message  
+        except:
+            return []
         
         
     def measureLight(self):
         # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
         return [self.lightsensorRed.getValue(), self.lightsensorGreen.getValue()]
 
+    
+    def add_locations_to_queue(self, locations):
+        return
+    
     
     def field_position(self):
         """
