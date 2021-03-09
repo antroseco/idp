@@ -1,7 +1,8 @@
 """Robot_controller controller."""
 import controller
 from robot import Robot
-from searchCalculations import *
+from field import Field
+from calculations import *
 import numpy as np
 import math
 import time
@@ -69,195 +70,109 @@ def collision_prevention():
             right_wheel.setVelocity(0)
             return 'stop'
 
-def field_collision_green(coord):
-    robot.step(TIME_STEP)
-    location = robot.gps.getValues()
-    location = (location[0],location[2])
+
+def encircle(coord, location, field):
+    """
+    location is 3D gps coordinates
+    coord is 2D target coordinate
     
-    m = (coord[1] - location[1])/(coord[0]-location[0])
-    c = coord[1] - m*coord[0]
-
-   #c1 = location[1] - m*location[0]
-    x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
-    z = m*x + c
-    z1 = [i for i in z if i > -0.6]
-    z2 = [i for i in z1 if i < -0.2]
-    x1 = [i for i in x if i > -0.2]
-    x2 = [i for i in x1 if i < 0.2]
-
-
-    if z2 and x2:
-        return True
-    else:
-        return False
-        
-def field_collision_red(coord):
-    robot.step(TIME_STEP)
-    location = robot.gps.getValues()
-    location = (location[0],location[2])
-    
-    m = (coord[1] - location[1])/(coord[0]-location[0])
-    c = coord[1] - m*coord[0]
-   #c1 = location[1] - m*location[0]
-    x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
-    z = m*x + c
-    z1 = [i for i in z if i > 0.2]
-    z2 = [i for i in z1 if i < 0.6]
-    x1 = [i for i in x if i > -0.2]
-    x2 = [i for i in x1 if i < 0.2]
-
-    if z2 and x2:
-        return True
-    else:
-        return False
-
-
-
-def find_closest_point_green():
-    robot.step(TIME_STEP)
-    location = robot.gps.getValues()
-    location = (location[0],location[2])
-    p1 = (0.0,0.0)
-    p2 = (0.0,-0.8)
-    p3 = (0.5,-0.4)
-    p4 = (-0.5,-0.4)
-    points = [p1,p2,p3,p4]
-    bearings = [180.0,0.0,90.0,-90.0]
-    distances = []
-    
-    for point in points:
-        x = (point[0] - location[0])
-        z = (point[1] - location[1])
-        distance = (x**2 + z**2)**0.5
-        distances.append(distance)
-    i = distances.index(min(distances))
-    checkpoint = points[i]
-    bearing = bearings[i]
-    return checkpoint,bearing
-    
-
-def find_closest_point_red():
-    robot.step(TIME_STEP)
-    location = robot.gps.getValues()
-    location = (location[0],location[2])
-    p1 = (0.0,0.8)
-    p2 = (0.0,0.0)
-    p3 = (0.5,0.4)
-    p4 = (-0.5,0.4)
-    points = [p1,p2,p3,p4]
-    bearings = [180.0,0.0,90.0,-90.0]
-    distances = []
-    
-    for point in points:
-        x = (point[0] - location[0])
-        z = (point[1] - location[1])
-        distance = (x**2 + z**2)**0.5
-        distances.append(distance)
-    i = distances.index(min(distances))
-    checkpoint = points[i]
-    bearing = bearings[i]
-    return checkpoint,bearing
-
-
-
-def encircle_green(coord):
-    if not field_collision_green(coord):
+    this assumes both coord and location are in the same half of the field
+    """
+    if not robot.field_collision(coord, field):
         pass
     else:
-        checkpoint,bearing = find_closest_point_green()
-        move(checkpoint,error_translation = 0.05)
-        bearing += 90
-        if bearing > 180:
-            bearing -= 360
+        checkpoint, bearing = robot.find_closest_point(field)
+        move(checkpoint, error_translation = 0.05)
+        
+        speed_inner_wheel = 1.3
+        speed_outer_wheel = 3         
+        
+        #determine whether its better to turn anticlockwise
+        clockwise = turn_clockwise(coord, location, field)
+        
+ 
+        if clockwise:
+            bearing += 90
+            if bearing > 180:
+                bearing -= 360 
+        else:
+            bearing -= 90
+            if bearing <= -180:
+                bearing += 360
+        
         PID_rotation(bearing)
-        collision = field_collision_green(coord)        
+        
+        collision = robot.field_collision(coord, field)        
         while collision:
-            robot.left_wheel.setVelocity(1.37)
-            robot.right_wheel.setVelocity(5.0)
+        
+            if clockwise:
+                robot.left_wheel.setVelocity(speed_inner_wheel)
+                robot.right_wheel.setVelocity(speed_outer_wheel)
+            else:
+                robot.left_wheel.setVelocity(speed_outer_wheel)
+                robot.right_wheel.setVelocity(speed_inner_wheel)
             robot.step(TIME_STEP)
-            collision = field_collision_green(coord)
+            collision = robot.field_collision(coord, field)
+            
+    robot.left_wheel.setVelocity(0)
+    robot.right_wheel.setVelocity(0)
     return
     
     
-def encircle_red(coord):
-    if not field_collision_red(coord):
-        pass
-    else:
-        checkpoint,bearing = find_closest_point_red()
-        move(checkpoint,error_translation = 0.05)
-        bearing += 90
-        if bearing > 180:
-            bearing -= 360
-        PID_rotation(bearing)
-        collision = field_collision_red(coord)        
-        while collision:
-            robot.left_wheel.setVelocity(1.36)
-            robot.right_wheel.setVelocity(5.0)
-            robot.step(TIME_STEP)
-            collision = field_collision_red(coord)
-    return
-            
-            
-
-            
-        
+def move_avoid_fields(coord, error_translation = 0.05):
+    """
+    avoids both fields
+    """
+    robot.step(TIME_STEP)
+    location = robot.gps.getValues()
     
-
-         
-   
-
-
-
-def required_bearing(coord):
-    """
-    helper function for PID_rotation
-    returns a bearing angle to turn to
-    """
-    for i in range(2):
-        location = robot.gps.getValues()
-        required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
-        robot.step(TIME_STEP)
-      
+    
+    if location[2] * coord[1] >= 0: #target and current location are on the same half
         
-    #Q1    
-    if (coord[1] <= location[2]) and (coord[0] >= location[0]):
-        required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
-        required = required *180.0/np.pi
-        #print('Q1')
+        if location[2] > 0:
+            #red half
+            encircle(coord, location, red_field)
+        else:
+            #green half
+            encircle(coord, location, green_field)
+        move(coord, error_translation)
+    
+    else: #opposite halfs
+        if coord[0] > 0.3 or coord[0] < -0.3:
+            intermediate = [coord[0], 0]
+        else:
+            if coord[0] > 0:
+                intermediate = [0.3, 0]
+            else:
+                intermediate = [-0.3, 0]
+        if location[2] > 0: # red half
+            intermediate[1] = -0.2
+            encircle(intermediate, location, red_field)
+            move(intermediate, error_translation)
+            
+            encircle(coord, robot.gps.getValues(), green_field)
+            move(coord, error_translation)
+        else: #green half
+            intermediate[1] = 0.2
+            encircle(intermediate, location, green_field)
+            move(intermediate, error_translation)
+            
+            encircle(coord, robot.gps.getValues(), red_field)
+            move(coord, error_translation)
        
+        
+    return
     
 
-    #Q2            
-    elif (coord[1] > location[2]) and (coord[0] >= location[0]) :
-        required = np.arctan2((coord[1]-location[2]),((coord[0]-location[0])))
-        required = required *180.0/np.pi +90.0
-        #print('Q2')
-        
-    #Q3    
-    elif (coord[1] <= location[2]) and (coord[0] < location[0]) :
-        required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
-        required = required *180.0/np.pi 
-        #print('Q3')
-    #Q4    
-    elif (coord[1] > location[2]) and (coord[0] <= location[0]) :
-        required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
-        required = required *180.0/np.pi 
-        #print('Q4')
-    return required    
-    
-    
-    
 
 def PID_rotation(required, final_error = 0.5):
-
+    
     error = required - bearing1(robot.compass)
     
     previous_error = error
 
- 
     while abs(error) > final_error:
-        #print(required,'required')
-        #print(error)
+
         kP = 0.003
         kD = -11.0
         P = 6.28*kP*error
@@ -274,14 +189,14 @@ def PID_rotation(required, final_error = 0.5):
         
         previous_error = error
         error = required - bearing1(robot.compass)
-     
         
         robot.step(TIME_STEP)
     return
-    
+  
 
 
-def PID_translation_reverse(coord, final_error = 0.15):
+
+def PID_translation(coord, final_error = 0.15, reverse = False):
     error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
     
     while abs(error) > final_error or math.isnan(error):
@@ -293,39 +208,13 @@ def PID_translation_reverse(coord, final_error = 0.15):
             v = error*6.28*10
             if v > 6.28:
                 v = 6.28
-                
-            robot.left_wheel.setVelocity(-v)
-            robot.right_wheel.setVelocity(-v)
             
-        robot.step(TIME_STEP)
-        x = (coord[0] - robot.gps.getValues()[0])
-        z = (coord[1] - robot.gps.getValues()[2])
-        
-        previous_error = error
-        error = (x**2 + z**2)**0.5
-        
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0) 
-        
-    return
-
-
-
-def PID_translation(coord, final_error = 0.15):
-    error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
-    
-    while abs(error) > final_error or math.isnan(error):
-        if math.isnan(error) :
-            pass
-            
-        else:
-        
-            v = error*6.28*10
-            if v > 6.28:
-                v = 6.28
-                
+              
             robot.left_wheel.setVelocity(v)
             robot.right_wheel.setVelocity(v)
+            if reverse: 
+                robot.left_wheel.setVelocity(-v)
+                robot.right_wheel.setVelocity(-v) 
             
         robot.step(TIME_STEP)
         x = (coord[0] - robot.gps.getValues()[0])
@@ -335,7 +224,7 @@ def PID_translation(coord, final_error = 0.15):
         error = (x**2 + z**2)**0.5
         
         if previous_error < error:
-            angle = required_bearing(coord)
+            angle = required_bearing(coord, robot.gps.getValues())
             PID_rotation(angle)
         
     robot.left_wheel.setVelocity(0)
@@ -350,7 +239,7 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
     """
     move to location coord
     """
-    required_angle = required_bearing(coord)
+    required_angle = required_bearing(coord, robot.gps.getValues())
     PID_rotation(required_angle, error_rotation)
 
     PID_translation(coord, error_translation)
@@ -561,10 +450,8 @@ def return_box_field(coord):
     """
     
     intermediate, final = robot.field.get_to_field(coord)
-    encircle_red(intermediate)
-    encircle_green(intermediate)
  
-    move(intermediate, error_translation = 0.15)
+    move_avoid_fields(intermediate, error_translation = 0.15)
     if final[0] > 0:
         PID_rotation(-90)
     else:
@@ -574,15 +461,8 @@ def return_box_field(coord):
     
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
-    robot.left_wheel.setVelocity(-5)
-    robot.right_wheel.setVelocity(-5)
-    #reverse a little bit
-    for j in range(30):
-        robot.step(TIME_STEP)
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)
-    robot.step(TIME_STEP)
-    return 
+    reverse()
+    return
 
 
 def reverse():
@@ -609,9 +489,7 @@ def finish_in_field():
         intermediate = (0, -1)
         final = (0, -0.4)
         
-    encircle_green(intermediate)
-    encircle_red(intermediate)    
-    move(intermediate)
+    move_avoid_fields(intermediate)
     
     if robot.colour == 'red':
         PID_rotation(180)
@@ -619,7 +497,7 @@ def finish_in_field():
         PID_rotation(0)
         
        
-    PID_translation_reverse(final)
+    PID_translation(final, reverse=True)
     
     return
     
@@ -631,12 +509,16 @@ def finish_in_field():
 r = controller.Robot()
 if r.getName() == 'robot_red':
     robot = Robot(r, 'red')
+    
 else:
     robot = Robot(r, 'green')
+        
+red_field = Field('red')
+green_field = Field('green')
 
-
-
+ 
 robot.step(TIME_STEP)
+
 
 
 positions = sweep(0.4)
@@ -649,30 +531,27 @@ robot.step(TIME_STEP)
 #to visit are saved in robot.box_queue
 robot.get_sweep_locations()
 
-print(positions)
+#print(positions)
 
 initial_pass = True   
 
 while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
-    
-    if initial_pass == True:
-        initial_pass = False
-    else:
-        encircle_green(pos)
-        encircle_red(pos)
-
-
-    
     withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
-    move(pos, error_translation=0.1)
+    
+    if initial_pass:
+        initial_pass = False
+        move(pos)
+    else:
+        move_avoid_fields(pos, error_translation = 0.1)
+
 
     robot.step(TIME_STEP)
     c = deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
-    robot.step(TIME_STEP)
-    robot.step(TIME_STEP)
+    for i in range(10):
+        robot.step(TIME_STEP)
 
     
     colour = ''
@@ -682,7 +561,7 @@ while not robot.box_queue.empty() and robot.field.available():
         colour = 'green'
         
     robot.step(TIME_STEP)
-    
+
     
            
     if colour == robot.colour:
@@ -697,8 +576,11 @@ while not robot.box_queue.empty() and robot.field.available():
         
     robot.read_all_locations()
     
+    
 
 print('parking')
+deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+
 robot.step(TIME_STEP)
 finish_in_field()
 

@@ -2,6 +2,64 @@ import numpy as np
 import math    
 
 
+def turn_clockwise(coord, location, field):
+    """
+    returns true if it's faster to turn clockwise from location to coord
+    """
+    angle1 = math.degrees(np.arctan2(location[2] - field.y, location[0] - field.x))
+    angle1 = angle1 % 360
+    angle2 = math.degrees(np.arctan2(coord[1] - field.y, coord[0] - field.x))
+    angle2 = angle2 % 360
+            
+    diff = angle2 - angle1
+    if diff < 0:
+        diff += 360
+    if diff < 180:
+        return True
+    
+    return False
+
+
+    
+
+def required_bearing(coord, location):
+    """
+    helper function for PID_rotation
+    returns a bearing angle to turn to
+    """
+
+    required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
+          
+        
+    #Q1    
+    if (coord[1] <= location[2]) and (coord[0] >= location[0]):
+        required = np.arctan2((coord[0]-location[0]),(-(coord[1]-location[2])))
+        required = required *180.0/np.pi
+        #print('Q1')
+       
+    
+
+    #Q2            
+    elif (coord[1] > location[2]) and (coord[0] >= location[0]) :
+        required = np.arctan2((coord[1]-location[2]),((coord[0]-location[0])))
+        required = required *180.0/np.pi +90.0
+        #print('Q2')
+        
+    #Q3    
+    elif (coord[1] <= location[2]) and (coord[0] < location[0]) :
+        required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
+        required = required *180.0/np.pi 
+        #print('Q3')
+    #Q4    
+    elif (coord[1] > location[2]) and (coord[0] <= location[0]) :
+        required = -np.arctan2(-(coord[0]-location[0]),(-(coord[1]-location[2])))
+        required = required *180.0/np.pi 
+        #print('Q4')
+    return required     
+    
+    
+
+
 def get_wall_position(angle, position):
     """
     finds distance from centre of the robot to the wall depending on the position and rotation of the robot

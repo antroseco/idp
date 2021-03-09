@@ -97,8 +97,62 @@ class Robot:
 
 
     def step(self, TIME_STEP):
+        """
+        performs a simulation step
+        """
         self._robot.step(TIME_STEP)
         return True
+    
+            
+    def field_collision(self, coord, field):
+        """
+        checks if on the path between current position and coord it needs to go across field
+        """
+        
+        location = self.gps.getValues()
+        location = (location[0],location[2])
+        
+        m = (coord[1] - location[1])/(coord[0]-location[0])
+        c = coord[1] - m*coord[0]
+    
+        x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
+        z = m*x + c
+        z1 = [i for i in z if (i > field.y - 0.2 and i < field.y + 0.2)]
+        x1 = [i for i in x if (i > field.x - 0.2 and i < field.x + 0.2)]
+    
+        if z1 and x1:
+            return True
+        
+        return False
+    
+    
+    
+    def find_closest_point(self, field):
+        """
+        helper function for avoiding the field 
+        input field is of type Field
+        """
+        location = self.gps.getValues()
+        location = (location[0],location[2])
+        p1 = [field.x, field.y + 0.35]
+        p2 = [field.x, field.y - 0.35]
+        p3 = [field.x + 0.35, field.y]
+        p4 = [field.x - 0.35, field.y]
+        points = [p1, p2, p3, p4]
+        bearings = [180.0, 0.0, 90.0, -90.0]
+        distances = []
+        
+        for point in points:
+            x = (point[0] - location[0])
+            z = (point[1] - location[1])
+            distance = (x**2 + z**2)**0.5
+            distances.append(distance)
+        i = distances.index(min(distances))
+        checkpoint = points[i]
+        bearing = bearings[i]
+        
+        return checkpoint,bearing
+        
     
         
 
@@ -131,7 +185,9 @@ class Robot:
     
     
     def send_sweep_locations(self, locations):
-    
+        """
+        send an array of locations as one message to other robot after the sweep
+        """
         message = ""
         for pos in locations:
             stringpos = "{},{}".format(pos[0], pos[1])
@@ -141,7 +197,9 @@ class Robot:
         
     
     def get_sweep_locations(self):
-    
+        """
+        gets an array of locations from a message
+        """
         message = self.get_message()
         
         if message != '':
@@ -160,8 +218,7 @@ class Robot:
         check sweep results from both robots, remove duplicate locations
         save locations on robot's half of the table to queue starting from the closest one to the robot
         """
-        
-        
+
         duplicates = []
         
         for i in range(self.sweep_locations.shape[0]):
@@ -197,12 +254,18 @@ class Robot:
                    
                    
     def send_box_location(self, location):
+        """
+        send a location of one box
+        """
         message = "{},{}".format(location[0],location[1])
         self.send_message(message)
         return
     
         
     def read_box_location(self):
+        """
+        receive location of one box
+        """
         message = self.get_message()
         s = message.split(',')
         coord = np.array([float(x) for x in s])
@@ -212,7 +275,9 @@ class Robot:
     
     
     def read_all_locations(self):
-        
+        """
+        read locations of all boxes boxes (if they are all in separate messages)
+        """
         locations = []
         
         while self.receiver.getQueueLength() > 0:
@@ -227,12 +292,18 @@ class Robot:
     
     
     def send_location(self):
+        """
+        send current location of the robot
+        """
         location = self.gps.getValues()
         message = "{},{}".format(location[0],location[2])
         self.send_message(message)
         
         
     def get_location(self):
+        """
+        get a location of another robot from a message
+        """
         message = self.get_message()
         message = tuple(map(str, message.split(',')))  
         try: 
@@ -240,14 +311,7 @@ class Robot:
             return message  
         except:
             return []
-        
-        
-    def measureLight(self):
-        # print(lightsensorRed.getValue(),lightsensorGreen.getValue())
-        return [self.lightsensorRed.getValue(), self.lightsensorGreen.getValue()]
-    
-    
-    
+
     
     def field_position(self):
         """
