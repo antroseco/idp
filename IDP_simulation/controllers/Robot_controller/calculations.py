@@ -2,6 +2,15 @@ import numpy as np
 import math    
 
 
+def get_distance(loc1, loc2):
+    
+    loc1 = np.array(loc1)
+    loc2 = np.array(loc2)
+    dist = np.linalg.norm(loc1 - loc2)
+    return dist
+    
+    
+
 def turn_clockwise(coord, location, field):
     """
     returns true if it's faster to turn clockwise from location to coord

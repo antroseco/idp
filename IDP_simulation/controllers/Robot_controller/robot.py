@@ -3,6 +3,7 @@ from field import Field
 import numpy as np
 import queue
 import hardware
+from calculations import *
 
 
 class Robot:
@@ -43,6 +44,9 @@ class Robot:
         self.box_queue = queue.Queue()
         self.sweep_locations = []
         self.other_sweep_locations = []
+        self.position = np.array([])
+        self.other_position = np.array([]) 
+        
 
         
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
@@ -101,7 +105,42 @@ class Robot:
         performs a simulation step
         """
         self._robot.step(TIME_STEP)
+        self.send_location()
+        self.get_location()
+        if self.colour == 'green' and self.position.size == 2 and self.other_position.size == 2:
+            self.collision_prevention()
+        
         return True
+    
+    
+    
+    def collision_prevention(self, threshold = 0.7):
+        """Checks if the distance between each robot is below a certain
+        threshold and stops the robot once beneath the threshold"""
+        
+        if self.other_position.size == 0 or self.position.size == 0:
+            pass
+        else:
+            dist = get_distance(self.position, self.other_position)
+            #print(dist)
+            if self.colour == 'green':
+                while dist < threshold:
+                   
+                    self.left_wheel.setVelocity(0)
+                    self.right_wheel.setVelocity(0)
+                    
+                    self._robot.step(Robot.TIME_STEP)
+                    
+                    self.send_location()
+                    self.get_location()
+                    
+                    if self.position.size == 2 and self.other_position.size == 2:
+            
+                        dist = get_distance(self.position, self.other_position)
+                    
+                    
+    
+
     
             
     def field_collision(self, coord, field):
@@ -160,6 +199,7 @@ class Robot:
         return: /
         """
         data = message.encode('utf-8')
+        self._robot.step(Robot.TIME_STEP)
         self.emitter.send(data)
         return
     
@@ -174,6 +214,7 @@ class Robot:
         if self.receiver.getQueueLength() > 0:
             data = self.receiver.getData()
             message = data.decode('utf-8')
+            self._robot.step(Robot.TIME_STEP)
             self.receiver.nextPacket()
             return message
         
@@ -271,10 +312,10 @@ class Robot:
         locations = []
         
         while self.receiver.getQueueLength() > 0:
-            self.step(Robot.TIME_STEP)
+            self._robot.step(Robot.TIME_STEP)
             coord = self.read_box_location()
             locations.append(coord)
-            self.step(Robot.TIME_STEP)
+            self._robot.step(Robot.TIME_STEP)
             self.box_queue.put(coord)
             
         return locations        
@@ -284,7 +325,9 @@ class Robot:
         """
         send current location of the robot
         """
+        self._robot.step(Robot.TIME_STEP)
         location = self.gps.getValues()
+        self.position = np.array([location[0], location[2]])
         message = "{},{}".format(location[0],location[2])
         self.send_message(message)
         
@@ -294,12 +337,14 @@ class Robot:
         get a location of another robot from a message
         """
         message = self.get_message()
-        message = tuple(map(str, message.split(',')))  
-        try: 
-            message = [float(message[0]),float(message[1])]
-            return message  
-        except:
+        if message == "":
+            self.other_position = np.array([])
             return []
+        s = message.split(',') 
+        loc = np.array([float(s[0]), float(s[1])])
+        self.other_position = loc
+        
+        return loc
 
 
     def field_position(self):
@@ -428,7 +473,7 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True 
-            self.step(Robot.TIME_STEP)
+            self._robot.step(Robot.TIME_STEP)
             
         for n in range(20):
         #Move forwards and do color detection
@@ -476,7 +521,7 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired) #both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            self.step(Robot.TIME_STEP)
+            self._robot.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
     
     def set_boxclaw(self, targetAngle):
@@ -492,7 +537,7 @@ class Robot:
         
         while error > accuracy:
             box_claw.setPosition(desired)
-            self.step(Robot.TIME_STEP)
+            self._robot.step(Robot.TIME_STEP)
             error = abs(desired - box_claw_sensor.getValue())
         return
         

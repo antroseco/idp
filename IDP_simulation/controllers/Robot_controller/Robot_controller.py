@@ -42,33 +42,6 @@ def bearing(compass_obj):
     return  theta
 
 
-
-def collision_prevention():
-    """Checks if the distance between each robot is below a certain
-    threshold and stops the robot once beneath the threshold"""
-    self_location = (gps.getValues()[0],gps.getValues()[2])
-    send_location()
-    other_location = get_location()
-    robot.step(TIME_STEP)
-    print(other_location,'other location')
-    print(self_location,'self location')
-    
-    if not other_location:
-        pass
-    else:
-        x = (self_location[0] - other_location[0])**2
-        z = (self_location[1] - other_location[1])**2
-        
-        distance = (x**2 + z**2)**0.5
-        print(distance)
-        threshold = 0.2
-        
-        if distance < threshold:
-            left_wheel.setVelocity(0)
-            right_wheel.setVelocity(0)
-            return 'stop'
-
-
 def encircle(coord, location, field):
     """
     location is 3D gps coordinates
@@ -80,7 +53,6 @@ def encircle(coord, location, field):
         pass
     else:
         checkpoint, bearing = robot.find_closest_point(field)
-        print(checkpoint)
         move(checkpoint, error_translation = 0.1)
         
         speed_inner_wheel = 2
@@ -176,15 +148,15 @@ def PID_rotation(required, final_error = 0.5):
     while abs(error) > final_error:
 
         kP = 0.003
-        kD = -11.0
+        kD = 10.0
         P = 6.28*kP*error
         D = (error-previous_error)/(100.0)*kD
         
         v = P + D 
-        if v > 6.0:
-            v = 6.0
-        elif v < -6.0:
-            v = -6.0
+        if v > MAX_VELOCITY:
+            v = MAX_VELOCITY
+        elif v < -MAX_VELOCITY:
+            v = -MAX_VELOCITY
     
         robot.left_wheel.setVelocity(-v)
         robot.right_wheel.setVelocity(v)
@@ -198,10 +170,12 @@ def PID_rotation(required, final_error = 0.5):
 
 
 
-def PID_translation(coord, final_error = 0.15, reverse = False):
+def PID_translation(coord, final_error = 0.15, reverse = False, maxVelocity = 6.7):
     """input: 2D desired coordinate coord,
     The function moves in a straight line until the desired location is within 
     the final error distance"""
+    
+    
     error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
     
     while abs(error) > final_error or math.isnan(error):
@@ -222,6 +196,7 @@ def PID_translation(coord, final_error = 0.15, reverse = False):
                 robot.right_wheel.setVelocity(-v) 
             
         robot.step(TIME_STEP)
+        
         x = (coord[0] - robot.gps.getValues()[0])
         z = (coord[1] - robot.gps.getValues()[2])
         
@@ -341,7 +316,7 @@ def reverse():
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
     #reverse a little bit
-    for j in range(25):
+    for j in range(10):
         robot.step(TIME_STEP)
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
@@ -371,6 +346,14 @@ def finish_in_field():
     PID_translation(final, reverse=True)
     
     return
+
+
+def test_collisions():
+    if robot.colour == 'green':
+        move((0, 1))  
+    if robot.colour == 'red':
+        move((1, 0))      
+
     
     
 #This part is executed
@@ -384,8 +367,12 @@ else:
 red_field = Field('red')
 green_field = Field('green')
 
+#test_collisions()
+
+
 robot.step(TIME_STEP)
 positions = sweep(0.4)
+print(positions)
 
 robot.step(TIME_STEP)
 robot.send_sweep_locations(positions)
@@ -402,6 +389,7 @@ initial_pass = True
 while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
+    print(pos)
     robot.withdraw_dualclaw()
     
     if initial_pass:
@@ -451,6 +439,4 @@ print('parking')
 
 robot.step(TIME_STEP)
 finish_in_field()
-
-
 
