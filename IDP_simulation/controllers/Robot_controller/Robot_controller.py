@@ -12,7 +12,7 @@ np.set_printoptions(suppress=True)
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
-MAX_VELOCITY = 6
+MAX_VELOCITY = 6.7
 
 
 def bearing1(compass_obj): 
@@ -48,6 +48,8 @@ def bearing(compass_obj):
 
 
 def collision_prevention():
+    """Checks if the distance between each robot is below a certain
+    threshold and stops the robot once beneath the threshold"""
     self_location = (gps.getValues()[0],gps.getValues()[2])
     send_location()
     other_location = get_location()
@@ -166,6 +168,9 @@ def move_avoid_fields(coord, error_translation = 0.05):
 
 
 def PID_rotation(required, final_error = 0.5):
+    """input: required is the required bearing,
+    The function rotates until the bearing is within final error 
+    of the required bearing"""
     
     error = required - bearing1(robot.compass)
     
@@ -197,6 +202,9 @@ def PID_rotation(required, final_error = 0.5):
 
 
 def PID_translation(coord, final_error = 0.15, reverse = False):
+    """input: 2D desired coordinate coord,
+    The function moves in a straight line until the desired location is within 
+    the final error distance"""
     error = ((coord[0] - robot.gps.getValues()[0])**2 +(coord[1] - robot.gps.getValues()[2])**2)**(1/2)
     
     while abs(error) > final_error or math.isnan(error):
@@ -205,9 +213,9 @@ def PID_translation(coord, final_error = 0.15, reverse = False):
             
         else:
         
-            v = error*6.28*10
-            if v > 6.28:
-                v = 6.28
+            v = error*MAX_VELOCITY*10
+            if v > MAX_VELOCITY:
+                v = MAX_VELOCITY
             
               
             robot.left_wheel.setVelocity(v)
@@ -444,6 +452,9 @@ else:
         
 red_field = Field('red')
 green_field = Field('green')
+
+
+
 
  
 robot.step(TIME_STEP)
