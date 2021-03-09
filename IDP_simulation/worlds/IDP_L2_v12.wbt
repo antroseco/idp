@@ -80,7 +80,7 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.3038
+          maxVelocity 6.702
           maxTorque 0.4
         }
       ]
@@ -113,7 +113,7 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.3038
+          maxVelocity 6.702
           maxTorque 0.4
         }
       ]
@@ -292,7 +292,7 @@ Robot {
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 2.3038
+          maxVelocity 6.702
           maxTorque 0.4
         }
       ]
@@ -325,7 +325,7 @@ Robot {
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 2.3038
+          maxVelocity 6.702
           maxTorque 0.4
         }
       ]
