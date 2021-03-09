@@ -24,12 +24,8 @@ def bearing1(compass_obj):
     theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
     theta = (theta-(np.pi /2.0) )*180.0/np.pi
     if theta < -180:
-        theta += 360
-        
-    
+        theta += 360    
     return  theta
-   
-   
    
    
 def bearing(compass_obj): 
@@ -231,8 +227,6 @@ def PID_translation(coord, final_error = 0.15, reverse = False):
     robot.right_wheel.setVelocity(0) 
         
     return
-
-
   
 
 def move(coord, error_rotation = 0.5, error_translation = 0.15):
@@ -244,11 +238,7 @@ def move(coord, error_rotation = 0.5, error_translation = 0.15):
 
     PID_translation(coord, error_translation)
     return
-    
-    
-    
-    
-    
+
 
 def sweep(velocity = 0.5, swept_angle =355):
     """
@@ -315,62 +305,6 @@ def sweep(velocity = 0.5, swept_angle =355):
     
     return locations
 
-                
-
-def set_claw(targetAngle, targetClaw, targetSensor):
-    """move the box_claw to the input angle, 
-    input in degrees, use positionSensor to provide feedback
-    input: targetAngle, targetClaw(which claw is used), targetSensor(Accompanying sensor)
-    
-    """
-    desired = targetAngle*np.pi/180
-    error = abs(desired - targetSensor.getValue())
-    accuracy = 5*np.pi/180
-    
-    while error > accuracy:
-        targetClaw.setPosition(desired)
-        robot.step(TIME_STEP)
-        error = abs(desired - targetSensor.getValue())
-    return
-    
-    # box_claw_sensor.
-    # box_claw.setPosition(np.pi/2)
-    
-def withdraw_boxclaw():
-    set_claw(90, box_claw, box_claw_sensor)
-    
-def deploy_boxclaw():
-    set_claw(0, box_claw, box_claw_sensor)
-
-def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2):
-    desired = targetAngle*np.pi/180
-    error = abs(desired - targetSensor1.getValue())
-    accuracy = 1*np.pi/180
-    previous = 100 #arbitrary value just serves as placeholder
-    count = 0    
-    while error > accuracy:
-        measurement = targetSensor1.getValue()
-        targetClaw1.setPosition(desired)
-        targetClaw2.setPosition(-desired)
-        if abs(measurement - previous) < accuracy:
-            count += 1
-        else:
-            count = 0
-            
-        if count >= 3:
-            break
-        previous = measurement
-        robot.step(TIME_STEP)
-    
-def measureLight(lightSensor):
-    """ Function to return voltage values based on the sensors input, use the filters for TEPT4400 as the ones in proto
-    
-    """
-    circuit = hardware.PhototransistorCircuit(robot.lightSensor)
-    analogue_input = hardware.ADCInput(lambda:circuit.voltage())
-    return analogue_input.read()
-      
-
 def return_box_field(coord):
     """
     function that makes robot return a box in the specified field without it clashing with
@@ -431,9 +365,6 @@ def finish_in_field():
     return
     
     
-    
-    
-
 #This part is executed
 r = controller.Robot()
 if r.getName() == 'robot_red':
@@ -444,10 +375,8 @@ else:
         
 red_field = Field('red')
 green_field = Field('green')
-
  
 robot.step(TIME_STEP)
-
 positions = sweep(0.4)
 
 robot.step(TIME_STEP)
@@ -466,7 +395,6 @@ while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
     robot.withdraw_dualclaw()
-
     
     if initial_pass:
         initial_pass = False
@@ -478,7 +406,7 @@ while not robot.box_queue.empty() and robot.field.available():
     robot.step(TIME_STEP)
     c = robot.deploy_dualclaw()
     robot.remeasure()
-    robot.deploy_without_measure()
+    robot.close_dualclaw()
     for i in range(10):
         robot.step(TIME_STEP)
 

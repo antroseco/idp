@@ -126,7 +126,6 @@ class Robot:
         return False
     
     
-    
     def find_closest_point(self, field):
         """
         helper function for avoiding the field 
@@ -153,9 +152,6 @@ class Robot:
         
         return checkpoint,bearing
         
-    
-        
-
         
     def send_message(self, message: str):
         """
@@ -335,7 +331,7 @@ class Robot:
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
-        desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
+        desired = 0*np.pi/180 #minus value should not be reached, break loop when count reaches 3
         error = abs(desired - sensor1.getValue())
         accuracy = 1*np.pi/180 #accuracy value in degrees
         previous = 100 #arbitrary value just serves as placeholder
@@ -355,14 +351,6 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired) #both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            if abs(measurement - previous) < accuracy: #compare measurement from previous time frame to current, add 1 to count if same
-                count += 1
-            else:
-                count = 0
-                
-            if count >= 3:
-                break
-            previous = measurement 
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
     
@@ -401,6 +389,8 @@ class Robot:
         
     def remeasure(self):
         """steps through multiple time steps, called when deploy_dualclaw doesn't return right value
+        goes back and forth in attempt to remeasure color
+        returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
         """
         claw1 = self.left_claw
         claw2 = self.right_claw
@@ -466,7 +456,7 @@ class Robot:
             print('bad result')
             return 3
 
-    def deploy_without_measure(self):
+    def close_dualclaw(self):
         """
         step through multiple time steps,
         closes dual claw and simultaneously attempts to detect the color of the box it is holding.
@@ -476,7 +466,7 @@ class Robot:
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
-        desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
+        desired = 0*np.pi/180 #minus value should not be reached, break loop when count reaches 3
         error = abs(desired - sensor1.getValue())
         accuracy = 1*np.pi/180 #accuracy value in degrees
         previous = 100 #arbitrary value just serves as placeholder
@@ -486,13 +476,29 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired) #both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            if abs(measurement - previous) < accuracy: #compare measurement from previous time frame to current, add 1 to count if same
-                count += 1
-            else:
-                count = 0
-                
-            if count >= 2:
-                break
-            previous = measurement 
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
+    
+    def set_boxclaw(self, targetAngle):
+        """not in use with the current claw mechanism
+        steps through multiple time steps,
+        move the box_claw to the input angle, 
+        input: targetAngle in degrees, use box_claw_sensor to provide feedback
+        """
+        
+        desired = targetAngle*np.pi/180
+        error = abs(desired - box_claw_sensor.getValue())
+        accuracy = 5*np.pi/180
+        
+        while error > accuracy:
+            box_claw.setPosition(desired)
+            self.step(Robot.TIME_STEP)
+            error = abs(desired - box_claw_sensor.getValue())
+        return
+        
+    def withdraw_boxclaw():
+        self.set_claw(90)
+    
+    def deploy_boxclaw():
+        self.set_claw(0)    
+    

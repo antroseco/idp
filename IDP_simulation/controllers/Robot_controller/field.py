@@ -73,6 +73,3 @@ class Field:
             intermediate_pos = (self.x - self.sizex / 2 - 0.2, final_pos[1])
             
         return intermediate_pos, final_pos
-
-        
-  
