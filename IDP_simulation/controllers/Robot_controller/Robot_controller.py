@@ -367,7 +367,6 @@ def finish_in_field():
     else:
         PID_rotation(0)
         
-       
     PID_translation(final, reverse=True)
     
     return
@@ -384,9 +383,6 @@ else:
 red_field = Field('red')
 green_field = Field('green')
 
-
-
- 
 robot.step(TIME_STEP)
 positions = sweep(0.4)
 
@@ -416,22 +412,27 @@ while not robot.box_queue.empty() and robot.field.available():
 
     robot.step(TIME_STEP)
     c = robot.deploy_dualclaw()
-    robot.remeasure()
-    robot.close_dualclaw()
     for i in range(10):
         robot.step(TIME_STEP)
 
-    
     colour = ''
     if c == 0:
         colour = 'red'
     elif c == 1:
         colour = 'green'
+    else:
+        c = robot.remeasure()
+        robot.close_dualclaw()
+        if c == 0:
+            colour = 'red'
+        elif c == 1:
+            colour = 'green'
+        
+
         
     robot.step(TIME_STEP)
 
     
-           
     if colour == robot.colour:
         return_box_field(robot.gps.getValues())
     else:
@@ -443,7 +444,6 @@ while not robot.box_queue.empty() and robot.field.available():
             robot.send_box_location(pos)
         
     robot.read_all_locations()
-    
     
 
 print('parking')

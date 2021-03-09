@@ -376,7 +376,7 @@ class Robot:
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
     
-        desired = 40*np.pi/180 #arbitrary value
+        desired = 20*np.pi/180 #arbitrary value
         error = abs(desired - sensor1.getValue())
         accuracy = 1*np.pi/180 #accuracy value in degrees
         while error > accuracy:
