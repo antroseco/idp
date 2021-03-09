@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.185430204438424 0.8075786493764995 0.5598503053077251 3.5523956960880305
-  position -0.3400307464051529 2.7162196494200597 -1.1193283693726988
+  orientation -0.20713749336974976 -0.8582125377862911 -0.4696437999451397 2.5501100384480364
+  position -0.9490527437589176 2.6461849554018197 -1.4364582076954775
 }
 Background {
   skyColor [
@@ -38,7 +38,7 @@ Floor {
   }
 }
 Robot {
-  translation 0 0.07 -0.4
+  translation 0 0.068 -0.4
   children [
     Compass {
       name "compass1"
@@ -75,26 +75,26 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.074892064168798e-12
         axis 0 0 -1
-        anchor 0.04 -0.02 0.11
+        anchor 0.04 -0.0172 0.11
       }
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 6.702
+          maxVelocity 2.3038
           maxTorque 0.4
         }
       ]
       endPoint Solid {
-        translation 0.04 -0.02 0.11
-        rotation 1 -7.701546003492461e-10 -7.701517706153041e-10 1.5707999999999935
+        translation 0.04 -0.0172 0.11
+        rotation 1 -5.399231985231418e-10 -5.399212152729267e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
               baseColor 1 0 0
             }
             geometry Cylinder {
-              height 0.01
-              radius 0.05
+              height 0.02
+              radius 0.0508
             }
           }
         ]
@@ -108,17 +108,18 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.07847065672431e-12
         axis 0 0 -1
-        anchor 0.04 -0.02 -0.11
+        anchor 0.04 -0.0172 -0.11
       }
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 6.702
+          maxVelocity 2.3038
           maxTorque 0.4
         }
       ]
       endPoint Solid {
-        rotation -0.9999999999999999 7.708309541836406e-10 -7.708317401708599e-10 1.5707953071795437
+        translation 0.04 -0.0172 -0.11
+        rotation -0.9999999999999999 5.403973620098928e-10 -5.403979130086115e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -129,14 +130,14 @@ Robot {
       }
     }
     DEF BEARING Solid {
-      translation -0.06 -0.035 0
+      translation -0.06 -0.059 0
       children [
         Shape {
           appearance PBRAppearance {
             baseColor 0.5 0.5 0.5
           }
           geometry DEF Ball_bearing Sphere {
-            radius 0.035
+            radius 0.009
           }
         }
       ]
@@ -160,7 +161,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.1550000000000002 -0.035000000926675975 0.02999999675663184
+        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -249,7 +250,7 @@ Robot {
   controller "Robot_controller"
 }
 Robot {
-  translation 0 0.07 0.4
+  translation -0.0187653 0.068 0.398589
   children [
     Compass {
       name "compass1"
@@ -286,26 +287,26 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.074892064168798e-12
         axis 0 0 -1
-        anchor 0.04 -0.02 0.11
+        anchor 0.04 -0.0172 0.11
       }
       device [
         RotationalMotor {
           name "left_wheel"
-          maxVelocity 6.702
+          maxVelocity 2.3038
           maxTorque 0.4
         }
       ]
       endPoint Solid {
-        translation 0.04 -0.02 0.11
-        rotation 1 -7.701545186112581e-10 -7.701520614436047e-10 1.5707999999999942
+        translation 0.04 -0.0172 0.11
+        rotation 1 -5.399231985231418e-10 -5.399212152729267e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
               baseColor 1 0 0
             }
             geometry Cylinder {
-              height 0.01
-              radius 0.05
+              height 0.02
+              radius 0.0508
             }
           }
         ]
@@ -319,19 +320,19 @@ Robot {
       jointParameters HingeJointParameters {
         position 4.07847065672431e-12
         axis 0 0 -1
-        anchor 0.04 -0.02 -0.11
+        anchor 0.04 -0.0172 -0.11
       }
       device [
         RotationalMotor {
           name "right_wheel"
-          maxVelocity 6.702
+          maxVelocity 2.3038
           maxTorque 0.4
         }
       ]
       endPoint Solid {
-        translation 0.04 -0.02 -0.11
-        rotation -0.9999999999999999 7.708309319689961e-10 -7.708317345086471e-10 1.5707953071795426
--        children [
+        translation 0.04 -0.0172 -0.11
+        rotation -0.9999999999999999 5.403973620098928e-10 -5.403979130086115e-10 1.5707953071795442
+        children [
           USE WHEEL
         ]
         name "right_wheel"
@@ -341,14 +342,14 @@ Robot {
       }
     }
     DEF BEARING Solid {
-      translation -0.06 -0.035 0
+      translation -0.06 -0.059 0
       children [
         Shape {
           appearance PBRAppearance {
             baseColor 0.5 0.5 0.5
           }
           geometry DEF Ball_bearing Sphere {
-            radius 0.035
+            radius 0.009
           }
         }
       ]
@@ -372,7 +373,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000008 -0.03500000092667596 0.02999999675663184
+        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -389,7 +390,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.1550000000000005 -0.03499999999999964 -0.030000000062187927
+        translation 0.15500000000000047 -0.03499999999999964 -0.030000000062187927
       }
     }
     DEF BOX_CLAW HingeJoint {
