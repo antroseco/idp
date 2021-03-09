@@ -80,7 +80,8 @@ def encircle(coord, location, field):
         pass
     else:
         checkpoint, bearing = robot.find_closest_point(field)
-        move(checkpoint, error_translation = 0.05)
+        print(checkpoint)
+        move(checkpoint, error_translation = 0.1)
         
         speed_inner_wheel = 2
         speed_outer_wheel = 3.5         
@@ -140,9 +141,9 @@ def move_avoid_fields(coord, error_translation = 0.05):
             intermediate = [coord[0], 0]
         else:
             if coord[0] > 0:
-                intermediate = [0.3, 0]
+                intermediate = [0.5, 0]
             else:
-                intermediate = [-0.3, 0]
+                intermediate = [-0.5, 0]
         if location[2] > 0: # red half
             intermediate[1] = -0.2
             encircle(intermediate, location, red_field)
@@ -237,7 +238,7 @@ def PID_translation(coord, final_error = 0.15, reverse = False):
     return
   
 
-def move(coord, error_rotation = 0.5, error_translation = 0.15):
+def move(coord, error_rotation = 1, error_translation = 0.15):
     """
     move to location coord
     """

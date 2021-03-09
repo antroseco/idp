@@ -16,15 +16,15 @@ class Field:
         
         if colour == 'green':
             self.y = -0.4
-            self.box_positions.append((self.x + 0.1, self.y ))
-            self.box_positions.append((self.x + 0.1, self.y + 0.2))
-            self.box_positions.append((self.x - 0.1, self.y))
-            self.box_positions.append((self.x - 0.1, self.y + 0.2))
+            self.box_positions.append((self.x + 0.05, self.y ))
+            self.box_positions.append((self.x + 0.05, self.y + 0.1))
+            self.box_positions.append((self.x - 0.05, self.y))
+            self.box_positions.append((self.x - 0.05, self.y + 0.1))
         else:#box red
-            self.box_positions.append((self.x + 0.1, self.y))
-            self.box_positions.append((self.x + 0.1, self.y - 0.2))
-            self.box_positions.append((self.x - 0.1, self.y))
-            self.box_positions.append((self.x - 0.1, self.y - 0.2))
+            self.box_positions.append((self.x + 0.05, self.y))
+            self.box_positions.append((self.x + 0.05, self.y - 0.1))
+            self.box_positions.append((self.x - 0.05, self.y))
+            self.box_positions.append((self.x - 0.05, self.y - 0.1))
             
         self.box_positions = np.array(self.box_positions)
          
