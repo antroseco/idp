@@ -84,8 +84,8 @@ def encircle(coord, location, field):
         checkpoint, bearing = robot.find_closest_point(field)
         move(checkpoint, error_translation = 0.05)
         
-        speed_inner_wheel = 1.8
-        speed_outer_wheel = 3.5         
+        speed_inner_wheel = 1.3
+        speed_outer_wheel = 3         
         
         #determine whether its better to turn anticlockwise
         clockwise = turn_clockwise(coord, location, field)
@@ -362,9 +362,6 @@ def set_dualclaw(targetAngle,targetClaw1,targetSensor1,targetClaw2,targetSensor2
         previous = measurement
         robot.step(TIME_STEP)
     
-    
-    
-    
 def measureLight(lightSensor):
     """ Function to return voltage values based on the sensors input, use the filters for TEPT4400 as the ones in proto
     
@@ -401,7 +398,7 @@ def reverse():
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
     #reverse a little bit
-    for j in range(20):
+    for j in range(30):
         robot.step(TIME_STEP)
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
@@ -444,14 +441,12 @@ if r.getName() == 'robot_red':
     
 else:
     robot = Robot(r, 'green')
-    
-
-
+        
 red_field = Field('red')
-green_field = Field('green') 
+green_field = Field('green')
+
+ 
 robot.step(TIME_STEP)
-
-
 
 positions = sweep(0.4)
 
@@ -482,6 +477,8 @@ while not robot.box_queue.empty() and robot.field.available():
 
     robot.step(TIME_STEP)
     c = robot.deploy_dualclaw()
+    robot.remeasure()
+    robot.deploy_without_measure()
     for i in range(10):
         robot.step(TIME_STEP)
 
@@ -511,8 +508,9 @@ while not robot.box_queue.empty() and robot.field.available():
     
 
 print('parking')
-deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
 
 robot.step(TIME_STEP)
 finish_in_field()
+
+
 
