@@ -1869,15 +1869,15 @@ Right angle and straight</description>
 <part name="GND3" library="IDP_library" deviceset="GND" device=""/>
 <part name="GND4" library="IDP_library" deviceset="GND" device=""/>
 <part name="RAPID65-0753" library="IDP_library" deviceset="POT" device="" value="5K"/>
-<part name="PHOTO" library="IDP_library" deviceset="22-?-02" device="05-7028" package3d_urn="urn:adsk.eagle:package:8078644/1"/>
+<part name="PHOTO" library="IDP_library" deviceset="22-?-02" device="05-7028" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005"/>
 <part name="P+4" library="IDP_library" deviceset="+5V" device=""/>
-<part name="LED2" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
-<part name="LED3" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
+<part name="LED2" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776"/>
+<part name="LED3" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776"/>
 <part name="GND5" library="IDP_library" deviceset="GND" device=""/>
 <part name="GND6" library="IDP_library" deviceset="GND" device=""/>
 <part name="R4" library="IDP_library" deviceset="R-EU_" device="0204/7" package3d_urn="urn:adsk.eagle:package:23498/2" value="10k"/>
 <part name="C3" library="IDP_library" deviceset="C-EU" device="025-024X044" package3d_urn="urn:adsk.eagle:package:23630/1" value="100n"/>
-<part name="LED1" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1"/>
+<part name="LED1" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776"/>
 </parts>
 <sheets>
 <sheet>
@@ -2257,10 +2257,6 @@ Right angle and straight</description>
 </nets>
 </sheet>
 </sheets>
-<errors>
-<approved hash="202,1,223.52,127,U1,2IN+,,,,"/>
-<approved hash="202,1,223.52,124.46,U1,2IN-,,,,"/>
-</errors>
 </schematic>
 </drawing>
 <compatibility>

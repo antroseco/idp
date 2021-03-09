@@ -913,7 +913,7 @@ design rules under a new name.</description>
 <attribute name="PRICE" value="None" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="47.809609375" y="26.60221875" size="1.273109375" layer="27" rot="R270"/>
 </element>
-<element name="PHOTO" library="IDP_library" package="7395-02" package3d_urn="urn:adsk.eagle:package:8078644/1" value="22-05-7028-02" x="35.56" y="19.05" smashed="yes">
+<element name="PHOTO" library="IDP_library" package="7395-02" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005" x="35.56" y="19.05" smashed="yes">
 <attribute name="MF" value="MOLEX" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="32.6121" y="24.2301" size="1.016" layer="25" ratio="10" rot="R270"/>
@@ -922,11 +922,11 @@ design rules under a new name.</description>
 <attribute name="POPULARITY" value="0" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="35.1521" y="25.5001" size="0.8128" layer="27" ratio="10" rot="R270"/>
 </element>
-<element name="LED2" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="LED_23MM" x="67.31" y="49.53" smashed="yes" rot="R270">
+<element name="LED2" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="67.31" y="49.53" smashed="yes" rot="R270">
 <attribute name="NAME" x="60.325" y="47.371" size="1.27" layer="25" ratio="10"/>
 <attribute name="POPULARITY" value="97" x="67.31" y="49.53" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="LED3" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="LED_23MM" x="69.85" y="44.45" smashed="yes" rot="R270">
+<element name="LED3" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="69.85" y="44.45" smashed="yes" rot="R270">
 <attribute name="NAME" x="71.755" y="42.291" size="1.27" layer="25" ratio="10"/>
 <attribute name="POPULARITY" value="97" x="69.85" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
@@ -942,7 +942,7 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="C" x="62.23" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="64.897" y="32.512" size="1.27" layer="27" ratio="10" rot="R90"/>
 </element>
-<element name="LED1" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="LED_23MM" x="36.83" y="30.48" smashed="yes" rot="R90">
+<element name="LED1" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="36.83" y="30.48" smashed="yes" rot="R90">
 <attribute name="NAME" x="36.449" y="32.385" size="1.27" layer="25" ratio="10" rot="R90"/>
 <attribute name="POPULARITY" value="97" x="36.83" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="38.481" y="32.385" size="1.27" layer="27" ratio="10" rot="R90"/>
