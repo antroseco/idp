@@ -84,8 +84,8 @@ def encircle(coord, location, field):
         checkpoint, bearing = robot.find_closest_point(field)
         move(checkpoint, error_translation = 0.05)
         
-        speed_inner_wheel = 1.3
-        speed_outer_wheel = 3         
+        speed_inner_wheel = 1.8
+        speed_outer_wheel = 3.5         
         
         #determine whether its better to turn anticlockwise
         clockwise = turn_clockwise(coord, location, field)
@@ -401,7 +401,7 @@ def reverse():
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
     #reverse a little bit
-    for j in range(30):
+    for j in range(20):
         robot.step(TIME_STEP)
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
@@ -444,11 +444,11 @@ if r.getName() == 'robot_red':
     
 else:
     robot = Robot(r, 'green')
-        
-red_field = Field('red')
-green_field = Field('green')
+    
 
- 
+
+red_field = Field('red')
+green_field = Field('green') 
 robot.step(TIME_STEP)
 
 
@@ -515,6 +515,4 @@ deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot
 
 robot.step(TIME_STEP)
 finish_in_field()
-
-
 

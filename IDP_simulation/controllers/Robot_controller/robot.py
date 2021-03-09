@@ -134,10 +134,10 @@ class Robot:
         """
         location = self.gps.getValues()
         location = (location[0],location[2])
-        p1 = [field.x, field.y + 0.35]
-        p2 = [field.x, field.y - 0.35]
-        p3 = [field.x + 0.35, field.y]
-        p4 = [field.x - 0.35, field.y]
+        p1 = [field.x, field.y + 0.4]
+        p2 = [field.x, field.y - 0.4]
+        p3 = [field.x + 0.4, field.y]
+        p4 = [field.x - 0.4, field.y]
         points = [p1, p2, p3, p4]
         bearings = [180.0, 0.0, 90.0, -90.0]
         distances = []
