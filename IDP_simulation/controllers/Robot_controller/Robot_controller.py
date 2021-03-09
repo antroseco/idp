@@ -84,8 +84,8 @@ def encircle(coord, location, field):
         checkpoint, bearing = robot.find_closest_point(field)
         move(checkpoint, error_translation = 0.05)
         
-        speed_inner_wheel = 1.3
-        speed_outer_wheel = 3         
+        speed_inner_wheel = 2
+        speed_outer_wheel = 3.5         
         
         #determine whether its better to turn anticlockwise
         clockwise = turn_clockwise(coord, location, field)
@@ -398,7 +398,7 @@ def reverse():
     robot.left_wheel.setVelocity(-5)
     robot.right_wheel.setVelocity(-5)
     #reverse a little bit
-    for j in range(30):
+    for j in range(25):
         robot.step(TIME_STEP)
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
