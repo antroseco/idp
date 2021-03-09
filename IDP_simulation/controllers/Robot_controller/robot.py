@@ -331,4 +331,80 @@ class Robot:
         intermediate, final = self.field.get_to_field(coord)
         return intermediate, final
 
+    def deploy_dualclaw(self):
+        """
+        step through multiple time steps,
+        closes dual claw and simultaneously attempts to detect the color of the box it is holding.
+        returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
+        """
+        
+        claw1 = self.left_claw
+        claw2 = self.right_claw
+        sensor1 = self.left_claw_sensor
+        sensor2 = self.right_claw_sensor
+        desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
+        error = abs(desired - sensor1.getValue())
+        accuracy = 1*np.pi/180 #accuracy value in degrees
+        previous = 100 #arbitrary value just serves as placeholder
+        count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
+        red = False
+        green = False
+        redLowerBound = 948 # (environment is 930),one reading above this value turns red to True
+        greenLowerBound = 436 # (environment is 418), values are about 0.5 lux above ambient
+        
+        while error > accuracy:
+            redValue = self.red_analogue.read()
+            greenValue = self.green_analogue.read()
+            if redValue > redLowerBound:
+                red = True
+            if greenValue > greenLowerBound:
+                green = True
+            measurement = sensor1.getValue()
+            claw1.setPosition(desired) #both claw move synchronously in different direction
+            claw2.setPosition(-desired)
+            if abs(measurement - previous) < accuracy: #compare measurement from previous time frame to current, add 1 to count if same
+                count += 1
+            else:
+                count = 0
+                
+            if count >= 3:
+                break
+            previous = measurement 
+            self.step(Robot.TIME_STEP)
+            error = abs(desired - sensor1.getValue())
+    
+        if red and not green:
+            print('red')
+            return 0
+        elif green and not red:
+            print('green')
+            return 1
+        elif not green and not red:
+            print('not detected')
+            return 2
+        if red and green:
+            print('bad result')
+            return 3
+            
+    def withdraw_dualclaw(self):
+        claw1 = self.left_claw
+        claw2 = self.right_claw
+        sensor1 = self.left_claw_sensor
+        sensor2 = self.right_claw_sensor
+    
+        desired = 40*np.pi/180 #arbitrary value
+        error = abs(desired - sensor1.getValue())
+        accuracy = 1*np.pi/180 #accuracy value in degrees
+        while error > accuracy:
+            measurement = sensor1.getValue()
+            claw1.setPosition(desired) #both claw move synchronously in different direction
+            claw2.setPosition(-desired)
+            self.step(Robot.TIME_STEP)
+            error = abs(desired - sensor1.getValue())
+        
+        
+        
+        
+        
+        
 

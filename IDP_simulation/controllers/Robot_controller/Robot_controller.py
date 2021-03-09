@@ -372,75 +372,7 @@ def measureLight(lightSensor):
     circuit = hardware.PhototransistorCircuit(robot.lightSensor)
     analogue_input = hardware.ADCInput(lambda:circuit.voltage())
     return analogue_input.read()
-    
-        
-def deploy_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
-    """function to make the dual-claw go from open to closed, detect colour of the block it holds in this process
-    return 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both
-    """
-
-    desired = -5*np.pi/180 #minus value should not be reached, break loop when count reaches 3
-    error = abs(desired - targetSensor1.getValue())
-    accuracy = 1*np.pi/180 #accuracy value in degrees
-    previous = 100 #arbitrary value just serves as placeholder
-    count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
-    red = False
-    green = False
-    redLowerBound = 948 # (environment is 930),one reading above this value turns red to True
-    greenLowerBound = 436 # (environment is 418), values are about 0.5 lux above ambient
-    
-    while error > accuracy:
-        redValue = robot.red_analogue.read()
-        greenValue = robot.green_analogue.read()
-        if redValue > redLowerBound:
-            red = True
-        if greenValue > greenLowerBound:
-            green = True
-        measurement = targetSensor1.getValue()
-        targetClaw1.setPosition(desired) #both claw move synchronously in different direction
-        targetClaw2.setPosition(-desired)
-        if abs(measurement - previous) < accuracy: #compare measurement from previous time frame to current, add 1 to count if same
-            count += 1
-        else:
-            count = 0
-            
-        if count >= 3:
-            break
-        previous = measurement 
-        robot.step(TIME_STEP)
-        error = abs(desired - targetSensor1.getValue())
-    
-    if red and not green:
-        print('red')
-        return 0
-    elif green and not red:
-        print('green')
-        return 1
-    elif not green and not red:
-        print('not detected')
-        return 2
-    if red and green:
-        print('bad result')
-        return 3
-        
-        
-        
-        
-def withdraw_dualclaw(targetClaw1,targetSensor1,targetClaw2,targetSensor2):
-    """function to make the dual-claw go from closed to open
-    
-    """
-
-    desired = 40*np.pi/180 #arbitrary value
-    error = abs(desired - targetSensor1.getValue())
-    accuracy = 1*np.pi/180 #accuracy value in degrees
-    while error > accuracy:
-        measurement = targetSensor1.getValue()
-        targetClaw1.setPosition(desired) #both claw move synchronously in different direction
-        targetClaw2.setPosition(-desired)
-        robot.step(TIME_STEP)
-        error = abs(desired - targetSensor1.getValue())
-        
+      
 
 def return_box_field(coord):
     """
@@ -459,7 +391,7 @@ def return_box_field(coord):
         
     move(final, error_translation = 0.2)
     
-    withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    robot.withdraw_dualclaw()
 
     reverse()
     return
@@ -538,7 +470,7 @@ initial_pass = True
 while not robot.box_queue.empty() and robot.field.available():
     
     pos = robot.box_queue.get()
-    withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    robot.withdraw_dualclaw()
 
     
     if initial_pass:
@@ -549,7 +481,7 @@ while not robot.box_queue.empty() and robot.field.available():
 
 
     robot.step(TIME_STEP)
-    c = deploy_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+    c = robot.deploy_dualclaw()
     for i in range(10):
         robot.step(TIME_STEP)
 
@@ -567,7 +499,7 @@ while not robot.box_queue.empty() and robot.field.available():
     if colour == robot.colour:
         return_box_field(robot.gps.getValues())
     else:
-        withdraw_dualclaw(robot.left_claw, robot.left_claw_sensor, robot.right_claw, robot.right_claw_sensor)
+        robot.withdraw_dualclaw()
         reverse()
         
         if c == 0 or c == 1: 
