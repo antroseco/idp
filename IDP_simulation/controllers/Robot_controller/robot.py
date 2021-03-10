@@ -420,6 +420,8 @@ class Robot:
 
     def remeasure(self):
         """steps through multiple time steps, called when deploy_dualclaw doesn't return right value
+        checks first if there is a box within reach with ultrasonic sensor, return -1 when there isn't,
+        if there is a box within reach,
         goes back and forth in attempt to remeasure color
         returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
         """
@@ -495,8 +497,7 @@ class Robot:
     def close_dualclaw(self):
         """
         step through multiple time steps,
-        closes dual claw and simultaneously attempts to detect the color of the box it is holding.
-        returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
+        closes dual claw
         """
         claw1 = self.left_claw
         claw2 = self.right_claw
