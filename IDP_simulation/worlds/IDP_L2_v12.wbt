@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.20713749336974976 -0.8582125377862911 -0.4696437999451397 2.5501100384480364
-  position -0.9490527437589176 2.6461849554018197 -1.4364582076954775
+  orientation 0.2573159138680089 -0.8444894198553888 -0.4697085694583185 4.148313986460895
+  position 1.9376344362251048 2.8233995062126453 -1.0489235764489602
 }
 Background {
   skyColor [
@@ -86,7 +86,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -6.479078382236169e-10 -6.47905458324403e-10 1.5707999999999938
+        rotation 1 -6.886567588653068e-10 -6.886542292872231e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -119,7 +119,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 6.484768344130897e-10 -6.484774956113556e-10 1.5707953071795442
+        rotation -0.9999999999999999 6.892615409803346e-10 -6.892622437633337e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -196,7 +196,7 @@ Robot {
       ]
     }
     DistanceSensor {
-      translation 0.06 -0.005 0.01
+      translation 0.09 -0.055 0.01
       rotation 1 0 0 -1.5707953071795862
       children [
         Group {
@@ -250,7 +250,7 @@ Robot {
   controller "Robot_controller"
 }
 Robot {
-  translation 0 0.068 0.4
+  translation 0.1 0.068 -0.30000000000000004
   children [
     Compass {
       name "compass1"
@@ -298,7 +298,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -5.593979084278779e-10 -5.593958536431922e-10 1.5707999999999938
+        rotation 1 -6.886567588653068e-10 -6.886542292872231e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -331,7 +331,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 7.634396618866356e-10 -7.634404403028236e-10 1.5707953071795442
+        rotation -0.9999999999999999 6.892615409803346e-10 -6.892622437633337e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -373,7 +373,7 @@ Robot {
         }
       ]
       endPoint SINGLE_CLAW {
-        translation 0.15500000000000014 -0.035000000926675975 0.02999999675663184
+        translation 0.1550000000000001 -0.035000000926675975 0.02999999675663184
       }
     }
     DEF LEFT_CLAW HingeJoint {
@@ -408,7 +408,7 @@ Robot {
       ]
     }
     DistanceSensor {
-      translation 0.06 -0.005 0.01
+      translation 0.09 -0.055 0.01
       rotation 1 0 0 -1.5707953071795862
       children [
         Group {
