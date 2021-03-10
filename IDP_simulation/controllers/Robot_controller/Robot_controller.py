@@ -105,11 +105,16 @@ def move_avoid_fields(coord, error_translation=0.05):
     return
 
 
-def PID_rotation(required, threshold=0.4):
-    """
-    input: required is the required bearing,
-    The function rotates until the bearing is within final error
-    of the required bearing
+def PID_rotation(required, threshold=0.4) -> bool:
+    """Rotate until the required bearing is reached.
+    Exits if error < threshold or oscillatory behaviour is detected.
+
+    Args:
+        required (float): Bearing in degrees.
+        threshold (float, optional): Maximum acceptable error. Defaults to 0.4.
+
+    Returns:
+        bool: True if error < threshold
     """
     if DEBUG_PID:
         start_time = robot._robot.getTime()
@@ -148,8 +153,8 @@ def PID_rotation(required, threshold=0.4):
 
         # Detect oscillatory behaviour
         # On a 64 ms TIME_STEP, it sometimes oscillates between 0.39 and -0.39 deg error
-        if np.isclose(error, -new_error):
-            break
+        if np.isclose(error, -new_error, atol=0.1):
+            return False
 
         error = new_error
 
@@ -158,6 +163,8 @@ def PID_rotation(required, threshold=0.4):
 
     if DEBUG_PID:
         print('PID_rotation end', robot._robot.getTime() - start_time)
+
+    return True
 
 
 def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
