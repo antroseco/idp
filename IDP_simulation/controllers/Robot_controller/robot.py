@@ -376,16 +376,16 @@ class Robot:
             error = abs(desired - sensor1.getValue())
 
         if red and not green:
-            print('red')
+            # print('red')
             return 0
         elif green and not red:
-            print('green')
+            # print('green')
             return 1
         elif not green and not red:
-            print('not detected')
+            # print('not detected')
             return 2
         if red and green:
-            print('bad result')
+            # print('bad result')
             return 3
     
     
@@ -480,18 +480,18 @@ class Robot:
                 green = True
             self.step(Robot.TIME_STEP)
 
-        print('remeasured:')
+        # print('remeasured:')
         if red and not green:
-            print('red')
+            # print('red')
             return 0
         elif green and not red:
-            print('green')
+            # print('green')
             return 1
         elif not green and not red:
-            print('not detected')
+            # print('not detected')
             return 2
         elif red and green:
-            print('bad result')
+            # print('bad result')
             return 3
 
     def close_dualclaw(self):
