@@ -363,14 +363,13 @@ def return_box_field(coord):
 
 
 def reverse():
-    robot.left_wheel.setVelocity(-5)
-    robot.right_wheel.setVelocity(-5)
+    robot.left_wheel.setVelocity(-robot.MAX_VELOCITY)
+    robot.right_wheel.setVelocity(-robot.MAX_VELOCITY)
     #reverse a little bit
-    for j in range(10):
+    for _ in range(2):
         robot.step(TIME_STEP)
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
-    robot.step(TIME_STEP)
 
 
 
