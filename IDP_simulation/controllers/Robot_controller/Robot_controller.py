@@ -1,12 +1,12 @@
 """Robot_controller controller."""
-import math
-
 import controller
-import numpy as np
-
-from calculations import *
-from field import Field
 from robot import Robot
+from field import Field
+from calculations import *
+import numpy as np
+import math
+import time
+import hardware
 
 np.set_printoptions(suppress=True)
 
@@ -401,7 +401,10 @@ initial_pass = True
 
 while not robot.box_queue.empty() and robot.field.available():
 
-    pos = robot.box_queue.get()
+    
+    t = robot.box_queue.get()
+    pos = t[1]
+
     print(pos)
     robot.withdraw_dualclaw()
 
@@ -412,34 +415,49 @@ while not robot.box_queue.empty() and robot.field.available():
         move_avoid_fields(pos, error_translation=0.1)
 
     robot.step(TIME_STEP)
-    c = robot.deploy_dualclaw()
-    for i in range(10):
-        robot.step(TIME_STEP)
-
-    colour = ''
-    if c == 0:
-        colour = 'red'
-    elif c == 1:
-        colour = 'green'
-    else:
-        c = robot.remeasure()
-        robot.close_dualclaw()
+    #if this is a new box and colour needs to be checked
+    if t[0] == 0:
+        c = robot.deploy_dualclaw()
+        for i in range(10):
+            robot.step(TIME_STEP)
+    
+        colour = ''
         if c == 0:
             colour = 'red'
         elif c == 1:
             colour = 'green'
 
-    robot.step(TIME_STEP)
-
-    if colour == robot.colour:
+        else:
+            c = robot.remeasure()
+            robot.close_dualclaw()
+            if c == 0:
+                colour = 'red'
+            elif c == 1:
+                colour = 'green'
+   
+        robot.step(TIME_STEP)
+    
+        
+        if colour == robot.colour:
+            return_box_field(robot.gps.getValues())
+        else:
+            robot.withdraw_dualclaw()
+            reverse()
+            if c == 0 or c == 1: 
+                robot.step(TIME_STEP)
+                valid, x, z = robot.remeasure_position()
+                if valid:
+                    robot.send_box_location(np.array([x, z]))
+            
+       
+            
+    else: #this is a known box, got a location form another robot, just need to pick it up
+        robot.close_dualclaw()        
+        for i in range(10):
+            robot.step(TIME_STEP)   
         return_box_field(robot.gps.getValues())
-    else:
-        robot.withdraw_dualclaw()
-        reverse()
-
-        if c == 0 or c == 1:
-            robot.step(TIME_STEP)
-            robot.send_box_location(pos)
+ 
+   
 
 
 print('parking')

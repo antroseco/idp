@@ -42,7 +42,8 @@ class Robot:
         self.colour = colour
         self.field = Field(colour)
         self.infrared_vref = 4.3
-        self.box_queue = queue.Queue()
+        #queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
+        self.box_queue = queue.Queue() 
         self.sweep_locations = []
         self.other_sweep_locations = []
         self.position = np.array([])
@@ -126,7 +127,7 @@ class Robot:
 
                 stop = False
 
-                if abs(required - current) > 40:
+                if abs(required - current) > 30: 
                     return
 
                 while dist < threshold:
@@ -225,9 +226,11 @@ class Robot:
                 self.other_position = loc
 
             elif type == 1:
-                coord = np.array([float(x) for x in s])
-                self.box_queue.put(coord)
-
+                try:
+                    coord = np.array([float(x) for x in s])
+                    self.box_queue.put((1, coord))
+                except:
+                    print('ERROR MESSAGE ', message)
             elif type == 2:
                 coordinates = np.array([float(x) for x in s])
                 coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
@@ -293,9 +296,9 @@ class Robot:
         """
         for pos in positions:
             if self.colour == 'red' and pos[1] > 0:
-                self.box_queue.put(pos)
+                self.box_queue.put((0, pos))
             elif self.colour == 'green' and pos[1] <= 0:
-                self.box_queue.put(pos)
+                self.box_queue.put((0, pos))
         return
 
     def bearing1(self, compass_obj):
@@ -384,7 +387,19 @@ class Robot:
         if red and green:
             print('bad result')
             return 3
-
+    
+    
+    def remeasure_position(self):
+        """
+        when the box was touched to check colour, this returns the new (possibly changed) position
+        """
+        dist = self.dsUltrasonic.getValue()
+        pos = potential_box_position(dist + 0.09, self.bearing(self.compass1), self.gps.getValues())
+        
+        return pos
+    
+    
+    
     def withdraw_dualclaw(self):
         """steps through multiple time steps, opens dual claw
         """
@@ -499,3 +514,28 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
+    
+    
+    def set_boxclaw(self, targetAngle):
+        """not in use with the current claw mechanism
+        steps through multiple time steps,
+        move the box_claw to the input angle, 
+        input: targetAngle in degrees, use box_claw_sensor to provide feedback
+        """
+        
+        desired = targetAngle*np.pi/180
+        error = abs(desired - box_claw_sensor.getValue())
+        accuracy = 5*np.pi/180
+        
+        while error > accuracy:
+            box_claw.setPosition(desired)
+            self._robot.step(Robot.TIME_STEP)
+            error = abs(desired - box_claw_sensor.getValue())
+        return
+        
+    def withdraw_boxclaw():
+        self.set_claw(90)
+    
+    def deploy_boxclaw():
+        self.set_claw(0)    
+    
