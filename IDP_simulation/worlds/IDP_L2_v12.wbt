@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.2573159138680089 -0.8444894198553888 -0.4697085694583185 4.148313986460895
-  position 1.9376344362251048 2.8233995062126453 -1.0489235764489602
+  orientation -0.051031256286792004 -0.9136243018922606 -0.4033440787636176 2.929414986142426
+  position -0.9148691127814195 2.917464293558351 -2.655446090882512
 }
 Background {
   skyColor [
@@ -39,6 +39,7 @@ Floor {
 }
 Robot {
   translation 0 0.068 -0.4
+  rotation 0 1 0 1.01503e-06
   children [
     Compass {
       name "compass1"
@@ -86,7 +87,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -6.927316509294758e-10 -6.927291063835053e-10 1.5707999999999938
+        rotation 1 -7.232933414107436e-10 -7.232906846056202e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -119,7 +120,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 6.933400116370592e-10 -6.933407185785315e-10 1.5707953071795442
+        rotation -0.9999999999999999 7.239285415624931e-10 -7.239292796925149e-10 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -298,7 +299,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -6.927316509294758e-10 -6.927291063835053e-10 1.5707999999999938
+        rotation 1 -7.232933414107436e-10 -7.232906846056202e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -331,7 +332,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 6.933400116370592e-10 -6.933407185785315e-10 1.5707953071795442
+        rotation -0.9999999999999999 7.239285415624931e-10 -7.239292796925149e-10 1.5707953071795442
         children [
           USE WHEEL
         ]

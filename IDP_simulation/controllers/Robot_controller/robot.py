@@ -109,8 +109,7 @@ class Robot:
         self.send_location()
         self.get_messages()
         # print(self.dsUltrasonic.getValue())
-        if self.colour == 'green' and self.position.size == 2 and self.other_position.size == 2:
-            self.collision_prevention()
+        self.collision_prevention()
         
         
         
@@ -127,9 +126,19 @@ class Robot:
         else:
             dist = get_distance(self.position, self.other_position)
             #print(dist)
-            if self.colour == 'green':
+            
+            if dist < threshold:
+                #check which robot is in the way
+                required = required_bearing(self.other_position, self.gps.getValues()) % 360
+                current = self.bearing1(self.compass) % 360
+                
+                
+                stop = False
+                
+                if abs(required - current) > 40: 
+                    return
+
                 while dist < threshold:
-                   
                     self.left_wheel.setVelocity(0)
                     self.right_wheel.setVelocity(0)
                     
@@ -316,7 +325,36 @@ class Robot:
         return
                    
        
+        
+    def bearing1(self, compass_obj): 
+        """
+        This gives a bearing -180,180
+        input: compass object(type Compass)
+        """
+        
+        theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
+        theta = (theta-(np.pi /2.0) )*180.0/np.pi
+        if theta < -180:
+            theta += 360    
+        return  theta
    
+   
+   
+   
+    def bearing(self, compass_obj): 
+        """
+        This gives a bearing 0,360
+        input: compass object(type Compass)
+        """
+        theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
+        theta = (theta-(np.pi /2.0))*180.0/np.pi
+        if theta < 0 :
+            theta += 360
+
+        return  theta
+
+
+
 
     def field_position(self):
         """

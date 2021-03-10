@@ -15,33 +15,6 @@ COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6.7
 
 
-def bearing1(compass_obj): 
-    """
-    This gives a bearing -180,180
-    input: compass object(type Compass)
-    """
-    
-    theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
-    theta = (theta-(np.pi /2.0) )*180.0/np.pi
-    if theta < -180:
-        theta += 360    
-    return  theta
-   
-   
-def bearing(compass_obj): 
-    """
-    This gives a bearing 0,360
-    input: compass object(type Compass)
-    """
-    theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
-    theta = (theta-(np.pi /2.0))*180.0/np.pi
-    if theta < 0 :
-        theta += 360
-        
-    
-    return  theta
-
-
 def encircle(coord, location, field):
     """
     location is 3D gps coordinates
@@ -137,14 +110,16 @@ def move_avoid_fields(coord, error_translation = 0.05):
 
 
 def PID_rotation(required, final_error = 0.4):
-    """input: required is the required bearing,
+    """
+    input: required is the required bearing,
     The function rotates until the bearing is within final error 
-    of the required bearing"""
+    of the required bearing
+    """
     
     kP = 0.005
     kD = 2.0
     
-    error = required - bearing1(robot.compass)
+    error = required - robot.bearing1(robot.compass)
     
     if error >= 0:
         forward_rot = 1.0
@@ -174,7 +149,7 @@ def PID_rotation(required, final_error = 0.4):
             
             previous_error2 = error2
             previous_error  = error
-            error = required - bearing1(robot.compass)
+            error = required - robot.bearing1(robot.compass)
             error2 = 360 - abs(error)
             error2 = -1.0*forward_rot*error2
             if abs(error2) > abs(error):
@@ -212,7 +187,7 @@ def PID_rotation(required, final_error = 0.4):
             robot.right_wheel.setVelocity(v)
             
             previous_error = error
-            error = required - bearing1(robot.compass)
+            error = required - robot.bearing1(robot.compass)
             
             robot.step(TIME_STEP)
         return
@@ -283,7 +258,7 @@ def sweep(velocity = 0.5, swept_angle =355):
     
     
     #find current rotation [0-360 degrees]
-    initial_angle = bearing(robot.compass1)   
+    initial_angle = robot.bearing(robot.compass1)   
     
     #store potential boxes locations     
     boxes = []    
@@ -299,7 +274,7 @@ def sweep(velocity = 0.5, swept_angle =355):
         robot.step(TIME_STEP)
         
         #distance from robot centre to wall in this direction
-        current_angle = bearing(robot.compass1)
+        current_angle = robot.bearing(robot.compass1)
         current_position = robot.gps.getValues()
         wall_dist = get_wall_position(current_angle, current_position)
         
@@ -399,9 +374,9 @@ def finish_in_field():
 
 def test_collisions():
     if robot.colour == 'green':
-        move((0, 1))  
+        move((0.4, -0.4))  
     if robot.colour == 'red':
-        move((1, 0))      
+        move((0, -1))      
 
     
     
@@ -440,10 +415,8 @@ robot.send_sweep_locations(positions)
 robot.step(TIME_STEP)
 #after we get locations from other robot, all boxes that each robot needs
 #to visit are saved in robot.box_queue
-#robot.get_sweep_locations()
 robot.get_messages()
 
-#print(positions)
 
 initial_pass = True   
 
@@ -492,9 +465,7 @@ while not robot.box_queue.empty() and robot.field.available():
         if c == 0 or c == 1: 
             robot.step(TIME_STEP)
             robot.send_box_location(pos)
-        
-    #robot.read_all_locations()
-    
+            
 
 print('parking')
 
