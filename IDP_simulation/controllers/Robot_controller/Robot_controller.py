@@ -136,36 +136,86 @@ def move_avoid_fields(coord, error_translation = 0.05):
     
 
 
-def PID_rotation(required, final_error = 0.5):
+def PID_rotation(required, final_error = 0.4):
     """input: required is the required bearing,
     The function rotates until the bearing is within final error 
     of the required bearing"""
     
+    kP = 0.005
+    kD = 2.0
+    
     error = required - bearing1(robot.compass)
     
-    previous_error = error
-
-    while abs(error) > final_error:
-
-        kP = 0.003
-        kD = 10.0
-        P = 6.28*kP*error
-        D = (error-previous_error)/(100.0)*kD
-        
-        v = P + D 
-        if v > MAX_VELOCITY:
-            v = MAX_VELOCITY
-        elif v < -MAX_VELOCITY:
-            v = -MAX_VELOCITY
+    if error >= 0:
+        forward_rot = 1.0
+    else:
+        forward_rot = -1.0
+ 
     
-        robot.left_wheel.setVelocity(-v)
-        robot.right_wheel.setVelocity(v)
+    error2 = 360 - abs(error)
+    
+    if abs(error2) < abs(error):
+        previous_error2 = error2
+        while abs(error2) > final_error:
+    
+            
+            P = MAX_VELOCITY*kP*error2
+            D = (error2-previous_error2)/(100.0)*kD
+            
+            v = P + D 
+            if v > MAX_VELOCITY:
+                v = MAX_VELOCITY
+            elif v < -MAX_VELOCITY:
+                v = -MAX_VELOCITY
+               
         
+            robot.left_wheel.setVelocity(-v)
+            robot.right_wheel.setVelocity(v)
+            
+            previous_error2 = error2
+            previous_error  = error
+            error = required - bearing1(robot.compass)
+            error2 = 360 - abs(error)
+            error2 = -1.0*forward_rot*error2
+            if abs(error2) > abs(error):
+                
+                previous_error2 = previous_error
+                error2 = error
+                
+            if error >= 0:
+                forward_rot = 1.0
+            else:
+                forward_rot = -1.0
+               
+            
+              
+             
+            robot.step(TIME_STEP)
+        return
+        
+    else:                          
         previous_error = error
-        error = required - bearing1(robot.compass)
+    
+        while abs(error) > final_error:
+    
         
-        robot.step(TIME_STEP)
-    return
+            P = MAX_VELOCITY*kP*error
+            D = (error-previous_error)/(100.0)*kD
+            
+            v = P + D 
+            if v > MAX_VELOCITY:
+                v = MAX_VELOCITY
+            elif v < -MAX_VELOCITY:
+                v = -MAX_VELOCITY
+        
+            robot.left_wheel.setVelocity(-v)
+            robot.right_wheel.setVelocity(v)
+            
+            previous_error = error
+            error = required - bearing1(robot.compass)
+            
+            robot.step(TIME_STEP)
+        return
   
 
 
@@ -367,8 +417,19 @@ else:
 red_field = Field('red')
 green_field = Field('green')
 
-#test_collisions()
+"""
+if r.getName() == 'robot_red':
+    coord = (0.0,0.5)
+    robot.step(TIME_STEP)
+    PID_rotation(required_bearing(coord,robot.gps.getValues()))
+    PID_translation(coord)
+    coord = (-0.5,0.1)
+    PID_rotation(required_bearing(coord,robot.gps.getValues()))
+    PID_translation(coord)
+   """
+    
 
+#test_collisions()
 
 robot.step(TIME_STEP)
 positions = sweep(0.4)
@@ -440,4 +501,3 @@ print('parking')
 
 robot.step(TIME_STEP)
 finish_in_field()
-
