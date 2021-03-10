@@ -264,12 +264,12 @@ def sweep(velocity=0.5, swept_angle=355):
 
         # wall_dist is decreased by robot-sensor distance
         wall_dist -= 0.11
-
+        
         # get quantized infrared level and convert to volts
         infrared_volts = robot.infrared_analogue.read() * robot.infrared_vref / 1023
         # get infrared reading and convert to meters
         infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
-
+      
         #print(infrared_dist, wall_dist)
 
         # if measured distance is less than wall_dist then assume there's a box
@@ -278,6 +278,13 @@ def sweep(velocity=0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
+         
+        # check if boxes are in between the robots 
+        if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.5:
+            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
+            if(valid):
+                boxes.append([x, z])       
+        
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
