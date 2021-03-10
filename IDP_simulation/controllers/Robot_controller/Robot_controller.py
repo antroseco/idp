@@ -5,14 +5,14 @@ from field import Field
 from calculations import *
 import numpy as np
 import math
-import time
-import hardware
 
 np.set_printoptions(suppress=True)
 
 TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6.7
+
+DEBUG_PID = False
 
 
 def encircle(coord, location, field):
@@ -105,71 +105,59 @@ def move_avoid_fields(coord, error_translation=0.05):
     return
 
 
-def PID_rotation(required, final_error=0.4):
+def PID_rotation(required, threshold=0.4):
     """
     input: required is the required bearing,
     The function rotates until the bearing is within final error
     of the required bearing
     """
+    if DEBUG_PID:
+        start_time = robot._robot.getTime()
+        print('PID_rotation start')
 
-    kP = 0.005
-    kD = 2.0
+    kP = 0.095
+    kI = 0.042735
+    kD = 0.011
 
-    error = required - robot.bearing1(robot.compass)
+    def angle_between(a, b):
+        return min(a - b, a - b + 360, a - b - 360, key=abs)
 
-    if error >= 0:
-        forward_rot = 1.0
-    else:
-        forward_rot = -1.0
+    error = angle_between(required, robot.bearing1(robot.compass))
+    error_integral = 0
+    error_derivative = 0
 
-    error2 = 360 - abs(error)
+    integral_threshold = max(abs(error / 6), 4)
 
-    if abs(error2) < abs(error):
-        previous_error2 = error2
+    while abs(error) > threshold:
+        P = kP * error
+        I = kI * error_integral if abs(error) > integral_threshold else 0
+        D = kD * error_derivative
 
-        while abs(error2) > final_error:
+        if DEBUG_PID:
+            print(f'{P=}, {I=}, {D=}, {error=}, {error_integral=}, {error_derivative=}')
 
-            P = MAX_VELOCITY*kP*error2
-            D = (error2-previous_error2)/(100.0)*kD
+        v = np.clip(P + I + D, -MAX_VELOCITY, MAX_VELOCITY)
 
-            v = np.clip(P + D, -MAX_VELOCITY, MAX_VELOCITY)
+        robot.left_wheel.setVelocity(-v)
+        robot.right_wheel.setVelocity(v)
 
-            robot.left_wheel.setVelocity(-v)
-            robot.right_wheel.setVelocity(v)
+        robot.step(TIME_STEP)
+        new_error = angle_between(required, robot.bearing1(robot.compass))
+        error_integral += new_error * TIME_STEP / 1000
+        error_derivative = (new_error - error) / (TIME_STEP / 1000)
 
-            previous_error2 = error2
-            previous_error = error
-            error = required - robot.bearing1(robot.compass)
-            error2 = 360 - abs(error)
-            error2 = -1.0*forward_rot*error2
-            if abs(error2) > abs(error):
+        # Detect oscillatory behaviour
+        # On a 64 ms TIME_STEP, it sometimes oscillates between 0.39 and -0.39 deg error
+        if np.isclose(error, -new_error):
+            break
 
-                previous_error2 = previous_error
-                error2 = error
+        error = new_error
 
-            if error >= 0:
-                forward_rot = 1.0
-            else:
-                forward_rot = -1.0
+    robot.left_wheel.setVelocity(0)
+    robot.right_wheel.setVelocity(0)
 
-            robot.step(TIME_STEP)
-    else:
-        previous_error = error
-
-        while abs(error) > final_error:
-
-            P = MAX_VELOCITY*kP*error
-            D = (error-previous_error)/(100.0)*kD
-
-            v = np.clip(P + D, -MAX_VELOCITY, MAX_VELOCITY)
-
-            robot.left_wheel.setVelocity(-v)
-            robot.right_wheel.setVelocity(v)
-
-            previous_error = error
-            error = required - robot.bearing1(robot.compass)
-
-            robot.step(TIME_STEP)
+    if DEBUG_PID:
+        print('PID_rotation end', robot._robot.getTime() - start_time)
 
 
 def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
