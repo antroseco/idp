@@ -1,5 +1,6 @@
+import math
+
 import numpy as np
-import math    
 
 
 def get_distance(loc1, loc2):
