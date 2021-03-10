@@ -10,6 +10,7 @@ class Robot:
     
     TIME_STEP = 64
     COMMUNICATION_CHANNEL = 1
+    
     MAX_VELOCITY = 6
 
     left_wheel_name = 'left_wheel'
@@ -106,7 +107,7 @@ class Robot:
         """
         self._robot.step(TIME_STEP)
         self.send_location()
-        self.get_location()
+        self.get_messages()
         if self.colour == 'green' and self.position.size == 2 and self.other_position.size == 2:
             self.collision_prevention()
         
@@ -132,7 +133,7 @@ class Robot:
                     self._robot.step(Robot.TIME_STEP)
                     
                     self.send_location()
-                    self.get_location()
+                    self.get_messages()
                     
                     if self.position.size == 2 and self.other_position.size == 2:
             
@@ -192,12 +193,13 @@ class Robot:
         return checkpoint,bearing
         
         
-    def send_message(self, message: str):
+    def send_message(self, message: str, type: int):
         """
         sends string message through a receiver
-        input: string message
+        input: string message, type = 0 for robot coordinates, type = 1 for a single box coordinates, type = 2 for multiple box coordinates
         return: /
         """
+        message = str(type) + message
         data = message.encode('utf-8')
         self._robot.step(Robot.TIME_STEP)
         self.emitter.send(data)
@@ -205,20 +207,39 @@ class Robot:
     
     
     
-    def get_message(self):
+    def get_messages(self):
         """
         gets the first message in receiver's queue and pops it from queue
         input: /
-        return: string message, if there aren't any messages returns empty string
+        return: string message, int type if there aren't any messages returns empty string
+        type = 0 for robot coordinates, type = 1 for a single box coordinates, type = 2 for multiple box coordinates
         """        
-        if self.receiver.getQueueLength() > 0:
+        while self.receiver.getQueueLength() > 0:
             data = self.receiver.getData()
             message = data.decode('utf-8')
+            type = int(message[0])
+            message = message[1:]
             self._robot.step(Robot.TIME_STEP)
             self.receiver.nextPacket()
-            return message
-        
-        return ""
+            if message == "":
+                continue
+             
+            s = message.split(',') 
+    
+            if type == 0:
+                loc = np.array([float(s[0]), float(s[1])])
+                self.other_position = loc
+                
+            elif type == 1:
+                coord = np.array([float(x) for x in s])
+                self.box_queue.put(coord)
+                
+            elif type == 2:
+                coordinates = np.array([float(x) for x in s])
+                coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
+                self.other_sweep_locations = coordinates
+                self.compare_sweep_results()
+        return
     
     
     def send_sweep_locations(self, locations):
@@ -230,25 +251,31 @@ class Robot:
             stringpos = "{},{}".format(pos[0], pos[1])
             message += stringpos + ','
             
-        self.send_message(message[:-1])
+        self.send_message(message[:-1], type=2)
         
+        
+        
+    def send_box_location(self, location):
+        """
+        send a location of one box
+        """
+        message = "{},{}".format(location[0],location[1])
+        self.send_message(message, type=1)
+        return
     
-    def get_sweep_locations(self):
-        """
-        gets an array of locations from a message
-        """
-        message = self.get_message()
-        
-        if message != '':
-            s = message.split(',')
-            coordinates = np.array([float(x) for x in s])
-            coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
-        
-        self.other_sweep_locations = coordinates
-        self.compare_sweep_results()
+    
 
-        return coordinates
+    def send_location(self):
+        """
+        send current location of the robot
+        """
+        self._robot.step(Robot.TIME_STEP)
+        location = self.gps.getValues()
+        self.position = np.array([location[0], location[2]])
+        message = "{},{}".format(location[0],location[2])
+        self.send_message(message, type=0)
         
+   
         
     def compare_sweep_results(self):
         """
@@ -286,66 +313,7 @@ class Robot:
         return
                    
        
-    def send_box_location(self, location):
-        """
-        send a location of one box
-        """
-        message = "{},{}".format(location[0],location[1])
-        self.send_message(message)
-        return
-    
-        
-    def read_box_location(self):
-        """
-        receive location of one box
-        """
-        message = self.get_message()
-        s = message.split(',')
-        coord = np.array([float(x) for x in s])
-        return coord
-    
-    
-    def read_all_locations(self):
-        """
-        read locations of all boxes boxes (if they are all in separate messages)
-        """
-        locations = []
-        
-        while self.receiver.getQueueLength() > 0:
-            self._robot.step(Robot.TIME_STEP)
-            coord = self.read_box_location()
-            locations.append(coord)
-            self._robot.step(Robot.TIME_STEP)
-            self.box_queue.put(coord)
-            
-        return locations        
-    
-
-    def send_location(self):
-        """
-        send current location of the robot
-        """
-        self._robot.step(Robot.TIME_STEP)
-        location = self.gps.getValues()
-        self.position = np.array([location[0], location[2]])
-        message = "{},{}".format(location[0],location[2])
-        self.send_message(message)
-        
-
-    def get_location(self):
-        """
-        get a location of another robot from a message
-        """
-        message = self.get_message()
-        if message == "":
-            self.other_position = np.array([])
-            return []
-        s = message.split(',') 
-        loc = np.array([float(s[0]), float(s[1])])
-        self.other_position = loc
-        
-        return loc
-
+   
 
     def field_position(self):
         """

@@ -380,7 +380,8 @@ robot.send_sweep_locations(positions)
 robot.step(TIME_STEP)
 #after we get locations from other robot, all boxes that each robot needs
 #to visit are saved in robot.box_queue
-robot.get_sweep_locations()
+#robot.get_sweep_locations()
+robot.get_messages()
 
 #print(positions)
 
@@ -432,7 +433,7 @@ while not robot.box_queue.empty() and robot.field.available():
             robot.step(TIME_STEP)
             robot.send_box_location(pos)
         
-    robot.read_all_locations()
+    #robot.read_all_locations()
     
 
 print('parking')
