@@ -126,16 +126,13 @@ def PID_rotation(required, final_error=0.4):
 
     if abs(error2) < abs(error):
         previous_error2 = error2
+
         while abs(error2) > final_error:
 
             P = MAX_VELOCITY*kP*error2
             D = (error2-previous_error2)/(100.0)*kD
 
-            v = P + D
-            if v > MAX_VELOCITY:
-                v = MAX_VELOCITY
-            elif v < -MAX_VELOCITY:
-                v = -MAX_VELOCITY
+            v = np.clip(P + D, -MAX_VELOCITY, MAX_VELOCITY)
 
             robot.left_wheel.setVelocity(-v)
             robot.right_wheel.setVelocity(v)
@@ -156,8 +153,6 @@ def PID_rotation(required, final_error=0.4):
                 forward_rot = -1.0
 
             robot.step(TIME_STEP)
-        return
-
     else:
         previous_error = error
 
@@ -166,11 +161,7 @@ def PID_rotation(required, final_error=0.4):
             P = MAX_VELOCITY*kP*error
             D = (error-previous_error)/(100.0)*kD
 
-            v = P + D
-            if v > MAX_VELOCITY:
-                v = MAX_VELOCITY
-            elif v < -MAX_VELOCITY:
-                v = -MAX_VELOCITY
+            v = np.clip(P + D, -MAX_VELOCITY, MAX_VELOCITY)
 
             robot.left_wheel.setVelocity(-v)
             robot.right_wheel.setVelocity(v)
@@ -179,7 +170,6 @@ def PID_rotation(required, final_error=0.4):
             error = required - robot.bearing1(robot.compass)
 
             robot.step(TIME_STEP)
-        return
 
 
 def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
@@ -264,12 +254,12 @@ def sweep(velocity=0.5, swept_angle=355):
 
         # wall_dist is decreased by robot-sensor distance
         wall_dist -= 0.11
-        
+
         # get quantized infrared level and convert to volts
         infrared_volts = robot.infrared_analogue.read() * robot.infrared_vref / 1023
         # get infrared reading and convert to meters
         infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
-      
+
         #print(infrared_dist, wall_dist)
 
         # if measured distance is less than wall_dist then assume there's a box
@@ -278,13 +268,12 @@ def sweep(velocity=0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
-         
-        # check if boxes are in between the robots 
+
+        # check if boxes are in between the robots
         if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.5:
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
-                boxes.append([x, z])       
-        
+                boxes.append([x, z])
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
@@ -408,7 +397,6 @@ initial_pass = True
 
 while not robot.box_queue.empty() and robot.field.available():
 
-    
     t = robot.box_queue.get()
     pos = t[1]
 
@@ -422,12 +410,12 @@ while not robot.box_queue.empty() and robot.field.available():
         move_avoid_fields(pos, error_translation=0.1)
 
     robot.step(TIME_STEP)
-    #if this is a new box and colour needs to be checked
+    # if this is a new box and colour needs to be checked
     if t[0] == 0:
         c = robot.deploy_dualclaw()
         for i in range(10):
             robot.step(TIME_STEP)
-    
+
         colour = ''
         if c == 0:
             colour = 'red'
@@ -441,30 +429,25 @@ while not robot.box_queue.empty() and robot.field.available():
                 colour = 'red'
             elif c == 1:
                 colour = 'green'
-   
+
         robot.step(TIME_STEP)
-    
-        
+
         if colour == robot.colour:
             return_box_field(robot.gps.getValues())
         else:
             robot.withdraw_dualclaw()
             reverse()
-            if c == 0 or c == 1: 
+            if c == 0 or c == 1:
                 robot.step(TIME_STEP)
                 valid, x, z = robot.remeasure_position()
                 if valid:
                     robot.send_box_location(np.array([x, z]))
-            
-       
-            
-    else: #this is a known box, got a location form another robot, just need to pick it up
-        robot.close_dualclaw()        
+
+    else:  # this is a known box, got a location form another robot, just need to pick it up
+        robot.close_dualclaw()
         for i in range(10):
-            robot.step(TIME_STEP)   
+            robot.step(TIME_STEP)
         return_box_field(robot.gps.getValues())
- 
-   
 
 
 print('parking')
