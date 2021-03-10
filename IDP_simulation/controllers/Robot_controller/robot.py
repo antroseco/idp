@@ -1,16 +1,18 @@
-import controller
-from field import Field
-import numpy as np
 import queue
+
+import controller
+import numpy as np
+
 import hardware
 from calculations import *
+from field import Field
 
 
 class Robot:
-    
+
     TIME_STEP = 64
     COMMUNICATION_CHANNEL = 1
-    
+
     MAX_VELOCITY = 6
 
     left_wheel_name = 'left_wheel'
@@ -31,12 +33,10 @@ class Robot:
     compass_name = 'compass'
     compass1_name = 'compass1'
 
-    
-    
-    def __init__(self, robot: controller.Robot, colour = 'red'):
+    def __init__(self, robot: controller.Robot, colour='red'):
         """
         initialize robot and its components, colour can be green or red
-        
+
         """
         self._robot = robot
         self.colour = colour
@@ -46,10 +46,8 @@ class Robot:
         self.sweep_locations = []
         self.other_sweep_locations = []
         self.position = np.array([])
-        self.other_position = np.array([]) 
-        
+        self.other_position = np.array([])
 
-        
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
         self.box_claw = robot.getDevice(Robot.box_claw_name)
@@ -69,8 +67,8 @@ class Robot:
         self.gps = robot.getDevice(Robot.gps_name)
         self.compass = robot.getDevice(Robot.compass_name)
         self.compass1 = robot.getDevice(Robot.compass1_name)
-                
-        TIME_STEP = Robot.TIME_STEP        
+
+        TIME_STEP = Robot.TIME_STEP
         self.infrared.enable(TIME_STEP)
         self.dsUltrasonic.enable(TIME_STEP)
         self.box_claw_sensor.enable(TIME_STEP)
@@ -82,10 +80,10 @@ class Robot:
         self.gps.enable(TIME_STEP)
         self.compass.enable(TIME_STEP)
         self.compass1.enable(TIME_STEP)
-        
+
         self.emitter.setChannel(Robot.COMMUNICATION_CHANNEL)
         self.receiver.setChannel(Robot.COMMUNICATION_CHANNEL)
-        
+
         self.box_claw.setPosition(0.0)
         self.left_claw.setPosition(0.0)
         self.right_claw.setPosition(0.0)
@@ -94,12 +92,10 @@ class Robot:
         self.right_wheel.setPosition(float('inf'))
         self.right_wheel.setVelocity(0.0)
 
-        self.green_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
-        self.red_analogue = hardware.ADCInput(lambda:hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
+        self.green_analogue = hardware.ADCInput(
+            lambda: hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
+        self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
-
-
-
 
     def step(self, TIME_STEP):
         """
@@ -110,81 +106,70 @@ class Robot:
         self.get_messages()
         # print(self.dsUltrasonic.getValue())
         self.collision_prevention()
-        
-        
-        
+
         return True
-    
-    
-    
-    def collision_prevention(self, threshold = 0.7):
+
+    def collision_prevention(self, threshold=0.7):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
-        
+
         if self.other_position.size == 0 or self.position.size == 0:
             pass
         else:
             dist = get_distance(self.position, self.other_position)
-            #print(dist)
-            
+            # print(dist)
+
             if dist < threshold:
-                #check which robot is in the way
+                # check which robot is in the way
                 required = required_bearing(self.other_position, self.gps.getValues()) % 360
                 current = self.bearing1(self.compass) % 360
-                
-                
+
                 stop = False
-                
-                if abs(required - current) > 40: 
+
+                if abs(required - current) > 40:
                     return
 
                 while dist < threshold:
                     self.left_wheel.setVelocity(0)
                     self.right_wheel.setVelocity(0)
-                    
+
                     self._robot.step(Robot.TIME_STEP)
-                    
+
                     self.send_location()
                     self.get_messages()
-                    
-                    if self.position.size == 2 and self.other_position.size == 2:
-            
-                        dist = get_distance(self.position, self.other_position)
-                    
-                    
-    
 
-    
-            
+                    if self.position.size == 2 and self.other_position.size == 2:
+
+                        dist = get_distance(self.position, self.other_position)
+
     def field_collision(self, coord, field):
         """
         checks if on the path between current position and coord it needs to go across field
         """
-        
+
         location = self.gps.getValues()
-        location = (location[0],location[2])
-        
+        location = (location[0], location[2])
+
         m = (coord[1] - location[1])/(coord[0]-location[0])
         c = coord[1] - m*coord[0]
-    
-        x = np.linspace(min(coord[0],location[0]),max(coord[0],location[0]),101,endpoint=True)
+
+        x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
         z = m*x + c
         z1 = [i for i in z if (i > field.y - 0.2 and i < field.y + 0.2)]
         x1 = [i for i in x if (i > field.x - 0.2 and i < field.x + 0.2)]
-    
+
         if z1 and x1:
             return True
-        
+
         return False
-    
-    
+
     def find_closest_point(self, field):
         """
-        helper function for avoiding the field 
+        helper function for avoiding the field
         input field is of type Field
         """
         location = self.gps.getValues()
-        location = (location[0],location[2])
+        location = (location[0], location[2])
         p1 = [field.x, field.y + 0.5]
         p2 = [field.x, field.y - 0.5]
         p3 = [field.x + 0.5, field.y]
@@ -192,7 +177,7 @@ class Robot:
         points = [p1, p2, p3, p4]
         bearings = [180.0, 0.0, 90.0, -90.0]
         distances = []
-        
+
         for point in points:
             x = (point[0] - location[0])
             z = (point[1] - location[1])
@@ -201,10 +186,9 @@ class Robot:
         i = distances.index(min(distances))
         checkpoint = points[i]
         bearing = bearings[i]
-        
-        return checkpoint,bearing
-        
-        
+
+        return checkpoint, bearing
+
     def send_message(self, message: str, type: int):
         """
         sends string message through a receiver
@@ -216,16 +200,14 @@ class Robot:
         self._robot.step(Robot.TIME_STEP)
         self.emitter.send(data)
         return
-    
-    
-    
+
     def get_messages(self):
         """
         gets the first message in receiver's queue and pops it from queue
         input: /
         return: string message, int type if there aren't any messages returns empty string
         type = 0 for robot coordinates, type = 1 for a single box coordinates, type = 2 for multiple box coordinates
-        """        
+        """
         while self.receiver.getQueueLength() > 0:
             data = self.receiver.getData()
             message = data.decode('utf-8')
@@ -235,25 +217,24 @@ class Robot:
             self.receiver.nextPacket()
             if message == "":
                 continue
-             
-            s = message.split(',') 
-    
+
+            s = message.split(',')
+
             if type == 0:
                 loc = np.array([float(s[0]), float(s[1])])
                 self.other_position = loc
-                
+
             elif type == 1:
                 coord = np.array([float(x) for x in s])
                 self.box_queue.put(coord)
-                
+
             elif type == 2:
                 coordinates = np.array([float(x) for x in s])
                 coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
                 self.other_sweep_locations = coordinates
                 self.compare_sweep_results()
         return
-    
-    
+
     def send_sweep_locations(self, locations):
         """
         send an array of locations as one message to other robot after the sweep
@@ -262,20 +243,16 @@ class Robot:
         for pos in locations:
             stringpos = "{},{}".format(pos[0], pos[1])
             message += stringpos + ','
-            
+
         self.send_message(message[:-1], type=2)
-        
-        
-        
+
     def send_box_location(self, location):
         """
         send a location of one box
         """
-        message = "{},{}".format(location[0],location[1])
+        message = "{},{}".format(location[0], location[1])
         self.send_message(message, type=1)
         return
-    
-    
 
     def send_location(self):
         """
@@ -284,11 +261,9 @@ class Robot:
         self._robot.step(Robot.TIME_STEP)
         location = self.gps.getValues()
         self.position = np.array([location[0], location[2]])
-        message = "{},{}".format(location[0],location[2])
+        message = "{},{}".format(location[0], location[2])
         self.send_message(message, type=0)
-        
-   
-        
+
     def compare_sweep_results(self):
         """
         check sweep results from both robots, remove duplicate locations
@@ -296,65 +271,56 @@ class Robot:
         """
 
         duplicates = []
-        
+
         for i in range(self.sweep_locations.shape[0]):
             for j in range(self.other_sweep_locations.shape[1]):
-                
+
                 loc1 = np.array(self.sweep_locations[i])
                 loc2 = np.array(self.other_sweep_locations[j])
-                
-                #check if loc1 and loc2 are the same or very close
+
+                # check if loc1 and loc2 are the same or very close
                 dist = np.linalg.norm(loc1 - loc2)
                 if dist < 0.03:
                     duplicates.append(j)
-                    
-        unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis = 0)
-        self.add_boxes_to_queue(unique)
-        return    
 
-                     
+        unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis=0)
+        self.add_boxes_to_queue(unique)
+        return
+
     def add_boxes_to_queue(self, positions):
         """
         assigns boxes that are in one half of the field to this robot, the other one will check the rest
-        """  
+        """
         for pos in positions:
             if self.colour == 'red' and pos[1] > 0:
                 self.box_queue.put(pos)
             elif self.colour == 'green' and pos[1] <= 0:
                 self.box_queue.put(pos)
         return
-                   
-       
-        
-    def bearing1(self, compass_obj): 
+
+    def bearing1(self, compass_obj):
         """
         This gives a bearing -180,180
         input: compass object(type Compass)
         """
-        
-        theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
-        theta = (theta-(np.pi /2.0) )*180.0/np.pi
+
+        theta = np.arctan2(compass_obj.getValues()[0], compass_obj.getValues()[2])
+        theta = (theta-(np.pi / 2.0))*180.0/np.pi
         if theta < -180:
-            theta += 360    
-        return  theta
-   
-   
-   
-   
-    def bearing(self, compass_obj): 
+            theta += 360
+        return theta
+
+    def bearing(self, compass_obj):
         """
         This gives a bearing 0,360
         input: compass object(type Compass)
         """
-        theta = np.arctan2(compass_obj.getValues()[0],compass_obj.getValues()[2])
-        theta = (theta-(np.pi /2.0))*180.0/np.pi
-        if theta < 0 :
+        theta = np.arctan2(compass_obj.getValues()[0], compass_obj.getValues()[2])
+        theta = (theta-(np.pi / 2.0))*180.0/np.pi
+        if theta < 0:
             theta += 360
 
-        return  theta
-
-
-
+        return theta
 
     def field_position(self):
         """
@@ -364,16 +330,14 @@ class Robot:
         if self.colour == 'red':
             return (0, 0.4)
         return (0, -0.4)
-        
-        
+
     def return_box_to_field(self, coord):
         """
-        returns a set of 4 locations in a red/green field to put the boxes 
+        returns a set of 4 locations in a red/green field to put the boxes
         input 3d coordinates of robot
         """
         intermediate, final = self.field.get_to_field(coord)
         return intermediate, final
-
 
     def deploy_dualclaw(self):
         """
@@ -385,16 +349,16 @@ class Robot:
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
-        desired = -1*np.pi/180 #slightly less than 0 to cut through the box to keep it in place
+        desired = -1*np.pi/180  # slightly less than 0 to cut through the box to keep it in place
         error = abs(desired - sensor1.getValue())
-        accuracy = 1*np.pi/180 #accuracy value in degrees
-        previous = 100 #arbitrary value just serves as placeholder
-        count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
+        accuracy = 1*np.pi/180  # accuracy value in degrees
+        previous = 100  # arbitrary value just serves as placeholder
+        count = 0  # start counting for each time frame where the servo angle does not change, break loop upon reaching 3
         red = False
         green = False
-        redLowerBound = 948 # (environment is 930),one reading above this value turns red to True
-        greenLowerBound = 436 # (environment is 418), values are about 0.5 lux above ambient
-        
+        redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
+        greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
+
         while error > accuracy:
             redValue = self.red_analogue.read()
             greenValue = self.green_analogue.read()
@@ -403,11 +367,11 @@ class Robot:
             if greenValue > greenLowerBound:
                 green = True
             measurement = sensor1.getValue()
-            claw1.setPosition(desired) #both claw move synchronously in different direction
+            claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
-    
+
         if red and not green:
             print('red')
             return 0
@@ -420,8 +384,7 @@ class Robot:
         if red and green:
             print('bad result')
             return 3
-        
-            
+
     def withdraw_dualclaw(self):
         """steps through multiple time steps, opens dual claw
         """
@@ -429,18 +392,17 @@ class Robot:
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
-    
-        desired = 20*np.pi/180 #arbitrary value
+
+        desired = 20*np.pi/180  # arbitrary value
         error = abs(desired - sensor1.getValue())
-        accuracy = 1*np.pi/180 #accuracy value in degrees
+        accuracy = 1*np.pi/180  # accuracy value in degrees
         while error > accuracy:
             measurement = sensor1.getValue()
-            claw1.setPosition(desired) #both claw move synchronously in different direction
+            claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
-        
-        
+
     def remeasure(self):
         """steps through multiple time steps, called when deploy_dualclaw doesn't return right value
         goes back and forth in attempt to remeasure color
@@ -449,8 +411,8 @@ class Robot:
         if self.dsUltrasonic.getValue() > 0.15:
             print('no box within reach')
             return -1
-            #check if there is box within reach, return -1 if there isn't
-        
+            # check if there is box within reach, return -1 if there isn't
+
         claw1 = self.left_claw
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
@@ -460,11 +422,11 @@ class Robot:
         openAngle = 10*np.pi/180
         red = False
         green = False
-        redLowerBound = 948 # (environment is 930),one reading above this value turns red to True
-        greenLowerBound = 436 # (environment is 418), values are about 0.5 lux above ambient
-        
+        redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
+        greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
+
         for n in range(5):
-        #Reverse with box incase close to walls
+            # Reverse with box incase close to walls
             wheel1.setVelocity(-0.3)
             wheel2.setVelocity(-0.3)
             redValue = self.red_analogue.read()
@@ -474,9 +436,9 @@ class Robot:
             if greenValue > greenLowerBound:
                 green = True
             self.step(Robot.TIME_STEP)
-        
+
         for n in range(10):
-        #Release the box and move backwards, while doing color detection
+            # Release the box and move backwards, while doing color detection
             claw1.setPosition(openAngle)
             claw2.setPosition(-openAngle)
             wheel1.setVelocity(-0.3)
@@ -486,11 +448,11 @@ class Robot:
             if redValue > redLowerBound:
                 red = True
             if greenValue > greenLowerBound:
-                green = True 
+                green = True
             self._robot.step(Robot.TIME_STEP)
-            
+
         for n in range(20):
-        #Move forwards and do color detection
+            # Move forwards and do color detection
             wheel1.setVelocity(0.3)
             wheel2.setVelocity(0.3)
             redValue = self.red_analogue.read()
@@ -499,9 +461,9 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
-            self.step(Robot.TIME_STEP) 
-        
-        print('remeasured:')    
+            self.step(Robot.TIME_STEP)
+
+        print('remeasured:')
         if red and not green:
             print('red')
             return 0
@@ -525,15 +487,15 @@ class Robot:
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
-        desired = -1*np.pi/180 #minus value should not be reached, break loop when count reaches 3
+        desired = -1*np.pi/180  # minus value should not be reached, break loop when count reaches 3
         error = abs(desired - sensor1.getValue())
-        accuracy = 1*np.pi/180 #accuracy value in degrees
-        previous = 100 #arbitrary value just serves as placeholder
-        count = 0      #start counting for each time frame where the servo angle does not change, break loop upon reaching 3
-        
+        accuracy = 1*np.pi/180  # accuracy value in degrees
+        previous = 100  # arbitrary value just serves as placeholder
+        count = 0  # start counting for each time frame where the servo angle does not change, break loop upon reaching 3
+
         while error > accuracy:
             measurement = sensor1.getValue()
-            claw1.setPosition(desired) #both claw move synchronously in different direction
+            claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
             self._robot.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
