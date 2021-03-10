@@ -499,27 +499,3 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
-    
-    def set_boxclaw(self, targetAngle):
-        """not in use with the current claw mechanism
-        steps through multiple time steps,
-        move the box_claw to the input angle, 
-        input: targetAngle in degrees, use box_claw_sensor to provide feedback
-        """
-        
-        desired = targetAngle*np.pi/180
-        error = abs(desired - box_claw_sensor.getValue())
-        accuracy = 5*np.pi/180
-        
-        while error > accuracy:
-            box_claw.setPosition(desired)
-            self._robot.step(Robot.TIME_STEP)
-            error = abs(desired - box_claw_sensor.getValue())
-        return
-        
-    def withdraw_boxclaw():
-        self.set_claw(90)
-    
-    def deploy_boxclaw():
-        self.set_claw(0)    
-    
