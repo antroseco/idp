@@ -385,8 +385,6 @@ robot.send_sweep_locations(positions)
 robot.step(TIME_STEP)
 # after we get locations from other robot, all boxes that each robot needs
 # to visit are saved in robot.box_queue
-robot.get_messages()
-
 
 initial_pass = True
 
