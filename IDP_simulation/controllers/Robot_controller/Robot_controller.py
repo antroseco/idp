@@ -339,6 +339,8 @@ def finish_in_field():
     for the ending of the task, robot goes and stays in its field
     """
 
+    print('parking')
+
     if robot.colour == 'red':
         intermediate = (0, 1)
         final = (0, 0.4)
@@ -348,14 +350,21 @@ def finish_in_field():
 
     move_avoid_fields(intermediate)
 
+    # TODO: Think of something better
+    if not robot.box_queue.empty() and robot.field.available():
+        return False
+
     if robot.colour == 'red':
         PID_rotation(180)
     else:
         PID_rotation(0)
 
+    if not robot.box_queue.empty() and robot.field.available():
+        return False
+
     PID_translation(final, reverse=True)
 
-    return
+    return True
 
 
 def test_collisions():
@@ -401,62 +410,66 @@ robot.step(TIME_STEP)
 
 initial_pass = True
 
-while not robot.box_queue.empty() and robot.field.available():
+parked = False
 
-    t = robot.box_queue.get()
-    pos = t[1]
+while True:
+    while not robot.box_queue.empty() and robot.field.available():
+        parked = False
 
-    print(pos)
-    robot.withdraw_dualclaw()
+        t = robot.box_queue.get()
+        pos = t[1]
 
-    if initial_pass:
-        initial_pass = False
-        move(pos)
-    else:
-        move_avoid_fields(pos, error_translation=0.1)
+        print(pos)
+        robot.withdraw_dualclaw()
 
-    robot.step(TIME_STEP)
-    # if this is a new box and colour needs to be checked
-    if t[0] == 0:
-        c = robot.deploy_dualclaw()
-        for i in range(10):
-            robot.step(TIME_STEP)
-
-        colour = ''
-        if c == 0:
-            colour = 'red'
-        elif c == 1:
-            colour = 'green'
-
+        if initial_pass:
+            initial_pass = False
+            move(pos)
         else:
-            c = robot.remeasure()
-            robot.close_dualclaw()
+            move_avoid_fields(pos, error_translation=0.1)
+
+        robot.step(TIME_STEP)
+        # if this is a new box and colour needs to be checked
+        if t[0] == 0:
+            c = robot.deploy_dualclaw()
+            for i in range(10):
+                robot.step(TIME_STEP)
+
+            colour = ''
             if c == 0:
                 colour = 'red'
             elif c == 1:
                 colour = 'green'
 
-        robot.step(TIME_STEP)
+            else:
+                c = robot.remeasure()
+                robot.close_dualclaw()
+                if c == 0:
+                    colour = 'red'
+                elif c == 1:
+                    colour = 'green'
 
-        if colour == robot.colour:
-            return_box_field(robot.gps.getValues())
-        else:
-            robot.withdraw_dualclaw()
-            reverse()
-            if c == 0 or c == 1:
-                robot.step(TIME_STEP)
-                valid, x, z = robot.remeasure_position()
-                if valid:
-                    robot.send_box_location(np.array([x, z]))
-
-    else:  # this is a known box, got a location form another robot, just need to pick it up
-        robot.close_dualclaw()
-        for i in range(10):
             robot.step(TIME_STEP)
-        return_box_field(robot.gps.getValues())
 
+            if colour == robot.colour:
+                return_box_field(robot.gps.getValues())
+            else:
+                robot.withdraw_dualclaw()
+                reverse()
+                if c == 0 or c == 1:
+                    robot.step(TIME_STEP)
+                    valid, x, z = robot.remeasure_position()
+                    if valid:
+                        robot.send_box_location(np.array([x, z]))
 
-print('parking')
+        else:  # this is a known box, got a location form another robot, just need to pick it up
+            robot.close_dualclaw()
+            for i in range(10):
+                robot.step(TIME_STEP)
+            return_box_field(robot.gps.getValues())
 
-robot.step(TIME_STEP)
-finish_in_field()
+    # TODO: Is this time step necessary?
+    robot.step(TIME_STEP)
+
+    if not parked:
+        parked = finish_in_field()
