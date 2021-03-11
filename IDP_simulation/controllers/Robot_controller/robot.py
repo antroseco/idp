@@ -48,6 +48,8 @@ class Robot:
         self.other_sweep_locations = []
         self.position = np.array([])
         self.other_position = np.array([])
+        self.stop = False
+        self.other_stop = False
 
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -112,7 +114,6 @@ class Robot:
         ret = self._robot.step(TIME_STEP)
         self.send_location()
         self.get_messages()
-        # print(self.dsUltrasonic.getValue())
         self.collision_prevention()
 
         # self.collision_prevention() may call robot._robot.step() multiple times
@@ -122,38 +123,91 @@ class Robot:
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
-    def collision_prevention(self, threshold=0.7):
+    def collision_prevention(self, threshold=0.75):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
-
+        
         if self.other_position.size == 0 or self.position.size == 0:
-            pass
+            return
         else:
+            
             dist = get_distance(self.position, self.other_position)
-            # print(dist)
-
             if dist < threshold:
                 # check which robot is in the way
-                required = required_bearing(self.other_position, self.gps.getValues()) % 360
+                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = (required % 360 + 90) % 360
                 current = self.bearing1(self.compass) % 360
-
-                stop = False
-
-                if abs(required - current) > 30:
+                
+                diff = abs(required - current)
+                if(diff > 180):
+                    diff = 360 - diff
+                
+                if diff > 30:
                     return
+                
+                self.left_wheel
+                self.stop = True
+                self._robot.step(Robot.TIME_STEP)
+                self.send_message('stop', 3)
+                self.get_messages()
+                self.send_location()
+                    
+                if self.stop and self.other_stop:
+                    self.left_wheel.setVelocity(-Robot.MAX_VELOCITY)
+                    self.right_wheel.setVelocity(-Robot.MAX_VELOCITY)
+                    # reverse a little bit
+                    for _ in range(2):
+                        self._robot.step(Robot.TIME_STEP)
 
-                while dist < threshold:
+                    self.left_wheel.setVelocity(-3)
+                    self.right_wheel.setVelocity(3)
+                    
+                    while diff <= 30:  
+                        print('turn')
+                        self._robot.step(Robot.TIME_STEP)
+                        self.get_messages()
+                        self.send_location()
+                        
+                        required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                        required = (required % 360 + 90) % 360
+                        current = self.bearing1(self.compass) % 360
+                        diff1 = abs(required - current)
+                        if(diff1 > 180):
+                            diff = 360 - diff1
+                        else:
+                            diff = diff1
+                        
+                        
+                    self.left_wheel.setVelocity(6.7)
+                    self.right_wheel.setVelocity(6.7)
+                    for _ in range(5):
+                        self._robot.step(Robot.TIME_STEP)
                     self.left_wheel.setVelocity(0)
-                    self.right_wheel.setVelocity(0)
-
+                    self.left_wheel.setVelocity(0)
                     self._robot.step(Robot.TIME_STEP)
+                     
+                else:
+   
+                    while dist < threshold and abs(required - current) <= 40:
+                        self.left_wheel.setVelocity(0)
+                        self.right_wheel.setVelocity(0)
+                        
+                        self._robot.step(Robot.TIME_STEP)
+                        
+                        self.send_location()
+                        self.send_message('stop', 3)
+                        self._robot.step(Robot.TIME_STEP)
+                        self.get_messages()
+    
+                        if self.position.size == 2 and self.other_position.size == 2:
+                            dist = get_distance(self.position, self.other_position)
+                            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                            required = (required % 360 + 90) % 360
+                            current = self.bearing1(self.compass) % 360
+                self.stop = False
+                self.send_message('done', 3)        
 
-                    self.send_location()
-                    self.get_messages()
 
-                    if self.position.size == 2 and self.other_position.size == 2:
-
-                        dist = get_distance(self.position, self.other_position)
 
     def field_collision(self, coord, field):
         """
@@ -183,10 +237,10 @@ class Robot:
         """
         location = self.gps.getValues()
         location = (location[0], location[2])
-        p1 = [field.x, field.y + 0.5]
-        p2 = [field.x, field.y - 0.5]
-        p3 = [field.x + 0.5, field.y]
-        p4 = [field.x - 0.5, field.y]
+        p1 = [field.x, field.y + 0.4]
+        p2 = [field.x, field.y - 0.4]
+        p3 = [field.x + 0.4, field.y]
+        p4 = [field.x - 0.4, field.y]
         points = [p1, p2, p3, p4]
         bearings = [180.0, 0.0, 90.0, -90.0]
         distances = []
@@ -250,6 +304,11 @@ class Robot:
                 coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
                 self.other_sweep_locations = coordinates
                 self.compare_sweep_results()
+            elif type == 3:
+                if message == 'stop':
+                    self.other_stop = True
+                elif message == 'done':
+                    self.other_stop = False
         return
 
     def send_sweep_locations(self, locations):
@@ -438,7 +497,7 @@ class Robot:
         returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
         """
         if self.dsUltrasonic.getValue() > 0.15:
-            print('no box within reach')
+            #print('no box within reach')
             return -1
             # check if there is box within reach, return -1 if there isn't
 

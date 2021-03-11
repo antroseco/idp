@@ -62,7 +62,7 @@ def encircle(coord, location, field):
     return
 
 
-def move_avoid_fields(coord, error_translation=0.05):
+def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
     """
@@ -112,7 +112,6 @@ def PID_rotation(required, threshold=0.4) -> bool:
     Args:
         required (float): Bearing in degrees.
         threshold (float, optional): Maximum acceptable error. Defaults to 0.4.
-
     Returns:
         bool: True if error < threshold
     """
@@ -124,6 +123,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
     kP = 0.095
     kI = 0.042735
     kD = 0.011
+
 
     # Once we fix the time step issue
     # kP = 0.114847
@@ -195,7 +195,7 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
 
         else:
 
-            v = error*MAX_VELOCITY*10
+            v = error*MAX_VELOCITY*5
             if v > MAX_VELOCITY:
                 v = MAX_VELOCITY
 
@@ -223,13 +223,13 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
     return
 
 
-def move(coord, error_rotation=1, error_translation=0.15):
+def move(coord, error_rotation=1, error_translation=0.1):
     """
     move to location coord
     """
     required_angle = required_bearing(coord, robot.gps.getValues())
+    
     PID_rotation(required_angle, error_rotation)
-
     PID_translation(coord, error_translation)
     return
 
@@ -309,7 +309,6 @@ def return_box_field(coord):
     """
 
     intermediate, final = robot.field.get_to_field(coord)
-
     move_avoid_fields(intermediate, error_translation=0.15)
     if final[0] > 0:
         PID_rotation(-90)
@@ -339,7 +338,7 @@ def finish_in_field():
     for the ending of the task, robot goes and stays in its field
     """
 
-    print('parking')
+    #print('parking')
 
     if robot.colour == 'red':
         intermediate = (0, 1)
@@ -368,10 +367,14 @@ def finish_in_field():
 
 
 def test_collisions():
+    robot.step(TIME_STEP)
+
+
     if robot.colour == 'green':
-        move((0.4, -0.4))
+        move((0.2, 0.4))
     if robot.colour == 'red':
-        move((0, -1))
+        move((-0.2, -0.4))
+
 
 
 # This part is executed
@@ -385,29 +388,17 @@ else:
 red_field = Field('red')
 green_field = Field('green')
 
-"""
-if r.getName() == 'robot_red':
-    coord = (0.0,0.5)
-    robot.step(TIME_STEP)
-    PID_rotation(required_bearing(coord,robot.gps.getValues()))
-    PID_translation(coord)
-    coord = (-0.5,0.1)
-    PID_rotation(required_bearing(coord,robot.gps.getValues()))
-    PID_translation(coord)
-   """
+
+#robot.step(TIME_STEP)
+#test_collisions()
 
 
 robot.step(TIME_STEP)
-positions = sweep(0.4)
-print(positions)
+positions = sweep(0.5)
 
 robot.step(TIME_STEP)
 robot.send_sweep_locations(positions)
-
 robot.step(TIME_STEP)
-# after we get locations from other robot, all boxes that each robot needs
-# to visit are saved in robot.box_queue
-
 initial_pass = True
 
 parked = False
@@ -418,8 +409,7 @@ while True:
 
         t = robot.box_queue.get()
         pos = t[1]
-
-        print(pos)
+        
         robot.withdraw_dualclaw()
 
         if initial_pass:
@@ -436,18 +426,23 @@ while True:
                 robot.step(TIME_STEP)
 
             colour = ''
+
             if c == 0:
                 colour = 'red'
+                print(colour)
             elif c == 1:
                 colour = 'green'
+                print(colour)
 
             else:
                 c = robot.remeasure()
                 robot.close_dualclaw()
                 if c == 0:
                     colour = 'red'
+                    print(colour)
                 elif c == 1:
                     colour = 'green'
+                    print(colour)
 
             robot.step(TIME_STEP)
 
