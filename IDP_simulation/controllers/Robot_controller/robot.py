@@ -194,6 +194,7 @@ class Robot:
                         self._robot.step(Robot.TIME_STEP)
                     self.left_wheel.setVelocity(0)
                     self.left_wheel.setVelocity(0)
+                    # TODO: Remove this time step, there's no need to wait for the robot to stop
                     self._robot.step(Robot.TIME_STEP)
 
                 else:
