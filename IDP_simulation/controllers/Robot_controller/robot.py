@@ -126,25 +126,26 @@ class Robot:
     def collision_prevention(self, threshold=0.75):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
-        
+
         if self.other_position.size == 0 or self.position.size == 0:
             return
         else:
-            
+
             dist = get_distance(self.position, self.other_position)
             if dist < threshold:
                 # check which robot is in the way
-                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = math.degrees(np.arctan2(
+                    self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                 required = (required % 360 + 90) % 360
                 current = self.bearing1(self.compass) % 360
-                
+
                 diff = abs(required - current)
                 if(diff > 180):
                     diff = 360 - diff
-                
+
                 if diff > 30:
                     return
-                
+
                 self.left_wheel.setVelocity(0)
                 self.right_wheel.setVelocity(0)
                 self.stop = True
@@ -152,8 +153,7 @@ class Robot:
                 self.send_message('stop', 3)
                 self.get_messages()
                 self.send_location()
-                
-                    
+
                 if self.stop and self.other_stop:
                     #print('both stop')
                     self.left_wheel.setVelocity(-Robot.MAX_VELOCITY)
@@ -161,24 +161,25 @@ class Robot:
                     # reverse a little bit
                     for _ in range(5):
                         self._robot.step(Robot.TIME_STEP)
-                    #print('reversed')
-                    
+                    # print('reversed')
+
                     if self.position[0] > 0:
                         self.left_wheel.setVelocity(-3)
                         self.right_wheel.setVelocity(3)
                     else:
                         self.left_wheel.setVelocity(3)
                         self.right_wheel.setVelocity(-3)
-                    
-                    while diff <= 30 and dist < 0.75:  
+
+                    while diff <= 30 and dist < 0.75:
                         print('turn')
                         self._robot.step(Robot.TIME_STEP)
                         self.get_messages()
                         self.send_location()
-                        
+
                         if self.position.size == 2 and self.other_position.size == 2:
                             dist = get_distance(self.position, self.other_position)
-                            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                            required = math.degrees(np.arctan2(
+                                self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                             required = (required % 360 + 90) % 360
                         current = self.bearing1(self.compass) % 360
                         diff1 = abs(required - current)
@@ -186,8 +187,7 @@ class Robot:
                             diff = 360 - diff1
                         else:
                             diff = diff1
-                        
-                        
+
                     self.left_wheel.setVelocity(6.7)
                     self.right_wheel.setVelocity(6.7)
                     for _ in range(3):
@@ -195,29 +195,28 @@ class Robot:
                     self.left_wheel.setVelocity(0)
                     self.left_wheel.setVelocity(0)
                     self._robot.step(Robot.TIME_STEP)
-                     
+
                 else:
-   
+
                     while dist < threshold and abs(required - current) <= 40:
                         self.left_wheel.setVelocity(0)
                         self.right_wheel.setVelocity(0)
-                        
+
                         self._robot.step(Robot.TIME_STEP)
-                        
+
                         self.send_location()
                         self.send_message('stop', 3)
                         self._robot.step(Robot.TIME_STEP)
                         self.get_messages()
-    
+
                         if self.position.size == 2 and self.other_position.size == 2:
                             dist = get_distance(self.position, self.other_position)
-                            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                            required = math.degrees(np.arctan2(
+                                self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                             required = (required % 360 + 90) % 360
                             current = self.bearing1(self.compass) % 360
                 self.stop = False
-                self.send_message('done', 3)        
-
-
+                self.send_message('done', 3)
 
     def field_collision(self, coord, field):
         """
@@ -446,6 +445,7 @@ class Robot:
         redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
         greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
 
+        i = 0
         while error > accuracy:
             redValue = self.red_analogue.read()
             greenValue = self.green_analogue.read()
@@ -458,6 +458,10 @@ class Robot:
             claw2.setPosition(-desired)
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
+            # TODO: Jerry please fix
+            i += 1
+            if i > 8:
+                break
 
         if red and not green:
             # print('red')
