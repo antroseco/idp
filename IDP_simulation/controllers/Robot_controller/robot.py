@@ -42,8 +42,8 @@ class Robot:
         self.colour = colour
         self.field = Field(colour)
         self.infrared_vref = 4.3
-        #queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
-        self.box_queue = queue.Queue() 
+        # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
+        self.box_queue = queue.Queue()
         self.sweep_locations = []
         self.other_sweep_locations = []
         self.position = np.array([])
@@ -98,17 +98,29 @@ class Robot:
         self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
-    def step(self, TIME_STEP):
+    def step(self, TIME_STEP: int) -> float:
+        """Block for the time requested and do some housekeeping.
+
+        Args:
+            TIME_STEP (int): Time to block in milliseconds, must be a multiple of the simulation's time step.
+
+        Returns:
+            float: seconds actually elapsed or -1 if we need to terminate
         """
-        performs a simulation step
-        """
-        self._robot.step(TIME_STEP)
+        start_time = self._robot.getTime()
+
+        ret = self._robot.step(TIME_STEP)
         self.send_location()
         self.get_messages()
         # print(self.dsUltrasonic.getValue())
         self.collision_prevention()
 
-        return True
+        # self.collision_prevention() may call robot._robot.step() multiple times
+        # hence, we need to measure the actual time elapsed
+        elapsed_time = self._robot.getTime() - start_time  # in seconds
+
+        # -1 is Webots telling us to terminate the process
+        return -1 if ret == -1 else elapsed_time
 
     def collision_prevention(self, threshold=0.7):
         """Checks if the distance between each robot is below a certain
@@ -127,7 +139,7 @@ class Robot:
 
                 stop = False
 
-                if abs(required - current) > 30: 
+                if abs(required - current) > 30:
                     return
 
                 while dist < threshold:
@@ -198,6 +210,7 @@ class Robot:
         """
         message = str(type) + message
         data = message.encode('utf-8')
+        # TODO: Remove
         self._robot.step(Robot.TIME_STEP)
         self.emitter.send(data)
         return
@@ -214,6 +227,7 @@ class Robot:
             message = data.decode('utf-8')
             type = int(message[0])
             message = message[1:]
+            # TODO: Remove
             self._robot.step(Robot.TIME_STEP)
             self.receiver.nextPacket()
             if message == "":
@@ -261,6 +275,7 @@ class Robot:
         """
         send current location of the robot
         """
+        # TODO: Remove
         self._robot.step(Robot.TIME_STEP)
         location = self.gps.getValues()
         self.position = np.array([location[0], location[2]])
@@ -387,19 +402,16 @@ class Robot:
         if red and green:
             # print('bad result')
             return 3
-    
-    
+
     def remeasure_position(self):
         """
         when the box was touched to check colour, this returns the new (possibly changed) position
         """
         dist = self.dsUltrasonic.getValue()
         pos = potential_box_position(dist + 0.09, self.bearing(self.compass1), self.gps.getValues())
-        
+
         return pos
-    
-    
-    
+
     def withdraw_dualclaw(self):
         """steps through multiple time steps, opens dual claw
         """
@@ -515,28 +527,3 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
-    
-    
-    def set_boxclaw(self, targetAngle):
-        """not in use with the current claw mechanism
-        steps through multiple time steps,
-        move the box_claw to the input angle, 
-        input: targetAngle in degrees, use box_claw_sensor to provide feedback
-        """
-        
-        desired = targetAngle*np.pi/180
-        error = abs(desired - box_claw_sensor.getValue())
-        accuracy = 5*np.pi/180
-        
-        while error > accuracy:
-            box_claw.setPosition(desired)
-            self._robot.step(Robot.TIME_STEP)
-            error = abs(desired - box_claw_sensor.getValue())
-        return
-        
-    def withdraw_boxclaw():
-        self.set_claw(90)
-    
-    def deploy_boxclaw():
-        self.set_claw(0)    
-    

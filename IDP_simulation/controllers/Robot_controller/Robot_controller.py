@@ -120,9 +120,15 @@ def PID_rotation(required, threshold=0.4) -> bool:
         start_time = robot._robot.getTime()
         print('PID_rotation start')
 
+    # These values are tuned for inconsistent time steps...
     kP = 0.095
     kI = 0.042735
     kD = 0.011
+
+    # Once we fix the time step issue
+    # kP = 0.114847
+    # kI = 0.042735
+    # kD = 1.192699
 
     def angle_between(a, b):
         return min(a - b, a - b + 360, a - b - 360, key=abs)
@@ -146,10 +152,19 @@ def PID_rotation(required, threshold=0.4) -> bool:
         robot.left_wheel.setVelocity(-v)
         robot.right_wheel.setVelocity(v)
 
+        time_elapsed = TIME_STEP / 1000  # TODO
         robot.step(TIME_STEP)
+
         new_error = angle_between(required, robot.bearing1(robot.compass))
-        error_integral += new_error * TIME_STEP / 1000
-        error_derivative = (new_error - error) / (TIME_STEP / 1000)
+
+        # If more than one TIME_STEPs elapsed, then the robot had stopped due to collision prevention
+        # Reset to avoid blowing up
+        if True:  # np.isclose(time_elapsed, TIME_STEP, atol=0.001):
+            error_integral += new_error * time_elapsed
+            error_derivative = (new_error - error) / time_elapsed
+        else:
+            error_integral = 0
+            error_derivative = 0
 
         # Detect oscillatory behaviour
         # On a 64 ms TIME_STEP, it sometimes oscillates between 0.39 and -0.39 deg error
@@ -372,8 +387,6 @@ if r.getName() == 'robot_red':
     PID_translation(coord)
    """
 
-
-# test_collisions()
 
 robot.step(TIME_STEP)
 positions = sweep(0.4)
