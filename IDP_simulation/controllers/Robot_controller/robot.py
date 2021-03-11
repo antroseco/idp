@@ -145,22 +145,30 @@ class Robot:
                 if diff > 30:
                     return
                 
-                self.left_wheel
+                self.left_wheel.setVelocity(0)
+                self.right_wheel.setVelocity(0)
                 self.stop = True
                 self._robot.step(Robot.TIME_STEP)
                 self.send_message('stop', 3)
                 self.get_messages()
                 self.send_location()
+                
                     
                 if self.stop and self.other_stop:
+                    print('both stop')
                     self.left_wheel.setVelocity(-Robot.MAX_VELOCITY)
                     self.right_wheel.setVelocity(-Robot.MAX_VELOCITY)
                     # reverse a little bit
-                    for _ in range(2):
+                    for _ in range(5):
                         self._robot.step(Robot.TIME_STEP)
-
-                    self.left_wheel.setVelocity(-3)
-                    self.right_wheel.setVelocity(3)
+                    print('reversed')
+                    
+                    if self.position[0] > 0:
+                        self.left_wheel.setVelocity(-3)
+                        self.right_wheel.setVelocity(3)
+                    else:
+                        self.left_wheel.setVelocity(3)
+                        self.right_wheel.setVelocity(-3)
                     
                     while diff <= 30:  
                         print('turn')
@@ -180,7 +188,7 @@ class Robot:
                         
                     self.left_wheel.setVelocity(6.7)
                     self.right_wheel.setVelocity(6.7)
-                    for _ in range(5):
+                    for _ in range(3):
                         self._robot.step(Robot.TIME_STEP)
                     self.left_wheel.setVelocity(0)
                     self.left_wheel.setVelocity(0)

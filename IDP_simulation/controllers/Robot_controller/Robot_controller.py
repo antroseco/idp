@@ -80,7 +80,7 @@ def move_avoid_fields(coord, error_translation=0.1):
         move(coord, error_translation)
 
     else:  # opposite halfs
-        if coord[0] > 0.3 or coord[0] < -0.3:
+        if coord[0] > 0.5 or coord[0] < -0.5:
             intermediate = [coord[0], 0]
         else:
             if coord[0] > 0:
@@ -391,6 +391,9 @@ green_field = Field('green')
 
 #robot.step(TIME_STEP)
 #test_collisions()
+
+
+
 
 
 robot.step(TIME_STEP)

@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.12549536003459993 -0.8866764002941655 -0.44503469052554434 2.6678553392561613
-  position -1.2367484425438595 3.533853497495756 -2.105750968402562
+  orientation -0.12071469196632323 -0.8959344075362989 -0.4274687129323695 2.6629309479878884
+  position -1.3069372503552474 3.4512404023115515 -2.222932169486141
 }
 Background {
   skyColor [
@@ -39,6 +39,7 @@ Floor {
 }
 Robot {
   translation 0 0.068 -0.4
+  rotation 0 1 0 -1.5707953071795862
   children [
     Compass {
       name "compass1"
@@ -86,7 +87,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -2.7804438925564557e-10 -2.780433679382305e-10 1.5707999999999938
+        rotation 1 -3.4935500037860024e-10 -3.493537171231659e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -119,7 +120,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 1.906692492833471e-09 -1.906694436928398e-09 1.5707953071795442
+        rotation -0.9999999999999999 1.97806572932615e-09 -1.978067746194365e-09 1.5707953071795442
         children [
           USE WHEEL
         ]
@@ -251,6 +252,7 @@ Robot {
 }
 Robot {
   translation 0 0.068 0.4
+  rotation 0 1 0 1.5708
   children [
     Compass {
       name "compass1"
@@ -298,7 +300,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -8.813143762926419e-10 -8.813111388721036e-10 1.5707999999999938
+        rotation 1 -9.526249874156012e-10 -9.526214880570388e-10 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -331,7 +333,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 1.085638833968275e-09 -1.085639941735961e-09 1.5707953071795442
+        rotation -0.9999999999999999 1.1570120704609555e-09 -1.1570132510019226e-09 1.5707953071795442
         children [
           USE WHEEL
         ]
