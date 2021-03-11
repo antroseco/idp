@@ -155,13 +155,13 @@ class Robot:
                 
                     
                 if self.stop and self.other_stop:
-                    print('both stop')
+                    #print('both stop')
                     self.left_wheel.setVelocity(-Robot.MAX_VELOCITY)
                     self.right_wheel.setVelocity(-Robot.MAX_VELOCITY)
                     # reverse a little bit
                     for _ in range(5):
                         self._robot.step(Robot.TIME_STEP)
-                    print('reversed')
+                    #print('reversed')
                     
                     if self.position[0] > 0:
                         self.left_wheel.setVelocity(-3)
@@ -170,14 +170,16 @@ class Robot:
                         self.left_wheel.setVelocity(3)
                         self.right_wheel.setVelocity(-3)
                     
-                    while diff <= 30:  
+                    while diff <= 30 and dist < 0.75:  
                         print('turn')
                         self._robot.step(Robot.TIME_STEP)
                         self.get_messages()
                         self.send_location()
                         
-                        required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
-                        required = (required % 360 + 90) % 360
+                        if self.position.size == 2 and self.other_position.size == 2:
+                            dist = get_distance(self.position, self.other_position)
+                            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                            required = (required % 360 + 90) % 360
                         current = self.bearing1(self.compass) % 360
                         diff1 = abs(required - current)
                         if(diff1 > 180):

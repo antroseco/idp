@@ -234,7 +234,7 @@ def move(coord, error_rotation=1, error_translation=0.1):
     return
 
 
-def sweep(velocity=0.5, swept_angle=355):
+def sweep(velocity=-0.5, swept_angle=355):
     """
     do a 180 degree spin while collecting data from distance sensor
     input: velocity of wheels/how fast is the rotation
@@ -374,7 +374,7 @@ def test_collisions():
         move((0.2, 0.4))
     if robot.colour == 'red':
         move((-0.2, -0.4))
-
+print('********')
 
 
 # This part is executed
@@ -397,6 +397,12 @@ green_field = Field('green')
 
 
 robot.step(TIME_STEP)
+
+if robot.colour == 'green':
+    PID_rotation(180)
+else:
+    PID_rotation(0)
+
 positions = sweep(0.5)
 
 robot.step(TIME_STEP)
@@ -432,20 +438,20 @@ while True:
 
             if c == 0:
                 colour = 'red'
-                print(colour)
+                print('detected ', colour)
             elif c == 1:
                 colour = 'green'
-                print(colour)
+                print('detected ', colour)
 
             else:
                 c = robot.remeasure()
                 robot.close_dualclaw()
                 if c == 0:
                     colour = 'red'
-                    print(colour)
+                    print('detected ', colour)
                 elif c == 1:
                     colour = 'green'
-                    print(colour)
+                    print('detected ', colour)
 
             robot.step(TIME_STEP)
 
@@ -459,7 +465,7 @@ while True:
                     valid, x, z = robot.remeasure_position()
                     if valid:
                         robot.send_box_location(np.array([x, z]))
-
+                    
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
             for i in range(10):
