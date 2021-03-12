@@ -531,7 +531,7 @@ class Robot:
         redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
         greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
 
-        for n in range(5):
+        for _ in range(5):
             # Reverse with box incase close to walls
             wheel1.setVelocity(-0.3)
             wheel2.setVelocity(-0.3)
@@ -543,7 +543,7 @@ class Robot:
                 green = True
             self.step()
 
-        for n in range(10):
+        for _ in range(10):
             # Release the box and move backwards, while doing color detection
             claw1.setPosition(openAngle)
             claw2.setPosition(-openAngle)
@@ -555,9 +555,10 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
+            # TODO: Why is this different?
             self._robot.step(self.TIME_STEP)
 
-        for n in range(20):
+        for _ in range(20):
             # Move forwards and do color detection
             wheel1.setVelocity(0.3)
             wheel2.setVelocity(0.3)
