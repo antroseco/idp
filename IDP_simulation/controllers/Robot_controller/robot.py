@@ -384,30 +384,37 @@ class Robot:
         return
 
     @staticmethod
-    def bearing1(compass_obj):
-        """
-        This gives a bearing -180,180
-        input: compass object(type Compass)
-        """
+    def bearing1(compass: controller.Compass) -> float:
+        """Get bearing from compass ([-180, 180] version)
 
-        theta = np.arctan2(compass_obj.getValues()[0], compass_obj.getValues()[2])
-        theta = (theta-(np.pi / 2.0))*180.0/np.pi
-        if theta < -180:
-            theta += 360
+        Args:
+            compass (controller.Compass): Compass instance.
+
+        Returns:
+            float: Bearing in degrees, [-180, 180]
+        """
+        theta = Robot.bearing(compass)
+        if theta > 180:
+            theta -= 360
+
         return theta
 
     @staticmethod
-    def bearing(compass_obj):
-        """
-        This gives a bearing 0,360
-        input: compass object(type Compass)
-        """
-        theta = np.arctan2(compass_obj.getValues()[0], compass_obj.getValues()[2])
-        theta = (theta-(np.pi / 2.0))*180.0/np.pi
-        if theta < 0:
-            theta += 360
+    def bearing(compass: controller.Compass) -> float:
+        """Get bearing from compass ([0, 360] version)
 
-        return theta
+        Args:
+            compass (controller.Compass): Compass instance.
+
+        Returns:
+            float: Bearing in degrees, [0, 360]
+        """
+        values = compass.getValues()
+        theta = np.arctan2(values[0], values[2])
+        theta = np.rad2deg(theta) - 90
+
+        # Unlike C/C++, Python's modulus operator returns a number with the same sign as the divisor
+        return theta % 360
 
     def field_position(self):
         """
