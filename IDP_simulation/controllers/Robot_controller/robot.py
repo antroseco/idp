@@ -135,7 +135,7 @@ class Robot:
                 required = math.degrees(np.arctan2(
                     self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                 required = (required % 360 + 90) % 360
-                current = self.bearing1(self.compass) % 360
+                current = self.bearing(self.compass)
 
                 diff = abs(required - current)
                 if(diff > 180):
@@ -179,7 +179,7 @@ class Robot:
                             required = math.degrees(np.arctan2(
                                 self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                             required = (required % 360 + 90) % 360
-                        current = self.bearing1(self.compass) % 360
+                        current = self.bearing(self.compass)
                         diff1 = abs(required - current)
                         if(diff1 > 180):
                             diff = 360 - diff1
@@ -213,7 +213,7 @@ class Robot:
                             required = math.degrees(np.arctan2(
                                 self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                             required = (required % 360 + 90) % 360
-                            current = self.bearing1(self.compass) % 360
+                            current = self.bearing(self.compass)
                 self.stop = False
                 self.send_message('done', 3)
 
