@@ -6,6 +6,7 @@ import numpy as np
 import hardware
 from calculations import *
 from field import Field
+from instrumentation import trace
 
 
 class Robot:
@@ -426,6 +427,7 @@ class Robot:
         intermediate, final = self.field.get_to_field(coord)
         return intermediate, final
 
+    @trace
     def deploy_dualclaw(self):
         """
         step through multiple time steps,
@@ -486,6 +488,7 @@ class Robot:
 
         return pos
 
+    @trace
     def withdraw_dualclaw(self):
         """steps through multiple time steps, opens dual claw
         """
@@ -504,6 +507,7 @@ class Robot:
             self.step(Robot.TIME_STEP)
             error = abs(desired - sensor1.getValue())
 
+    @trace
     def remeasure(self):
         """steps through multiple time steps, called when deploy_dualclaw doesn't return right value
         checks first if there is a box within reach with ultrasonic sensor, return -1 when there isn't,
@@ -580,6 +584,7 @@ class Robot:
             # print('bad result')
             return 3
 
+    @trace
     def close_dualclaw(self):
         """
         step through multiple time steps,

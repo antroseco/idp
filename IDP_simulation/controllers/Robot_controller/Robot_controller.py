@@ -1,10 +1,14 @@
 """Robot_controller controller."""
-import controller
-from robot import Robot
-from field import Field
-from calculations import *
-import numpy as np
+import logging
 import math
+
+import controller
+import numpy as np
+
+from calculations import *
+from field import Field
+from robot import Robot
+from instrumentation import trace
 
 np.set_printoptions(suppress=True)
 
@@ -13,8 +17,29 @@ COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6.7
 
 DEBUG_PID = False
+DEBUG_TRACING = False
 
 
+# Default level is WARNING, change it to DEBUG
+logging.basicConfig(level=logging.DEBUG)
+
+if not DEBUG_TRACING:
+    logging.getLogger('tracing').setLevel(logging.INFO)
+
+
+# Initialize robot
+r = controller.Robot()
+if r.getName() == 'robot_red':
+    robot = Robot(r, 'red')
+
+else:
+    robot = Robot(r, 'green')
+
+red_field = Field('red')
+green_field = Field('green')
+
+
+@trace
 def encircle(coord, location, field):
     """
     location is 3D gps coordinates
@@ -62,6 +87,7 @@ def encircle(coord, location, field):
     return
 
 
+@trace
 def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
@@ -105,6 +131,7 @@ def move_avoid_fields(coord, error_translation=0.1):
     return
 
 
+@trace
 def PID_rotation(required, threshold=0.4) -> bool:
     """Rotate until the required bearing is reached.
     Exits if error < threshold or oscillatory behaviour is detected.
@@ -123,7 +150,6 @@ def PID_rotation(required, threshold=0.4) -> bool:
     kP = 0.095
     kI = 0.042735
     kD = 0.011
-
 
     # Once we fix the time step issue
     # kP = 0.114847
@@ -182,6 +208,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
     return True
 
 
+@trace
 def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
     """input: 2D desired coordinate coord,
     The function moves in a straight line until the desired location is within
@@ -223,17 +250,19 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
     return
 
 
+@trace
 def move(coord, error_rotation=1, error_translation=0.1):
     """
     move to location coord
     """
     required_angle = required_bearing(coord, robot.gps.getValues())
-    
+
     PID_rotation(required_angle, error_rotation)
     PID_translation(coord, error_translation)
     return
 
 
+@trace
 def sweep(velocity=-0.5, swept_angle=355):
     """
     do a 180 degree spin while collecting data from distance sensor
@@ -270,7 +299,7 @@ def sweep(velocity=-0.5, swept_angle=355):
         # get infrared reading and convert to meters
         infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
 
-        #print(infrared_dist, wall_dist)
+        # print(infrared_dist, wall_dist)
 
         # if measured distance is less than wall_dist then assume there's a box
         # also if wall is more than 1.5 away disregard measurements because it's further than sensor's range
@@ -301,6 +330,7 @@ def sweep(velocity=-0.5, swept_angle=355):
     return locations
 
 
+@trace
 def return_box_field(coord):
     """
     function that makes robot return a box in the specified field without it clashing with
@@ -323,6 +353,7 @@ def return_box_field(coord):
     return
 
 
+@trace
 def reverse():
     robot.left_wheel.setVelocity(-robot.MAX_VELOCITY)
     robot.right_wheel.setVelocity(-robot.MAX_VELOCITY)
@@ -333,12 +364,13 @@ def reverse():
     robot.right_wheel.setVelocity(0)
 
 
+@trace
 def finish_in_field():
     """
     for the ending of the task, robot goes and stays in its field
     """
 
-    #print('parking')
+    # print('parking')
 
     if robot.colour == 'red':
         intermediate = (0, 1)
@@ -369,31 +401,19 @@ def finish_in_field():
 def test_collisions():
     robot.step(TIME_STEP)
 
-
     if robot.colour == 'green':
         move((0.2, 0.4))
     if robot.colour == 'red':
         move((-0.2, -0.4))
+
+
 print('********')
 
 
 # This part is executed
-r = controller.Robot()
-if r.getName() == 'robot_red':
-    robot = Robot(r, 'red')
 
-else:
-    robot = Robot(r, 'green')
-
-red_field = Field('red')
-green_field = Field('green')
-
-
-#robot.step(TIME_STEP)
-#test_collisions()
-
-
-
+# robot.step(TIME_STEP)
+# test_collisions()
 
 
 robot.step(TIME_STEP)
@@ -418,7 +438,7 @@ while True:
 
         t = robot.box_queue.get()
         pos = t[1]
-        
+
         robot.withdraw_dualclaw()
 
         if initial_pass:
@@ -465,7 +485,7 @@ while True:
                     valid, x, z = robot.remeasure_position()
                     if valid:
                         robot.send_box_location(np.array([x, z]))
-                    
+
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
             for i in range(10):
