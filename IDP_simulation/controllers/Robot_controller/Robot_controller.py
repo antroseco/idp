@@ -12,7 +12,6 @@ from instrumentation import trace
 
 np.set_printoptions(suppress=True)
 
-TIME_STEP = 64
 COMMUNICATION_CHANNEL = 1
 MAX_VELOCITY = 6.7
 
@@ -79,7 +78,7 @@ def encircle(coord, location, field):
             else:
                 robot.left_wheel.setVelocity(speed_outer_wheel)
                 robot.right_wheel.setVelocity(speed_inner_wheel)
-            robot.step(TIME_STEP)
+            robot.step()
             collision = robot.field_collision(coord, field)
 
     robot.left_wheel.setVelocity(0)
@@ -92,7 +91,7 @@ def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
     """
-    robot.step(TIME_STEP)
+    robot.step()
     location = robot.gps.getValues()
 
     if location[2] * coord[1] >= 0:  # target and current location are on the same half
@@ -178,8 +177,8 @@ def PID_rotation(required, threshold=0.4) -> bool:
         robot.left_wheel.setVelocity(-v)
         robot.right_wheel.setVelocity(v)
 
-        time_elapsed = TIME_STEP / 1000  # TODO
-        robot.step(TIME_STEP)
+        time_elapsed = robot.TIME_STEP / 1000  # TODO
+        robot.step()
 
         new_error = angle_between(required, robot.bearing1(robot.compass))
 
@@ -232,7 +231,7 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
                 robot.left_wheel.setVelocity(-v)
                 robot.right_wheel.setVelocity(-v)
 
-        robot.step(TIME_STEP)
+        robot.step()
 
         x = (coord[0] - robot.gps.getValues()[0])
         z = (coord[1] - robot.gps.getValues()[2])
@@ -284,7 +283,7 @@ def sweep(velocity=-0.5, swept_angle=355):
         robot.right_wheel.setVelocity(velocity)
         robot.left_wheel.setVelocity(-velocity)
 
-        robot.step(TIME_STEP)
+        robot.step()
 
         # distance from robot centre to wall in this direction
         current_angle = robot.bearing(robot.compass1)
@@ -323,7 +322,7 @@ def sweep(velocity=-0.5, swept_angle=355):
 
     robot.right_wheel.setVelocity(0)
     robot.left_wheel.setVelocity(0)
-    robot.step(TIME_STEP)
+    robot.step()
 
     robot.sweep_locations = locations
 
@@ -359,7 +358,7 @@ def reverse():
     robot.right_wheel.setVelocity(-robot.MAX_VELOCITY)
     # reverse a little bit
     for _ in range(2):
-        robot.step(TIME_STEP)
+        robot.step()
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
 
@@ -399,7 +398,7 @@ def finish_in_field():
 
 
 def test_collisions():
-    robot.step(TIME_STEP)
+    robot.step()
 
     if robot.colour == 'green':
         move((0.2, 0.4))
@@ -412,11 +411,11 @@ print('********')
 
 # This part is executed
 
-# robot.step(TIME_STEP)
+# robot.step()
 # test_collisions()
 
 
-robot.step(TIME_STEP)
+robot.step()
 
 if robot.colour == 'green':
     PID_rotation(180)
@@ -425,9 +424,9 @@ else:
 
 positions = sweep(0.5)
 
-robot.step(TIME_STEP)
+robot.step()
 robot.send_sweep_locations(positions)
-robot.step(TIME_STEP)
+robot.step()
 initial_pass = True
 
 parked = False
@@ -447,12 +446,12 @@ while True:
         else:
             move_avoid_fields(pos, error_translation=0.1)
 
-        robot.step(TIME_STEP)
+        robot.step()
         # if this is a new box and colour needs to be checked
         if t[0] == 0:
             c = robot.deploy_dualclaw()
             for i in range(10):
-                robot.step(TIME_STEP)
+                robot.step()
 
             colour = ''
 
@@ -473,7 +472,7 @@ while True:
                     colour = 'green'
                     print('detected ', colour)
 
-            robot.step(TIME_STEP)
+            robot.step()
 
             if colour == robot.colour:
                 return_box_field(robot.gps.getValues())
@@ -481,7 +480,7 @@ while True:
                 robot.withdraw_dualclaw()
                 reverse()
                 if c == 0 or c == 1:
-                    robot.step(TIME_STEP)
+                    robot.step()
                     valid, x, z = robot.remeasure_position()
                     if valid:
                         robot.send_box_location(np.array([x, z]))
@@ -489,11 +488,11 @@ while True:
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
             for i in range(10):
-                robot.step(TIME_STEP)
+                robot.step()
             return_box_field(robot.gps.getValues())
 
     # TODO: Is this time step necessary?
-    robot.step(TIME_STEP)
+    robot.step()
 
     if not parked:
         parked = finish_in_field()

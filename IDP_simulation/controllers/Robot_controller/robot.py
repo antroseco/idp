@@ -11,7 +11,7 @@ from instrumentation import trace
 
 class Robot:
 
-    TIME_STEP = 64
+    TIME_STEP = 64  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
 
     MAX_VELOCITY = 6
@@ -72,7 +72,7 @@ class Robot:
         self.compass = robot.getDevice(Robot.compass_name)
         self.compass1 = robot.getDevice(Robot.compass1_name)
 
-        TIME_STEP = Robot.TIME_STEP
+        TIME_STEP = self.TIME_STEP
         self.infrared.enable(TIME_STEP)
         self.dsUltrasonic.enable(TIME_STEP)
         self.box_claw_sensor.enable(TIME_STEP)
@@ -101,18 +101,15 @@ class Robot:
         self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
-    def step(self, TIME_STEP: int) -> float:
-        """Block for the time requested and do some housekeeping.
-
-        Args:
-            TIME_STEP (int): Time to block in milliseconds, must be a multiple of the simulation's time step.
+    def step(self) -> float:
+        """Block for self.TIME_STEP milliseconds and do some housekeeping.
 
         Returns:
-            float: seconds actually elapsed or -1 if we need to terminate
+            float: Time in seconds elapsed or -1 if we need to terminate.
         """
         start_time = self._robot.getTime()
 
-        ret = self._robot.step(TIME_STEP)
+        ret = self._robot.step(self.TIME_STEP)
         self.send_location()
         self.get_messages()
         self.collision_prevention()
@@ -150,7 +147,7 @@ class Robot:
                 self.left_wheel.setVelocity(0)
                 self.right_wheel.setVelocity(0)
                 self.stop = True
-                self._robot.step(Robot.TIME_STEP)
+                self._robot.step(self.TIME_STEP)
                 self.send_message('stop', 3)
                 self.get_messages()
                 self.send_location()
@@ -161,7 +158,7 @@ class Robot:
                     self.right_wheel.setVelocity(-Robot.MAX_VELOCITY)
                     # reverse a little bit
                     for _ in range(5):
-                        self._robot.step(Robot.TIME_STEP)
+                        self._robot.step(self.TIME_STEP)
                     # print('reversed')
 
                     if self.position[0] > 0:
@@ -173,7 +170,7 @@ class Robot:
 
                     while diff <= 30 and dist < 0.75:
                         print('turn')
-                        self._robot.step(Robot.TIME_STEP)
+                        self._robot.step(self.TIME_STEP)
                         self.get_messages()
                         self.send_location()
 
@@ -192,11 +189,11 @@ class Robot:
                     self.left_wheel.setVelocity(6.7)
                     self.right_wheel.setVelocity(6.7)
                     for _ in range(3):
-                        self._robot.step(Robot.TIME_STEP)
+                        self._robot.step(self.TIME_STEP)
                     self.left_wheel.setVelocity(0)
                     self.left_wheel.setVelocity(0)
                     # TODO: Remove this time step, there's no need to wait for the robot to stop
-                    self._robot.step(Robot.TIME_STEP)
+                    self._robot.step(self.TIME_STEP)
 
                 else:
 
@@ -204,11 +201,11 @@ class Robot:
                         self.left_wheel.setVelocity(0)
                         self.right_wheel.setVelocity(0)
 
-                        self._robot.step(Robot.TIME_STEP)
+                        self._robot.step(self.TIME_STEP)
 
                         self.send_location()
                         self.send_message('stop', 3)
-                        self._robot.step(Robot.TIME_STEP)
+                        self._robot.step(self.TIME_STEP)
                         self.get_messages()
 
                         if self.position.size == 2 and self.other_position.size == 2:
@@ -276,7 +273,7 @@ class Robot:
         message = str(type) + message
         data = message.encode('utf-8')
         # TODO: Remove
-        self._robot.step(Robot.TIME_STEP)
+        self._robot.step(self.TIME_STEP)
         self.emitter.send(data)
         return
 
@@ -293,7 +290,7 @@ class Robot:
             type = int(message[0])
             message = message[1:]
             # TODO: Remove
-            self._robot.step(Robot.TIME_STEP)
+            self._robot.step(self.TIME_STEP)
             self.receiver.nextPacket()
             if message == "":
                 continue
@@ -346,7 +343,7 @@ class Robot:
         send current location of the robot
         """
         # TODO: Remove
-        self._robot.step(Robot.TIME_STEP)
+        self._robot.step(self.TIME_STEP)
         location = self.gps.getValues()
         self.position = np.array([location[0], location[2]])
         message = "{},{}".format(location[0], location[2])
@@ -461,7 +458,7 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            self.step(Robot.TIME_STEP)
+            self.step()
             error = abs(desired - sensor1.getValue())
             # TODO: Jerry please fix
             i += 1
@@ -506,7 +503,7 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            self.step(Robot.TIME_STEP)
+            self.step()
             error = abs(desired - sensor1.getValue())
 
     @trace
@@ -544,7 +541,7 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
-            self.step(Robot.TIME_STEP)
+            self.step()
 
         for n in range(10):
             # Release the box and move backwards, while doing color detection
@@ -558,7 +555,7 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
-            self._robot.step(Robot.TIME_STEP)
+            self._robot.step(self.TIME_STEP)
 
         for n in range(20):
             # Move forwards and do color detection
@@ -570,7 +567,7 @@ class Robot:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
-            self.step(Robot.TIME_STEP)
+            self.step()
 
         # print('remeasured:')
         if red and not green:
@@ -606,5 +603,5 @@ class Robot:
             measurement = sensor1.getValue()
             claw1.setPosition(desired)  # both claw move synchronously in different direction
             claw2.setPosition(-desired)
-            self._robot.step(Robot.TIME_STEP)
+            self._robot.step(self.TIME_STEP)
             error = abs(desired - sensor1.getValue())
