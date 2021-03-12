@@ -212,7 +212,16 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
     """input: 2D desired coordinate coord,
     The function moves in a straight line until the desired location is within
     the final error distance"""
-
+    
+    if coord[0] > 1:
+        coord[0] = 1
+    if coord[0] < -1:
+        coord[0] = -1
+    if coord[1] > 1:
+        coord[1] = 1
+    if coord[1] < -1:
+        coord[1] = -1
+    
     error = ((coord[0] - robot.gps.getValues()[0])**2 + (coord[1] - robot.gps.getValues()[2])**2)**(1/2)
 
     while abs(error) > final_error or math.isnan(error):
@@ -496,3 +505,5 @@ while True:
 
     if not parked:
         parked = finish_in_field()
+        
+        

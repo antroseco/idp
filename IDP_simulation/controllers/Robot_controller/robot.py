@@ -121,7 +121,7 @@ class Robot:
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
-    def collision_prevention(self, threshold=0.75):
+    def collision_prevention(self, threshold=0.7):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
 
@@ -168,9 +168,9 @@ class Robot:
                         self.left_wheel.setVelocity(3)
                         self.right_wheel.setVelocity(-3)
 
-                    while diff <= 30 and dist < 0.75:
-                        print('turn')
-                        self._robot.step(self.TIME_STEP)
+                    while diff <= 30 and dist < 0.7:
+                        #print('turn')
+                        self._robot.step(Robot.TIME_STEP)
                         self.get_messages()
                         self.send_location()
 
