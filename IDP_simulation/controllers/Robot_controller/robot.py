@@ -386,7 +386,8 @@ class Robot:
                 self.box_queue.put((0, pos))
         return
 
-    def bearing1(self, compass_obj):
+    @staticmethod
+    def bearing1(compass_obj):
         """
         This gives a bearing -180,180
         input: compass object(type Compass)
@@ -398,7 +399,8 @@ class Robot:
             theta += 360
         return theta
 
-    def bearing(self, compass_obj):
+    @staticmethod
+    def bearing(compass_obj):
         """
         This gives a bearing 0,360
         input: compass object(type Compass)
