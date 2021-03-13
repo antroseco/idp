@@ -14,7 +14,8 @@ class Robot:
     TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
 
-    MAX_VELOCITY = 6
+    # TODO: Remove duplicate definitions
+    MAX_VELOCITY = 6.7
 
     left_wheel_name = 'left_wheel'
     right_wheel_name = 'right_wheel'
@@ -160,7 +161,7 @@ class Robot:
                 self.send_location()
 
             if self.stop and self.other_stop:
-                #print('both stop')
+                # print('both stop')
                 bearing = self.bearing(self.compass)
                 # check if there is anything close in direction +-45 of current direction
                 dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60) % 360)
@@ -621,7 +622,7 @@ class Robot:
         returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
         """
         if self.dsUltrasonic.getValue() > 0.15:
-            #print('no box within reach')
+            # print('no box within reach')
             return -1
             # check if there is box within reach, return -1 if there isn't
 
@@ -727,3 +728,42 @@ class Robot:
         """Sets motor velocities to 0.
         """
         self.set_motor_velocities(0, 0)
+
+    def current_location(self) -> np.ndarray:
+        """Returns the 2D GPS coordinates of the robot.
+
+        Returns:
+            np.ndarray: 2D GPS coordinates.
+        """
+        values = self.gps.getValues()
+        return np.asarray_chkfinite([values[0], values[2]])
+
+    @trace
+    def move_forwards(self, distance: float, threshold: float = 0.05):
+        """Moves forwards (or backwards if distance is negative) in a straight line.
+
+        Args:
+            distance (float): Distance to move.
+            threshold (float, optional): Maximum error. Defaults to 0.05.
+        """
+        assert np.isfinite(distance)
+        assert threshold > 0
+
+        start = self.current_location()
+        error = abs(distance)
+
+        while error > threshold:
+            # TODO: Integral & Derivative control
+            v = np.clip(error * self.MAX_VELOCITY * 5, -self.MAX_VELOCITY, self.MAX_VELOCITY)
+
+            v *= np.sign(distance)
+
+            self.set_motor_velocities(v, v)
+
+            # TODO: Check if the collision detection algorithm made us move
+            self.step()
+
+            # Euclidean distance
+            error = abs(distance) - np.linalg.norm(start - self.current_location())
+
+        self.reset_motor_velocities()
