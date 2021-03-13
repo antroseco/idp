@@ -314,17 +314,8 @@ def return_box_field(coord):
 
     robot.withdraw_dualclaw()
 
-    reverse()
+    robot.move_forwards(-0.10, 0.02)
     return
-
-
-@trace
-def reverse():
-    robot.set_motor_velocities(-robot.MAX_VELOCITY, -robot.MAX_VELOCITY)
-    # reverse a little bit
-    for _ in range(2):
-        robot.step()
-    robot.reset_motor_velocities()
 
 
 @trace
@@ -462,7 +453,7 @@ while True:
                 return_box_field(robot.gps.getValues())
             else:
                 robot.withdraw_dualclaw()
-                reverse()
+                robot.move_forwards(-0.10, 0.02)
                 if c == 0 or c == 1:
                     robot.step()
                     valid, x, z = robot.remeasure_position()

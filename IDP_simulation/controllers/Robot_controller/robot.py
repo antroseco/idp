@@ -107,8 +107,11 @@ class Robot:
         self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
-    def step(self) -> float:
+    def step(self, collision_detection: bool = True) -> float:
         """Block for self.TIME_STEP milliseconds and do some housekeeping.
+
+        Args:
+            collision_detection (bool, optional): Whether to look for collisions. Defaults to True.
 
         Returns:
             float: Time in seconds elapsed or -1 if we need to terminate.
@@ -117,7 +120,8 @@ class Robot:
         ret = self._robot.step(self.TIME_STEP)
         self.send_location()
         self.get_messages()
-        self.collision_prevention()
+        if collision_detection:
+            self.collision_prevention()
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
@@ -174,7 +178,7 @@ class Robot:
                         self.send_message('blocked', 5)
                         if self.other_blocked:
                             # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.reverse(num_steps=4)
+                            self.move_forwards(-0.10, collision_detection=False)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
                         else:
@@ -188,7 +192,7 @@ class Robot:
                         if not resolved:
                             self.send_message('blocked', 5)
                             # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.reverse(num_steps=4)
+                            self.move_forwards(-0.10, collision_detection=False)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
                     else:
@@ -270,7 +274,7 @@ class Robot:
             # check that robots aren't stuck
             i += 1
             if i == 10 and abs(diff - diff_start) < 1:
-                self.reverse(10)
+                self.move_forwards(-0.10, collision_detection=False)
                 break
             self._robot.step(Robot.TIME_STEP)
             self.get_messages()
@@ -301,17 +305,6 @@ class Robot:
             self.send_message('done', 5)
             return True
         return False
-
-    def reverse(self, num_steps=1):
-        self.left_wheel.setVelocity(-4)
-        self.right_wheel.setVelocity(-4)
-        for _ in range(num_steps):
-            self._robot.step(Robot.TIME_STEP)
-            self.send_location()
-            self.get_messages()
-        self.left_wheel.setVelocity(0)
-        self.right_wheel.setVelocity(0)
-        return
 
     def field_collision(self, coord, field):
         """
@@ -739,7 +732,7 @@ class Robot:
         return np.asarray_chkfinite([values[0], values[2]])
 
     @trace
-    def move_forwards(self, distance: float, threshold: float = 0.05):
+    def move_forwards(self, distance: float, threshold: float = 0.05, collision_detection: bool = True):
         """Moves forwards (or backwards if distance is negative) in a straight line.
 
         Args:
@@ -761,7 +754,7 @@ class Robot:
             self.set_motor_velocities(v, v)
 
             # TODO: Check if the collision detection algorithm made us move
-            self.step()
+            self.step(collision_detection)
 
             # Euclidean distance
             error = abs(distance) - np.linalg.norm(start - self.current_location())
