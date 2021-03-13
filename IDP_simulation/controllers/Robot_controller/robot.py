@@ -49,6 +49,7 @@ class Robot:
         self.other_sweep_locations = []
         self.position = np.array([])
         self.other_position = np.array([])
+        self.other_bearing = 0 #this one is 0-360
 
         self.stop = False
         self.other_stop = False
@@ -116,7 +117,6 @@ class Robot:
         self.send_location()
         self.get_messages()
         self.collision_prevention()
-
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
@@ -250,8 +250,7 @@ class Robot:
         i = 0
         diff_start = diff
         while diff <= angle_threshold:
-            print('turning')
-            print(diff)
+            #print('turning')
             #check that robots aren't stuck
             i += 1
             if i == 10 and abs(diff - diff_start) < 1:
@@ -377,6 +376,7 @@ class Robot:
 
             if type == 0:
                 loc = np.array([float(s[0]), float(s[1])])
+                self.other_bearing = float(s[2])
                 self.other_position = loc
 
             elif type == 1:
@@ -428,14 +428,14 @@ class Robot:
 
     def send_location(self):
         """
-        send current location of the robot
+        send current location and bearing of the robot
         update current location
         """
         # TODO: Remove
         self._robot.step(self.TIME_STEP)
         location = self.gps.getValues()
         self.position = np.array([location[0], location[2]])
-        message = "{},{}".format(location[0], location[2])
+        message = "{},{},{}".format(location[0], location[2], self.bearing(self.compass))
         self.send_message(message, type=0)
 
     def compare_sweep_results(self):
