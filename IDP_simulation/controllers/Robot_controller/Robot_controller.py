@@ -152,8 +152,8 @@ def PID_rotation(required, threshold=0.4) -> bool:
 
         v = np.clip(P + I + D, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
-        if DEBUG_PID:
-            print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
+        # if DEBUG_PID:
+            # print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
 
         robot.set_motor_velocities(-v, v)
 
@@ -431,37 +431,41 @@ while True:
         robot.step()
         # if this is a new box and colour needs to be checked
         if t[0] == 0:
-            c = robot.deploy_dualclaw()
-
-            colour = ''
-
-            if c == 0:
-                colour = 'red'
-                print('detected ', colour)
-            elif c == 1:
-                colour = 'green'
-                print('detected ', colour)
-
-            else:
-                c = robot.remeasure()
-                robot.close_dualclaw()
-                if c == 0:
-                    colour = 'red'
-                    print('detected ', colour)
-                elif c == 1:
-                    colour = 'green'
-                    print('detected ', colour)
-
-            if colour == robot.colour:
+        
+            result = robot.get_target()[0] # -1, -2 for errors, True for getting same colour, False for detecting different colour
+            
+            if result == -1:
+                print('did not detect box')
+            elif result == -2:
+                print('failed to detect colour after remeasure')
+            elif result:
                 return_box_field(robot.gps.getValues())
             else:
-                robot.withdraw_dualclaw()
                 robot.move_forwards(-0.15, 0.02)
-                if c == 0 or c == 1:
-                    valid, x, z = robot.remeasure_position()
-                    if valid:
-                        robot.send_box_location(np.array([x, z]))
+                valid, x, z = robot.remeasure_position()
+                if valid:
+                    robot.send_box_location(np.array([x, z]))
+            # c = robot.deploy_dualclaw()
 
+            # colour = ''
+
+            # if c == 0:
+                # colour = 'red'
+                # print('detected ', colour)
+            # elif c == 1:
+                # colour = 'green'
+                # print('detected ', colour)
+
+            # else:
+                # c = robot.remeasure()
+                # robot.close_dualclaw()
+                # if c == 0:
+                    # colour = 'red'
+                    # print('detected ', colour)
+                # elif c == 1:
+                    # colour = 'green'
+                    # print('detected ', colour)
+               
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
             return_box_field(robot.gps.getValues())

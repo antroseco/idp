@@ -595,7 +595,7 @@ class Robot:
         sensor1 = self.left_claw_sensor
         sensor2 = self.right_claw_sensor
 
-        desired = 20*np.pi/180  # arbitrary value
+        desired = 30*np.pi/180  # arbitrary value
         error = abs(desired - sensor1.getValue())
         accuracy = 1*np.pi/180  # accuracy value in degrees
         while error > accuracy:
@@ -613,11 +613,6 @@ class Robot:
         goes back and forth in attempt to remeasure color
         returns 0 if detected red, 1 if detected green, 2 if detected neither, 3 if detected both.
         """
-        if self.dsUltrasonic.getValue() > 0.15:
-            # print('no box within reach')
-            return -1
-            # check if there is box within reach, return -1 if there isn't
-
         claw1 = self.left_claw
         claw2 = self.right_claw
         sensor1 = self.left_claw_sensor
@@ -629,11 +624,19 @@ class Robot:
         green = False
         redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
         greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
-
-        for _ in range(5):
+        reverseDistance1 = 0.05 #reverse this distance with box in case close to walls
+        reverseDistance2 = 0.05 #reverse this distance without box
+        advanceDistance3 = 0.1 #advance this distance without box
+        moveVelocity = 0.5
+        
+        def reached(distance,startPosition):
+            return np.sqrt((self.position[0]-startPosition[0])**2 + (self.position[1]-startPosition[1])**2) > distance
+            
+        position1 = self.position
+        while not reached(reverseDistance1,position1):
             # Reverse with box incase close to walls
-            wheel1.setVelocity(-0.3)
-            wheel2.setVelocity(-0.3)
+            wheel1.setVelocity(-moveVelocity)
+            wheel2.setVelocity(-moveVelocity)
             redValue = self.red_analogue.read()
             greenValue = self.green_analogue.read()
             if redValue > redLowerBound:
@@ -641,26 +644,27 @@ class Robot:
             if greenValue > greenLowerBound:
                 green = True
             self.step()
-
-        for _ in range(10):
+        
+        position2 = self.position
+        while not reached(reverseDistance2,position2):
             # Release the box and move backwards, while doing color detection
             claw1.setPosition(openAngle)
             claw2.setPosition(-openAngle)
-            wheel1.setVelocity(-0.3)
-            wheel2.setVelocity(-0.3)
+            wheel1.setVelocity(-moveVelocity)
+            wheel2.setVelocity(-moveVelocity)
             redValue = self.red_analogue.read()
             greenValue = self.green_analogue.read()
             if redValue > redLowerBound:
                 red = True
             if greenValue > greenLowerBound:
                 green = True
-            # TODO: Why is this different?
-            self._robot.step(self.TIME_STEP)
-
-        for _ in range(20):
+            self.step()
+        
+        position3 = self.position
+        while not reached(advanceDistance3,position3):
             # Move forwards and do color detection
-            wheel1.setVelocity(0.3)
-            wheel2.setVelocity(0.3)
+            wheel1.setVelocity(moveVelocity)
+            wheel2.setVelocity(moveVelocity)
             redValue = self.red_analogue.read()
             greenValue = self.green_analogue.read()
             if redValue > redLowerBound:
@@ -705,6 +709,45 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(self.TIME_STEP)
             error = abs(desired - sensor1.getValue())
+            
+    def get_target(self):
+        """combine individual functions, step through multiple time steps,
+        start from deploying claws and remeasure if needed, print colour detected, 
+        compared colour with the colour it is supposed to collect,        
+        and returns the following:
+        return -1 if no boxes were founded at the position
+        return -2 if failed to get colour after remeasure
+        otherwise, return if it is right color,(and picks it up if it is)
+        return potential box location of the box after measuring it if it is not right color"""
+    
+        c = self.deploy_dualclaw()
+        if c != 0 and c!= 1:
+            if self.dsUltrasonic.getValue() > 0.15:
+            #check ultrasonic sensor whether the box is present, if not present, return -1
+                return -1,
+        	
+            c = self.remeasure()
+
+        if c == 0:
+        	colour = 'red'
+        	print('detected', colour)
+        elif c == 1:
+        	colour = 'green'
+        	print('detected',colour)
+        
+        else:
+            #return -2 if failed to measure after remeasure function is called
+            return -2,
+        
+        if colour == self.colour:
+            self.close_dualclaw()
+            return True,
+        else:
+        
+            pos = self.remeasure_position()
+            self.withdraw_dualclaw()
+            self.move_forwards(-0.1)
+            return False, pos
 
     def set_motor_velocities(self, left: float, right: float):
         """Sets motor velocities to the values specified.
