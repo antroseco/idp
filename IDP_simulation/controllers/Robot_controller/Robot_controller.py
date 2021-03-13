@@ -143,6 +143,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
     """
     if DEBUG_PID:
         start_time = robot._robot.getTime()
+        start_time1 = robot._robot.getTime()
         print('PID_rotation start')
 
     # These values are tuned for inconsistent time steps...
@@ -151,9 +152,9 @@ def PID_rotation(required, threshold=0.4) -> bool:
     kD = 0.011
 
     # Once we fix the time step issue
-    # kP = 0.114847
-    # kI = 0.042735
-    # kD = 1.192699
+    #kP = 0.114847
+    #kI = 0.042735
+    #kD = 1.192699
 
     def angle_between(a, b):
         return min(a - b, a - b + 360, a - b - 360, key=abs)
@@ -170,7 +171,9 @@ def PID_rotation(required, threshold=0.4) -> bool:
         D = kD * error_derivative
 
         if DEBUG_PID:
-            print(f'{P=}, {I=}, {D=}, {error=}, {error_integral=}, {error_derivative=}')
+            #print(f'{P=}, {I=}, {D=}, {error=}, {error_integral=}, {error_derivative=}')
+            print('PID_rotation timestep', robot._robot.getTime() - start_time)
+            start_time = robot._robot.getTime()
 
         v = np.clip(P + I + D, -MAX_VELOCITY, MAX_VELOCITY)
 
@@ -202,7 +205,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
     robot.right_wheel.setVelocity(0)
 
     if DEBUG_PID:
-        print('PID_rotation end', robot._robot.getTime() - start_time)
+        print('PID_rotation end', robot._robot.getTime() - start_time1)
 
     return True
 

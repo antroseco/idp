@@ -152,6 +152,7 @@ class Robot:
             self.stop = True
             #wait two timesteps to actually sync both robots
             for _ in range(2):
+                #check
                 self._robot.step(self.TIME_STEP)
                 self.send_message('stop', 3)
                 self.get_messages()
@@ -372,6 +373,7 @@ class Robot:
             self.receiver.nextPacket()
             if message == "":
                 continue
+                
 
             s = message.split(',')
 
@@ -405,7 +407,7 @@ class Robot:
                     self.other_blocked = True
                 elif message == 'done':
                     self.other_blocked = False               
-        return
+        return 
 
     def send_sweep_locations(self, locations):
         """
