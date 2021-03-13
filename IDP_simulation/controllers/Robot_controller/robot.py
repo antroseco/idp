@@ -248,13 +248,14 @@ class Robot:
         turns to avoid collision 
         """
         i = 0
-        diff_prev = diff
+        diff_start = diff
         while diff <= angle_threshold:
+            print('turning')
+            print(diff)
             #check that robots aren't stuck
-            if diff_prev == diff:
-                i += 1
-            if i == 5:
-                self.reverse(5)
+            i += 1
+            if i == 10 and abs(diff - diff_start) < 1:
+                self.reverse(10)
                 break
             self._robot.step(Robot.TIME_STEP)
             self.get_messages()
@@ -264,7 +265,6 @@ class Robot:
                 required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                 required = (required % 360 + 90) % 360
                 current = self.bearing(self.compass)
-                diff_prev = diff
                 diff = abs(required - current)
                 if(diff > 180):
                     diff = 360 - diff
