@@ -277,12 +277,14 @@ def sweep(velocity=-0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
+                
 
         # check if boxes are in between the robots
-        if abs(wall_dist - infrared_dist) > 0.09 and wall_dist > 1.4 and abs(infrared_dist) < 0.5:
+        if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.4:
             valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
+                print(x)
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
