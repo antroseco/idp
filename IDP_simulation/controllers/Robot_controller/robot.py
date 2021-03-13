@@ -11,7 +11,7 @@ from instrumentation import trace
 
 class Robot:
 
-    TIME_STEP = 64  # in ms, must be a multiple of the simulation's time step
+    TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
 
     MAX_VELOCITY = 6
@@ -49,7 +49,7 @@ class Robot:
         self.other_sweep_locations = []
         self.position = np.array([])
         self.other_position = np.array([])
-        self.other_bearing = 0 #this one is 0-360
+        self.other_bearing = 0  # this one is 0-360
 
         self.stop = False
         self.other_stop = False
@@ -127,16 +127,17 @@ class Robot:
     def collision_prevention(self, threshold=0.7, angle_threshold=30):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
-        #stop it from turning and moving when it's parked
+        # stop it from turning and moving when it's parked
         if self.parked or self.other_parked:
             return
         if self.other_position.size == 0 or self.position.size == 0:
             return
-        
+
         dist = get_distance(self.position, self.other_position)
         if dist < threshold:
             # check which robot is in the way
-            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+            required = math.degrees(np.arctan2(
+                self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
             required = (required % 360 + 90) % 360
             current = self.bearing(self.compass)
 
@@ -150,9 +151,9 @@ class Robot:
             self.left_wheel.setVelocity(0)
             self.right_wheel.setVelocity(0)
             self.stop = True
-            #wait two timesteps to actually sync both robots
+            # wait two timesteps to actually sync both robots
             for _ in range(2):
-                #check
+                # check
                 self._robot.step(self.TIME_STEP)
                 self.send_message('stop', 3)
                 self.get_messages()
@@ -161,21 +162,21 @@ class Robot:
             if self.stop and self.other_stop:
                 #print('both stop')
                 bearing = self.bearing(self.compass)
-                #check if there is anything close in direction +-45 of current direction
-                dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60)%360)
-                dist_right = obstacle_distance_at_angle(self.gps.getValues(), (bearing + 60)%360)
+                # check if there is anything close in direction +-45 of current direction
+                dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60) % 360)
+                dist_right = obstacle_distance_at_angle(self.gps.getValues(), (bearing + 60) % 360)
                 if self.colour == 'green':
-                    #can be improved (2)
+                    # can be improved (2)
                     resolved = self.can_resolve_collision(dist_left, dist_right)
                     if not resolved:
-                        #send help pls
+                        # send help pls
                         self.send_message('blocked', 5)
                         if self.other_blocked:
-                            #this may result in crashing into walls or going into the fields, but I don't see another solution
+                            # this may result in crashing into walls or going into the fields, but I don't see another solution
                             self.reverse(num_steps=4)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
-                        else: 
+                        else:
                             self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                             self.send_message('done', 3)
                             self.send_message('done', 5)
@@ -185,7 +186,7 @@ class Robot:
                         resolved = self.can_resolve_collision(dist_left, dist_right)
                         if not resolved:
                             self.send_message('blocked', 5)
-                            #this may result in crashing into walls or going into the fields, but I don't see another solution
+                            # this may result in crashing into walls or going into the fields, but I don't see another solution
                             self.reverse(num_steps=4)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
@@ -198,7 +199,7 @@ class Robot:
                 self.turn_to_avoid_collision(diff, angle_threshold)
                 self.left_wheel.setVelocity(3)
                 self.left_wheel.setVelocity(3)
-                #move forwards until path is cleared for the other robot
+                # move forwards until path is cleared for the other robot
                 diff = self.get_angle_diff_other()
                 while diff < angle_threshold:
                     diff = self.get_angle_diff_other()
@@ -215,7 +216,8 @@ class Robot:
         return
 
     def get_angle_diff_other(self):
-        required = math.degrees(np.arctan2(-self.other_position[1] + self.position[1], -self.other_position[0] + self.position[0]))
+        required = math.degrees(
+            np.arctan2(-self.other_position[1] + self.position[1], -self.other_position[0] + self.position[0]))
         required = (required % 360 + 90) % 360
         current = self.other_bearing
 
@@ -237,7 +239,7 @@ class Robot:
             diff = 360 - diff
         while dist < threshold or diff <= angle_threshold:
             if self.other_blocked or self.other_stop:
-                return  
+                return
 
             self._robot.step(self.TIME_STEP)
             self.send_location()
@@ -246,7 +248,8 @@ class Robot:
 
             if self.position.size == 2 and self.other_position.size == 2:
                 dist = get_distance(self.position, self.other_position)
-                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = math.degrees(np.arctan2(
+                    self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                 required = (required % 360 + 90) % 360
                 current = self.bearing(self.compass)
                 diff = abs(required - current)
@@ -257,13 +260,13 @@ class Robot:
     def turn_to_avoid_collision(self, diff, angle_threshold):
         """
         helper function for collision avoidance
-        turns to avoid collision 
+        turns to avoid collision
         """
         i = 0
         diff_start = diff
         while diff <= angle_threshold:
-            #print('turning')
-            #check that robots aren't stuck
+            # print('turning')
+            # check that robots aren't stuck
             i += 1
             if i == 10 and abs(diff - diff_start) < 1:
                 self.reverse(10)
@@ -273,31 +276,32 @@ class Robot:
             self.send_location()
 
             if self.position.size == 2 and self.other_position.size == 2:
-                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = math.degrees(np.arctan2(
+                    self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
                 required = (required % 360 + 90) % 360
                 current = self.bearing(self.compass)
                 diff = abs(required - current)
                 if(diff > 180):
                     diff = 360 - diff
-                
-        return 
+
+        return
 
     def can_resolve_collision(self, dist_left, dist_right):
         if dist_right > 0.3:
             self.left_wheel.setVelocity(-3)
             self.right_wheel.setVelocity(3)
-            #send that you're not blocked
+            # send that you're not blocked
             self.send_message('done', 5)
             return True
         if dist_left > 0.3:
             self.left_wheel.setVelocity(3)
             self.right_wheel.setVelocity(-3)
-            #say that you're not blocked
+            # say that you're not blocked
             self.send_message('done', 5)
             return True
         return False
 
-    def reverse(self, num_steps = 1):
+    def reverse(self, num_steps=1):
         self.left_wheel.setVelocity(-4)
         self.right_wheel.setVelocity(-4)
         for _ in range(num_steps):
@@ -306,7 +310,7 @@ class Robot:
             self.get_messages()
         self.left_wheel.setVelocity(0)
         self.right_wheel.setVelocity(0)
-        return 
+        return
 
     def field_collision(self, coord, field):
         """
@@ -363,10 +367,7 @@ class Robot:
         """
         message = str(type) + message
         data = message.encode('utf-8')
-        # TODO: Remove
-        self._robot.step(self.TIME_STEP)
         self.emitter.send(data)
-        return
 
     def get_messages(self):
         """
@@ -383,7 +384,6 @@ class Robot:
             self.receiver.nextPacket()
             if message == "":
                 continue
-                
 
             s = message.split(',')
 
@@ -417,8 +417,7 @@ class Robot:
                 if message == 'blocked':
                     self.other_blocked = True
                 elif message == 'done':
-                    self.other_blocked = False               
-        return 
+                    self.other_blocked = False
 
     def send_sweep_locations(self, locations):
         """
@@ -444,8 +443,6 @@ class Robot:
         send current location and bearing of the robot
         update current location
         """
-        # TODO: Remove
-        self._robot.step(self.TIME_STEP)
         location = self.gps.getValues()
         self.position = np.array([location[0], location[2]])
         message = "{},{},{}".format(location[0], location[2], self.bearing(self.compass))

@@ -141,20 +141,9 @@ def PID_rotation(required, threshold=0.4) -> bool:
     Returns:
         bool: True if error < threshold
     """
-    if DEBUG_PID:
-        start_time = robot._robot.getTime()
-        start_time1 = robot._robot.getTime()
-        print('PID_rotation start')
-
-    # These values are tuned for inconsistent time steps...
-    kP = 0.095
-    kI = 0.042735
-    kD = 0.011
-
-    # Once we fix the time step issue
-    #kP = 0.114847
-    #kI = 0.042735
-    #kD = 1.192699
+    kP = 11.0
+    kI = 0.90
+    kD = 7.55
 
     def angle_between(a, b):
         return min(a - b, a - b + 360, a - b - 360, key=abs)
@@ -163,49 +152,45 @@ def PID_rotation(required, threshold=0.4) -> bool:
     error_integral = 0
     error_derivative = 0
 
-    integral_threshold = max(abs(error / 6), 4)
-
     while abs(error) > threshold:
         P = kP * error
-        I = kI * error_integral if abs(error) > integral_threshold else 0
+        I = kI * error_integral
         D = kD * error_derivative
 
-        if DEBUG_PID:
-            #print(f'{P=}, {I=}, {D=}, {error=}, {error_integral=}, {error_derivative=}')
-            print('PID_rotation timestep', robot._robot.getTime() - start_time)
-            start_time = robot._robot.getTime()
-
         v = np.clip(P + I + D, -MAX_VELOCITY, MAX_VELOCITY)
+
+        if DEBUG_PID:
+            print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
 
         robot.left_wheel.setVelocity(-v)
         robot.right_wheel.setVelocity(v)
 
-        time_elapsed = robot.TIME_STEP / 1000  # TODO
-        robot.step()
+        time_elapsed = robot.step()
 
         new_error = angle_between(required, robot.bearing1(robot.compass))
 
         # If more than one TIME_STEPs elapsed, then the robot had stopped due to collision prevention
         # Reset to avoid blowing up
-        if True:  # np.isclose(time_elapsed, TIME_STEP, atol=0.001):
+        if np.isclose(time_elapsed, robot.TIME_STEP / 1000, atol=0.001):
             error_integral += new_error * time_elapsed
             error_derivative = (new_error - error) / time_elapsed
         else:
+            if DEBUG_PID:
+                print('PID_rotation resetting state due to collision detection')
             error_integral = 0
             error_derivative = 0
 
         # Detect oscillatory behaviour
         # On a 64 ms TIME_STEP, it sometimes oscillates between 0.39 and -0.39 deg error
         if np.isclose(error, -new_error, atol=0.1):
+            if DEBUG_PID:
+                print('PID_rotation halted due to oscillations')
             return False
 
         error = new_error
 
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
-
-    if DEBUG_PID:
-        print('PID_rotation end', robot._robot.getTime() - start_time1)
 
     return True
 
@@ -224,7 +209,6 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
         coord[1] = 1
     if coord[1] < -1:
         coord[1] = -1
-
 
     error = ((coord[0] - robot.gps.getValues()[0])**2 + (coord[1] - robot.gps.getValues()[2])**2)**(1/2)
 
@@ -415,10 +399,9 @@ def test_collisions():
 
     if robot.colour == 'green':
         move((-0.95, 0))
-        
+
     if robot.colour == 'red':
         move((0.95, 0))
-
 
 
 print('********')
@@ -426,8 +409,8 @@ print('********')
 
 # This part is executed
 
-#robot.step()
-#test_collisions()
+# robot.step()
+# test_collisions()
 
 
 robot.step()
@@ -437,7 +420,14 @@ if robot.colour == 'green':
 else:
     PID_rotation(0)
 
-
+# Test PID_rotation
+# PID_rotation(90)
+# t = 0
+# while t < 1:
+#     t += robot.step()
+# PID_rotation(-45)
+# while t < 2:
+#     t += robot.step()
 
 positions = sweep(0.5)
 
@@ -515,4 +505,3 @@ while True:
     if not robot.parked:
         robot.parked = finish_in_field()
         robot.send_message('parked', 4)
-
