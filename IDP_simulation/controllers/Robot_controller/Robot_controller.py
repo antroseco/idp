@@ -273,13 +273,13 @@ def sweep(velocity=-0.5, swept_angle=355):
 
         # if measured distance is less than wall_dist then assume there's a box
         # also if wall is more than 1.5 away disregard measurements because it's further than sensor's range
-        if abs(wall_dist - infrared_dist) > 0.08 and wall_dist < 1.4:
+        if abs(wall_dist - infrared_dist) > 0.1 and wall_dist < 1.4:
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
 
         # check if boxes are in between the robots
-        if abs(wall_dist - infrared_dist) > 0.08 and wall_dist > 1.4 and abs(infrared_dist) < 0.5:
+        if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.5:
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
