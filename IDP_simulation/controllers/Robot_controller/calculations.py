@@ -140,7 +140,7 @@ def potential_box_position(distance, angle, position):
 
     # if x or z are out of the bounds
     #print('x: ' + str(x)+ 'z: ' +str(z))
-    if abs(x) >= 1.18 or abs(z) >= 1.18:
+    if abs(x) >= 1.16 or abs(z) >= 1.16:
         return False, 0, 0
     #print('found')
     
