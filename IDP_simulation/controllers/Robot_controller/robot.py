@@ -195,11 +195,12 @@ class Robot:
                         return
 
                 self.turn_to_avoid_collision(diff, angle_threshold)
-                #move a bit in case this interrupt happened in the middle of rotating, so it doesn't end up in a loop
                 self.left_wheel.setVelocity(3)
                 self.left_wheel.setVelocity(3)
-                #can be improved (1)
-                for _ in range(2):
+                #move forwards until path is cleared for the other robot
+                diff = self.get_angle_diff_other()
+                while diff < angle_threshold:
+                    diff = self.get_angle_diff_other()
                     self._robot.step(Robot.TIME_STEP)
                     self.send_location()
                     self.get_messages()
@@ -211,6 +212,16 @@ class Robot:
             self.send_message('done', 3)
             self.send_message('done', 5)
         return
+
+    def get_angle_diff_other(self):
+        required = math.degrees(np.arctan2(-self.other_position[1] + self.position[1], -self.other_position[0] + self.position[0]))
+        required = (required % 360 + 90) % 360
+        current = self.other_bearing
+
+        diff = abs(required - current)
+        if(diff > 180):
+            diff = 360 - diff
+        return diff
 
     def wait_for_other_to_move(self, dist, required, current, threshold, angle_threshold):
         """
