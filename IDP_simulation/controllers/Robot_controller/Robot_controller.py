@@ -196,7 +196,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     # Euclidean distance
     error = np.linalg.norm(coord - robot.current_location())
 
-    while abs(error) > final_error:
+    while error > final_error:
         v = np.clip(error * robot.MAX_VELOCITY * 5, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
         if reverse:
@@ -209,7 +209,14 @@ def PID_translation(coord, final_error=0.15, reverse=False):
         error = np.linalg.norm(coord - robot.current_location())
 
         # Correct bearing (returns immediately if no correction is required)
-        PID_rotation(required_bearing(coord, robot.gps.getValues()))
+        bearing = required_bearing(coord, robot.gps.getValues())
+        if reverse:
+            if bearing > 0:
+                bearing -= 180
+            else:
+                bearing += 180
+
+        PID_rotation(bearing)
 
     robot.reset_motor_velocities()
 
