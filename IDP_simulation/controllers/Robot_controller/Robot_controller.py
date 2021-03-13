@@ -222,7 +222,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
 
 
 @trace
-def move(coord, error_rotation=1, error_translation=0.1):
+def move(coord, error_rotation=0.5, error_translation=0.1):
     """
     move to location coord
     """
