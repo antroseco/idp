@@ -311,7 +311,7 @@ def return_box_field(coord):
 
     robot.withdraw_dualclaw()
 
-    robot.move_forwards(-0.10, 0.02)
+    robot.move_forwards(-0.15, 0.02)
     return
 
 
@@ -446,7 +446,7 @@ while True:
                 return_box_field(robot.gps.getValues())
             else:
                 robot.withdraw_dualclaw()
-                robot.move_forwards(-0.10, 0.02)
+                robot.move_forwards(-0.15, 0.02)
                 if c == 0 or c == 1:
                     valid, x, z = robot.remeasure_position()
                     if valid:
