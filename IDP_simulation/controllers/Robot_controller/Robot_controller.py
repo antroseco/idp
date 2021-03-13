@@ -196,54 +196,37 @@ def PID_rotation(required, threshold=0.4) -> bool:
 
 
 @trace
-def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
+def PID_translation(coord, final_error=0.15, reverse=False):
     """input: 2D desired coordinate coord,
     The function moves in a straight line until the desired location is within
     the final error distance"""
+    coord = np.clip(coord, -1, 1)
 
-    if coord[0] > 1:
-        coord[0] = 1
-    if coord[0] < -1:
-        coord[0] = -1
-    if coord[1] > 1:
-        coord[1] = 1
-    if coord[1] < -1:
-        coord[1] = -1
+    def current_location():
+        values = robot.gps.getValues()
+        return np.asarray_chkfinite([values[0], values[2]])
 
-    error = ((coord[0] - robot.gps.getValues()[0])**2 + (coord[1] - robot.gps.getValues()[2])**2)**(1/2)
+    # Euclidean distance
+    error = np.linalg.norm(coord - current_location())
 
-    while abs(error) > final_error or math.isnan(error):
-        if math.isnan(error):
-            pass
+    while abs(error) > final_error:
+        v = np.clip(error * MAX_VELOCITY * 5, -MAX_VELOCITY, MAX_VELOCITY)
 
-        else:
+        if reverse:
+            v *= -1
 
-            v = error*MAX_VELOCITY*5
-            if v > MAX_VELOCITY:
-                v = MAX_VELOCITY
-
-            robot.left_wheel.setVelocity(v)
-            robot.right_wheel.setVelocity(v)
-            if reverse:
-                robot.left_wheel.setVelocity(-v)
-                robot.right_wheel.setVelocity(-v)
+        robot.left_wheel.setVelocity(v)
+        robot.right_wheel.setVelocity(v)
 
         robot.step()
 
-        x = (coord[0] - robot.gps.getValues()[0])
-        z = (coord[1] - robot.gps.getValues()[2])
+        error = np.linalg.norm(coord - current_location())
 
-        previous_error = error
-        error = (x**2 + z**2)**0.5
-
-        if previous_error < error:
-            angle = required_bearing(coord, robot.gps.getValues())
-            PID_rotation(angle)
+        # Correct bearing (returns immediately if no correction is required)
+        PID_rotation(required_bearing(coord, robot.gps.getValues()))
 
     robot.left_wheel.setVelocity(0)
     robot.right_wheel.setVelocity(0)
-
-    return
 
 
 @trace
