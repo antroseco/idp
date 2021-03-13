@@ -12,9 +12,6 @@ from instrumentation import trace
 
 np.set_printoptions(suppress=True)
 
-COMMUNICATION_CHANNEL = 1
-MAX_VELOCITY = 6.7
-
 DEBUG_PID = False
 DEBUG_TRACING = False
 
@@ -153,7 +150,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
         I = kI * error_integral
         D = kD * error_derivative
 
-        v = np.clip(P + I + D, -MAX_VELOCITY, MAX_VELOCITY)
+        v = np.clip(P + I + D, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
         if DEBUG_PID:
             print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
@@ -200,7 +197,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     error = np.linalg.norm(coord - robot.current_location())
 
     while abs(error) > final_error:
-        v = np.clip(error * MAX_VELOCITY * 5, -MAX_VELOCITY, MAX_VELOCITY)
+        v = np.clip(error * robot.MAX_VELOCITY * 5, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
         if reverse:
             v *= -1

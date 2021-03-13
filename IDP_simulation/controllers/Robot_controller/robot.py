@@ -14,7 +14,6 @@ class Robot:
     TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
 
-    # TODO: Remove duplicate definitions
     MAX_VELOCITY = 6.7
 
     left_wheel_name = 'left_wheel'
