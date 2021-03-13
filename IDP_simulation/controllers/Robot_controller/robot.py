@@ -712,3 +712,18 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(self.TIME_STEP)
             error = abs(desired - sensor1.getValue())
+
+    def set_motor_velocities(self, left: float, right: float):
+        """Sets motor velocities to the values specified.
+
+        Args:
+            left (float): Left motor velocity (rad/s).
+            right (float): Right motor velocity (rad/s).
+        """
+        self.left_wheel.setVelocity(left)
+        self.right_wheel.setVelocity(right)
+
+    def reset_motor_velocities(self):
+        """Sets motor velocities to 0.
+        """
+        self.set_motor_velocities(0, 0)

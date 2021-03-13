@@ -73,17 +73,13 @@ def encircle(coord, location, field):
         while collision:
 
             if clockwise:
-                robot.left_wheel.setVelocity(speed_inner_wheel)
-                robot.right_wheel.setVelocity(speed_outer_wheel)
+                robot.set_motor_velocities(speed_inner_wheel, speed_outer_wheel)
             else:
-                robot.left_wheel.setVelocity(speed_outer_wheel)
-                robot.right_wheel.setVelocity(speed_inner_wheel)
+                robot.set_motor_velocities(speed_outer_wheel, speed_inner_wheel)
             robot.step()
             collision = robot.field_collision(coord, field)
 
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)
-    return
+    robot.reset_motor_velocities()
 
 
 @trace
@@ -162,8 +158,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
         if DEBUG_PID:
             print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
 
-        robot.left_wheel.setVelocity(-v)
-        robot.right_wheel.setVelocity(v)
+        robot.set_motor_velocities(-v, v)
 
         time_elapsed = robot.step()
 
@@ -189,8 +184,7 @@ def PID_rotation(required, threshold=0.4) -> bool:
 
         error = new_error
 
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)
+    robot.reset_motor_velocities()
 
     return True
 
@@ -215,8 +209,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
         if reverse:
             v *= -1
 
-        robot.left_wheel.setVelocity(v)
-        robot.right_wheel.setVelocity(v)
+        robot.set_motor_velocities(v, v)
 
         robot.step()
 
@@ -225,8 +218,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
         # Correct bearing (returns immediately if no correction is required)
         PID_rotation(required_bearing(coord, robot.gps.getValues()))
 
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)
+    robot.reset_motor_velocities()
 
 
 @trace
@@ -260,8 +252,7 @@ def sweep(velocity=-0.5, swept_angle=355):
 
     while swept_angle < 355:
 
-        robot.right_wheel.setVelocity(velocity)
-        robot.left_wheel.setVelocity(-velocity)
+        robot.set_motor_velocities(-velocity, velocity)
 
         robot.step()
 
@@ -300,8 +291,7 @@ def sweep(velocity=-0.5, swept_angle=355):
 
     locations = box_position(np.array(boxes))
 
-    robot.right_wheel.setVelocity(0)
-    robot.left_wheel.setVelocity(0)
+    robot.reset_motor_velocities()
     robot.step()
 
     robot.sweep_locations = locations
@@ -334,13 +324,11 @@ def return_box_field(coord):
 
 @trace
 def reverse():
-    robot.left_wheel.setVelocity(-robot.MAX_VELOCITY)
-    robot.right_wheel.setVelocity(-robot.MAX_VELOCITY)
+    robot.set_motor_velocities(-robot.MAX_VELOCITY, -robot.MAX_VELOCITY)
     # reverse a little bit
     for _ in range(2):
         robot.step()
-    robot.left_wheel.setVelocity(0)
-    robot.right_wheel.setVelocity(0)
+    robot.reset_motor_velocities()
 
 
 @trace
