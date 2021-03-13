@@ -422,8 +422,6 @@ while True:
         # if this is a new box and colour needs to be checked
         if t[0] == 0:
             c = robot.deploy_dualclaw()
-            for i in range(10):
-                robot.step()
 
             colour = ''
 
@@ -444,27 +442,19 @@ while True:
                     colour = 'green'
                     print('detected ', colour)
 
-            robot.step()
-
             if colour == robot.colour:
                 return_box_field(robot.gps.getValues())
             else:
                 robot.withdraw_dualclaw()
                 robot.move_forwards(-0.10, 0.02)
                 if c == 0 or c == 1:
-                    robot.step()
                     valid, x, z = robot.remeasure_position()
                     if valid:
                         robot.send_box_location(np.array([x, z]))
 
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
-            for i in range(10):
-                robot.step()
             return_box_field(robot.gps.getValues())
-
-    # TODO: Is this time step necessary?
-    robot.step()
 
     if not robot.parked:
         robot.parked = finish_in_field()
