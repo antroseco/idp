@@ -21,6 +21,8 @@ while robot.step(TIME_STEP) != -1:
 from random import randint
 from typing import Callable
 
+from controller import LightSensor
+
 
 def clamp(value, low, high):
     return max(low, min(value, high))
@@ -95,7 +97,7 @@ class DigitalInput:
 
 
 class PhototransistorCircuit:
-    def __init__(self, device):
+    def __init__(self, device: LightSensor):
         """Simulates the circuit connected to the TEPT4400 (i.e. a 10 kΩ resistor connected to the Collector).
         Outputs ~500 mV at 26 lux so the internal 550 mV ADC Vref is recommended.
         Red   filter --> ~25 lux (ambient)
@@ -104,7 +106,8 @@ class PhototransistorCircuit:
         Args:
             device (Webots Device handle): TEPT4400 device, make sure it has been enabled!
         """
-        # TODO: type checking
+        assert isinstance(device, LightSensor)
+
         self.device = device
         self.r_load = 10000  # 10 kΩ load resistor
 
