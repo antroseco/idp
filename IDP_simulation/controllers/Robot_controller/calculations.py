@@ -108,22 +108,22 @@ def get_wall_position(angle, position):
     # eg top wall can be seen at angles between left_wall and top_wall
     # eg right wall can be seen at angles between top_wall and right_wall
 
-    left_wall = math.degrees(math.atan(abs((1.2 - z) / (1.2 - x))))
-    top_wall = math.degrees(math.atan(abs((1.2 - z) / (-1.2 - x)))) + 90
-    right_wall = math.degrees(math.atan(abs((-1.2 - z) / (-1.2 - x)))) + 180
-    bottom_wall = math.degrees(math.atan(abs((-1.2 - z) / (1.2 - x)))) + 270
+    left_wall = math.degrees(math.atan(abs((1.19 - z) / (1.19 - x))))
+    top_wall = math.degrees(math.atan(abs((1.19 - z) / (-1.19 - x)))) + 90
+    right_wall = math.degrees(math.atan(abs((-1.19 - z) / (-1.19 - x)))) + 180
+    bottom_wall = math.degrees(math.atan(abs((-1.19 - z) / (1.19 - x)))) + 270
 
     # now find the distance from the wall that robot is looking at
     dist = 0
 
     if bottom_wall < angle or angle <= left_wall:
-        dist = abs((1.2 - x)/math.cos(math.radians(angle)))
+        dist = abs((1.19 - x)/math.cos(math.radians(angle)))
     elif angle <= top_wall:
-        dist = abs((1.2 - z)/math.sin(math.radians(angle)))
+        dist = abs((1.19 - z)/math.sin(math.radians(angle)))
     elif angle <= right_wall:
-        dist = abs((-1.2 - x)/math.cos(math.radians(angle)))
+        dist = abs((-1.19 - x)/math.cos(math.radians(angle)))
     else:
-        dist = abs((-1.2 - z)/math.sin(math.radians(angle)))
+        dist = abs((-1.19 - z)/math.sin(math.radians(angle)))
 
     return dist
 
@@ -139,10 +139,11 @@ def potential_box_position(distance, angle, position):
     z = position[2] + distance * math.sin(math.radians(angle))
 
     # if x or z are out of the bounds
-
-    if abs(x) >= 1.15 or abs(z) >= 1.15:
+    #print('x: ' + str(x)+ 'z: ' +str(z))
+    if abs(x) >= 1.18 or abs(z) >= 1.18:
         return False, 0, 0
-
+    #print('found')
+    
     return True, x, z
 
 
