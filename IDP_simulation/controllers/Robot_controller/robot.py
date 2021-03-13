@@ -49,8 +49,12 @@ class Robot:
         self.other_sweep_locations = []
         self.position = np.array([])
         self.other_position = np.array([])
+
         self.stop = False
         self.other_stop = False
+        self.parked = False
+        self.other_parked = False
+        self.other_blocked = False
 
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -108,7 +112,6 @@ class Robot:
             float: Time in seconds elapsed or -1 if we need to terminate.
         """
         start_time = self._robot.getTime()
-
         ret = self._robot.step(self.TIME_STEP)
         self.send_location()
         self.get_messages()
@@ -121,101 +124,178 @@ class Robot:
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
-    def collision_prevention(self, threshold=0.7):
+    def collision_prevention(self, threshold=0.7, angle_threshold=30):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
-
+        #stop it from turning and moving when it's parked
+        if self.parked or self.other_parked:
+            return
         if self.other_position.size == 0 or self.position.size == 0:
             return
-        else:
+        
+        dist = get_distance(self.position, self.other_position)
+        if dist < threshold:
+            # check which robot is in the way
+            required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+            required = (required % 360 + 90) % 360
+            current = self.bearing(self.compass)
 
-            dist = get_distance(self.position, self.other_position)
-            if dist < threshold:
-                # check which robot is in the way
-                required = math.degrees(np.arctan2(
-                    self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
-                required = (required % 360 + 90) % 360
-                current = self.bearing(self.compass)
+            diff = abs(required - current)
+            if(diff > 180):
+                diff = 360 - diff
 
-                diff = abs(required - current)
-                if(diff > 180):
-                    diff = 360 - diff
+            if diff > angle_threshold:
+                return
 
-                if diff > 30:
-                    return
-
-                self.left_wheel.setVelocity(0)
-                self.right_wheel.setVelocity(0)
-                self.stop = True
+            self.left_wheel.setVelocity(0)
+            self.right_wheel.setVelocity(0)
+            self.stop = True
+            #wait two timesteps to actually sync both robots
+            for _ in range(2):
                 self._robot.step(self.TIME_STEP)
                 self.send_message('stop', 3)
                 self.get_messages()
                 self.send_location()
 
-                if self.stop and self.other_stop:
-                    #print('both stop')
-                    self.left_wheel.setVelocity(-Robot.MAX_VELOCITY)
-                    self.right_wheel.setVelocity(-Robot.MAX_VELOCITY)
-                    # reverse a little bit
-                    for _ in range(5):
-                        self._robot.step(self.TIME_STEP)
-                    # print('reversed')
-
-                    if self.position[0] > 0:
-                        self.left_wheel.setVelocity(-3)
-                        self.right_wheel.setVelocity(3)
-                    else:
-                        self.left_wheel.setVelocity(3)
-                        self.right_wheel.setVelocity(-3)
-
-                    while diff <= 30 and dist < 0.7:
-                        #print('turn')
-                        self._robot.step(Robot.TIME_STEP)
-                        self.get_messages()
-                        self.send_location()
-
-                        if self.position.size == 2 and self.other_position.size == 2:
-                            dist = get_distance(self.position, self.other_position)
-                            required = math.degrees(np.arctan2(
-                                self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
-                            required = (required % 360 + 90) % 360
-                        current = self.bearing(self.compass)
-                        diff1 = abs(required - current)
-                        if(diff1 > 180):
-                            diff = 360 - diff1
-                        else:
-                            diff = diff1
-
-                    self.left_wheel.setVelocity(6.7)
-                    self.right_wheel.setVelocity(6.7)
-                    for _ in range(3):
-                        self._robot.step(self.TIME_STEP)
-                    self.left_wheel.setVelocity(0)
-                    self.left_wheel.setVelocity(0)
-                    # TODO: Remove this time step, there's no need to wait for the robot to stop
-                    self._robot.step(self.TIME_STEP)
-
+            if self.stop and self.other_stop:
+                #print('both stop')
+                bearing = self.bearing(self.compass)
+                #check if there is anything close in direction +-45 of current direction
+                dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60)%360)
+                dist_right = obstacle_distance_at_angle(self.gps.getValues(), (bearing + 60)%360)
+                if self.colour == 'green':
+                    #can be improved (2)
+                    resolved = self.can_resolve_collision(dist_left, dist_right)
+                    if not resolved:
+                        #send help pls
+                        self.send_message('blocked', 5)
+                        if self.other_blocked:
+                            #this may result in crashing into walls or going into the fields, but I don't see another solution
+                            self.reverse(num_steps=4)
+                            self.left_wheel.setVelocity(-3)
+                            self.right_wheel.setVelocity(3)
+                        else: 
+                            self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
+                            self.send_message('done', 3)
+                            self.send_message('done', 5)
+                            return
                 else:
+                    if self.other_blocked:
+                        resolved = self.can_resolve_collision(dist_left, dist_right)
+                        if not resolved:
+                            self.send_message('blocked', 5)
+                            #this may result in crashing into walls or going into the fields, but I don't see another solution
+                            self.reverse(num_steps=4)
+                            self.left_wheel.setVelocity(-3)
+                            self.right_wheel.setVelocity(3)
+                    else:
+                        self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
+                        self.send_message('done', 3)
+                        self.send_message('done', 5)
+                        return
 
-                    while dist < threshold and abs(required - current) <= 40:
-                        self.left_wheel.setVelocity(0)
-                        self.right_wheel.setVelocity(0)
+                self.turn_to_avoid_collision(diff, angle_threshold)
+                #move a bit in case this interrupt happened in the middle of rotating, so it doesn't end up in a loop
+                self.left_wheel.setVelocity(3)
+                self.left_wheel.setVelocity(3)
+                #can be improved (1)
+                for _ in range(2):
+                    self._robot.step(Robot.TIME_STEP)
+                    self.send_location()
+                    self.get_messages()
+            else:
+                self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
+                if self.other_stop or self.other_blocked:
+                    return
+            self.stop = False
+            self.send_message('done', 3)
+            self.send_message('done', 5)
+        return
 
-                        self._robot.step(self.TIME_STEP)
+    def wait_for_other_to_move(self, dist, required, current, threshold, angle_threshold):
+        """
+        helper function for collision avoidance
+        waits until its cleared
+        """
+        self.left_wheel.setVelocity(0)
+        self.right_wheel.setVelocity(0)
+        self.send_message('stop', 3)
+        diff = abs(required - current)
+        if(diff > 180):
+            diff = 360 - diff
+        while dist < threshold or diff <= angle_threshold:
+            if self.other_blocked or self.other_stop:
+                return  
 
-                        self.send_location()
-                        self.send_message('stop', 3)
-                        self._robot.step(self.TIME_STEP)
-                        self.get_messages()
+            self._robot.step(self.TIME_STEP)
+            self.send_location()
+            self._robot.step(self.TIME_STEP)
+            self.get_messages()
 
-                        if self.position.size == 2 and self.other_position.size == 2:
-                            dist = get_distance(self.position, self.other_position)
-                            required = math.degrees(np.arctan2(
-                                self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
-                            required = (required % 360 + 90) % 360
-                            current = self.bearing(self.compass)
-                self.stop = False
-                self.send_message('done', 3)
+            if self.position.size == 2 and self.other_position.size == 2:
+                dist = get_distance(self.position, self.other_position)
+                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = (required % 360 + 90) % 360
+                current = self.bearing(self.compass)
+                diff = abs(required - current)
+                if(diff > 180):
+                    diff = 360 - diff
+        return
+
+    def turn_to_avoid_collision(self, diff, angle_threshold):
+        """
+        helper function for collision avoidance
+        turns to avoid collision 
+        """
+        i = 0
+        diff_prev = diff
+        while diff <= angle_threshold:
+            #check that robots aren't stuck
+            if diff_prev == diff:
+                i += 1
+            if i == 5:
+                self.reverse(5)
+                break
+            self._robot.step(Robot.TIME_STEP)
+            self.get_messages()
+            self.send_location()
+
+            if self.position.size == 2 and self.other_position.size == 2:
+                required = math.degrees(np.arctan2(self.other_position[1] - self.position[1], self.other_position[0] - self.position[0]))
+                required = (required % 360 + 90) % 360
+                current = self.bearing(self.compass)
+                diff_prev = diff
+                diff = abs(required - current)
+                if(diff > 180):
+                    diff = 360 - diff
+                
+        return 
+
+    def can_resolve_collision(self, dist_left, dist_right):
+        if dist_right > 0.3:
+            self.left_wheel.setVelocity(-3)
+            self.right_wheel.setVelocity(3)
+            #send that you're not blocked
+            self.send_message('done', 5)
+            return True
+        if dist_left > 0.3:
+            self.left_wheel.setVelocity(3)
+            self.right_wheel.setVelocity(-3)
+            #say that you're not blocked
+            self.send_message('done', 5)
+            return True
+        return False
+
+    def reverse(self, num_steps = 1):
+        self.left_wheel.setVelocity(-4)
+        self.right_wheel.setVelocity(-4)
+        for _ in range(num_steps):
+            self._robot.step(Robot.TIME_STEP)
+            self.send_location()
+            self.get_messages()
+        self.left_wheel.setVelocity(0)
+        self.right_wheel.setVelocity(0)
+        return 
 
     def field_collision(self, coord, field):
         """
@@ -289,8 +369,6 @@ class Robot:
             message = data.decode('utf-8')
             type = int(message[0])
             message = message[1:]
-            # TODO: Remove
-            self._robot.step(self.TIME_STEP)
             self.receiver.nextPacket()
             if message == "":
                 continue
@@ -317,6 +395,16 @@ class Robot:
                     self.other_stop = True
                 elif message == 'done':
                     self.other_stop = False
+            elif type == 4:
+                if message == 'parked':
+                    self.other_parked = True
+                elif message == 'done':
+                    self.other_parked = False
+            elif type == 5:
+                if message == 'blocked':
+                    self.other_blocked = True
+                elif message == 'done':
+                    self.other_blocked = False               
         return
 
     def send_sweep_locations(self, locations):
@@ -341,6 +429,7 @@ class Robot:
     def send_location(self):
         """
         send current location of the robot
+        update current location
         """
         # TODO: Remove
         self._robot.step(self.TIME_STEP)

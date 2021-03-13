@@ -212,7 +212,7 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
     """input: 2D desired coordinate coord,
     The function moves in a straight line until the desired location is within
     the final error distance"""
-    
+
     if coord[0] > 1:
         coord[0] = 1
     if coord[0] < -1:
@@ -221,7 +221,8 @@ def PID_translation(coord, final_error=0.15, reverse=False, maxVelocity=6.7):
         coord[1] = 1
     if coord[1] < -1:
         coord[1] = -1
-    
+
+
     error = ((coord[0] - robot.gps.getValues()[0])**2 + (coord[1] - robot.gps.getValues()[2])**2)**(1/2)
 
     while abs(error) > final_error or math.isnan(error):
@@ -410,9 +411,11 @@ def test_collisions():
     robot.step()
 
     if robot.colour == 'green':
-        move((0.2, 0.4))
+        move((-0.95, 0))
+        
     if robot.colour == 'red':
-        move((-0.2, -0.4))
+        move((0.95, 0))
+
 
 
 print('********')
@@ -420,8 +423,8 @@ print('********')
 
 # This part is executed
 
-# robot.step()
-# test_collisions()
+#robot.step()
+#test_collisions()
 
 
 robot.step()
@@ -431,6 +434,8 @@ if robot.colour == 'green':
 else:
     PID_rotation(0)
 
+
+
 positions = sweep(0.5)
 
 robot.step()
@@ -438,11 +443,12 @@ robot.send_sweep_locations(positions)
 robot.step()
 initial_pass = True
 
-parked = False
+robot.parked = False
 
 while True:
     while not robot.box_queue.empty() and robot.field.available():
-        parked = False
+        robot.parked = False
+        robot.send_message('done', 4)
 
         t = robot.box_queue.get()
         pos = t[1]
@@ -503,7 +509,7 @@ while True:
     # TODO: Is this time step necessary?
     robot.step()
 
-    if not parked:
-        parked = finish_in_field()
-        
-        
+    if not robot.parked:
+        robot.parked = finish_in_field()
+        robot.send_message('parked', 4)
+
