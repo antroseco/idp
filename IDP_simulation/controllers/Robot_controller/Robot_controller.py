@@ -466,3 +466,6 @@ while True:
     if not robot.parked:
         robot.parked = finish_in_field()
         robot.send_message('parked', 4)
+
+    # Yield if parked, otherwise Webots will be stuck waiting for us
+    robot.step()
