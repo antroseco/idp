@@ -11,8 +11,9 @@ from instrumentation import trace
 
 class Robot:
 
-    TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
+    TIME_STEP = 64  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
+    DEBUG_COLLISIONS = False
 
     MAX_VELOCITY = 6.7
 
@@ -134,7 +135,8 @@ class Robot:
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
-    def collision_prevention(self, threshold=0.7, angle_threshold=30):
+
+    def collision_prevention(self, threshold=0.7, angle_threshold=40):
         """Checks if the distance between each robot is below a certain
         threshold and stops the robot once beneath the threshold"""
         # stop it from turning and moving when it's parked
@@ -156,11 +158,16 @@ class Robot:
                 diff = 360 - diff
 
             if diff > angle_threshold:
+                self.send_message('done', 3)
+                self.send_message('done', 5)
+                #print('fine')
                 return
 
             self.left_wheel.setVelocity(0)
             self.right_wheel.setVelocity(0)
             self.stop = True
+            if Robot.DEBUG_COLLISIONS:
+                print('stop', diff)
             # wait two timesteps to actually sync both robots
             for _ in range(2):
                 # check
@@ -168,9 +175,9 @@ class Robot:
                 self.send_message('stop', 3)
                 self.get_messages()
                 self.send_location()
-
             if self.stop and self.other_stop:
-                # print('both stop')
+                if Robot.DEBUG_COLLISIONS:
+                    print('both stop')
                 bearing = self.bearing(self.compass)
                 # check if there is anything close in direction +-45 of current direction
                 dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60) % 360)
@@ -178,6 +185,8 @@ class Robot:
                 if self.colour == 'green':
                     # can be improved (2)
                     resolved = self.can_resolve_collision(dist_left, dist_right)
+                    if Robot.DEBUG_COLLISIONS:
+                        print('resolved')
                     if not resolved:
                         # send help pls
                         self.send_message('blocked', 5)
@@ -186,6 +195,8 @@ class Robot:
                             self.move_forwards(-0.10, collision_prevention=False)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
+                            if Robot.DEBUG_COLLISIONS:
+                                print('both blocked, avoid destructively')
                         else:
                             self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                             self.send_message('done', 3)
@@ -194,8 +205,12 @@ class Robot:
                 else:
                     if self.other_blocked:
                         resolved = self.can_resolve_collision(dist_left, dist_right)
+                        if Robot.DEBUG_COLLISIONS:
+                            print('resolved')
                         if not resolved:
                             self.send_message('blocked', 5)
+                            if Robot.DEBUG_COLLISIONS:
+                                print('both blocked, avoid destructively')
                             # this may result in crashing into walls or going into the fields, but I don't see another solution
                             self.move_forwards(-0.10, collision_prevention=False)
                             self.left_wheel.setVelocity(-3)
@@ -207,8 +222,9 @@ class Robot:
                         return
 
                 self.turn_to_avoid_collision(diff, angle_threshold)
-                self.left_wheel.setVelocity(3)
-                self.left_wheel.setVelocity(3)
+                self.left_wheel.setVelocity(6.7)
+                self.left_wheel.setVelocity(6.7)
+
                 # move forwards until path is cleared for the other robot
                 diff = self.get_angle_diff_other()
                 while diff < angle_threshold:
@@ -216,6 +232,8 @@ class Robot:
                     self._robot.step(Robot.TIME_STEP)
                     self.send_location()
                     self.get_messages()
+                if Robot.DEBUG_COLLISIONS:
+                    print("moved out of the way")
             else:
                 self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                 if self.other_stop or self.other_blocked:
@@ -241,13 +259,15 @@ class Robot:
         helper function for collision avoidance
         waits until its cleared
         """
+        if Robot.DEBUG_COLLISIONS:
+            print("wait for other to move")
         self.left_wheel.setVelocity(0)
         self.right_wheel.setVelocity(0)
         self.send_message('stop', 3)
         diff = abs(required - current)
         if(diff > 180):
             diff = 360 - diff
-        while dist < threshold or diff <= angle_threshold:
+        while dist < threshold and diff <= angle_threshold:
             if self.other_blocked or self.other_stop:
                 return
 
@@ -272,13 +292,15 @@ class Robot:
         helper function for collision avoidance
         turns to avoid collision
         """
+        if Robot.DEBUG_COLLISIONS:
+            print("turn to avoid collision")
         i = 0
         diff_start = diff
         while diff <= angle_threshold:
             # print('turning')
             # check that robots aren't stuck
             i += 1
-            if i == 10 and abs(diff - diff_start) < 1:
+            if i == 10 and abs(diff - diff_start) < 5:
                 self.move_forwards(-0.10, collision_prevention=False)
                 break
             self._robot.step(Robot.TIME_STEP)
@@ -813,7 +835,7 @@ class Robot:
 
             # Check that we aren't stuck
             if np.isclose(previous_error, error):
-                print('Robot.move_forwards() halted due to a collision')
+                #print('Robot.move_forwards() halted due to a collision')
                 return error < threshold
 
         self.reset_motor_velocities()

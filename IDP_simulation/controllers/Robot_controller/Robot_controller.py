@@ -15,8 +15,8 @@ np.set_printoptions(suppress=True)
 DEBUG_PID = False
 DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
-DEBUG_MAINLOOP = True
-
+DEBUG_MAINLOOP = False
+Robot.DEBUG_COLLISIONS = True
 
 # Default level is WARNING, change it to DEBUG
 logging.basicConfig(level=logging.DEBUG)
@@ -261,7 +261,7 @@ def move(coord, error_rotation=0.5, error_translation=0.1):
 
 
 @trace
-def sweep(velocity=-0.5, swept_angle=355):
+def sweep(velocity=0.5, swept_angle=355):
     """
     do a 180 degree spin while collecting data from distance sensor
     input: velocity of wheels/how fast is the rotation
@@ -315,7 +315,7 @@ def sweep(velocity=-0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
-                print(x)
+                #print(x)
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
@@ -323,7 +323,7 @@ def sweep(velocity=-0.5, swept_angle=355):
             swept_angle = 360 - initial_angle + current_angle
 
     locations = box_position(np.array(boxes))
-    print(locations)
+    #print(locations)
 
     robot.reset_motor_velocities()
     robot.step()
@@ -461,7 +461,7 @@ else:
 # while t < 2:
 #     t += robot.step()
 
-positions = sweep(0.5)
+positions = sweep(0.6)
 
 robot.step()
 robot.send_sweep_locations(positions)
