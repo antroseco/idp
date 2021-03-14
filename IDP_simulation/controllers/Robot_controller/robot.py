@@ -723,14 +723,14 @@ class Robot:
         and returns the following:
         return -1 if no boxes were founded at the position
         return -2 if failed to get colour after remeasure
-        otherwise, return if it is right color,(and picks it up if it is)
-        return potential box location of the box after measuring it if it is not right color"""
+        otherwise, return if it is right color
+        (close dualclaw if it is right colour, if not, open dualclaw and move backwards by 0.1)"""
 
         c = self.deploy_dualclaw()
         if c != 0 and c != 1:
             if self.dsUltrasonic.getValue() > 0.15:
                 # check ultrasonic sensor whether the box is present, if not present, return -1
-                return -1,
+                return -1
 
             c = self.remeasure()
 
@@ -743,17 +743,15 @@ class Robot:
 
         else:
             # return -2 if failed to measure after remeasure function is called
-            return -2,
+            return -2
 
         if colour == self.colour:
             self.close_dualclaw()
-            return True,
+            return True
         else:
-
-            pos = self.remeasure_position()
             self.withdraw_dualclaw()
             self.move_forwards(-0.1)
-            return False, pos
+            return False
 
     def set_motor_velocities(self, left: float, right: float):
         """Sets motor velocities to the values specified.

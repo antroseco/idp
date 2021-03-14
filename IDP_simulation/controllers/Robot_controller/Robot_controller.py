@@ -13,7 +13,7 @@ from instrumentation import trace
 np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
-DEBUG_TRACING = True
+DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
 
 
@@ -153,8 +153,8 @@ def PID_rotation(required, threshold=0.4) -> bool:
 
         v = np.clip(P + I + D, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
-        if DEBUG_PID:
-            print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
+        # if DEBUG_PID:
+            # print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
 
         robot.set_motor_velocities(-v, v)
 
@@ -490,7 +490,7 @@ while True:
         if t[0] == 0:
 
             # -1, -2 for errors, True for getting same colour, False for detecting different colour
-            result = robot.get_target()[0]
+            result = robot.get_target()
 
             if result == -1:
                 print('did not detect box')
@@ -503,26 +503,6 @@ while True:
                 valid, x, z = robot.remeasure_position()
                 if valid:
                     robot.send_box_location(np.array([x, z]))
-            # c = robot.deploy_dualclaw()
-
-            # colour = ''
-
-            # if c == 0:
-                # colour = 'red'
-                # print('detected ', colour)
-            # elif c == 1:
-                # colour = 'green'
-                # print('detected ', colour)
-
-            # else:
-                # c = robot.remeasure()
-                # robot.close_dualclaw()
-                # if c == 0:
-                    # colour = 'red'
-                    # print('detected ', colour)
-                # elif c == 1:
-                    # colour = 'green'
-                    # print('detected ', colour)
 
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
