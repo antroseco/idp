@@ -318,8 +318,8 @@ class Robot:
 
         x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
         z = m*x + c
-        z1 = [i for i in z if (i > field.y - 0.2 and i < field.y + 0.2)]
-        x1 = [i for i in x if (i > field.x - 0.2 and i < field.x + 0.2)]
+        z1 = [i for i in z if (i > field.y - 0.23 and i < field.y + 0.23)]
+        x1 = [i for i in x if (i > field.x - 0.23 and i < field.x + 0.23)]
 
         if z1 and x1:
             return True
