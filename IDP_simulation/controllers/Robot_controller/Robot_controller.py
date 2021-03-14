@@ -14,7 +14,7 @@ np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
 DEBUG_TRACING = False
-DEBUG_TRANSLATE = True
+DEBUG_TRANSLATE = False
 
 
 # Default level is WARNING, change it to DEBUG
@@ -153,8 +153,8 @@ def PID_rotation(required, threshold=0.4) -> bool:
 
         v = np.clip(P + I + D, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
-        # if DEBUG_PID:
-            # print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
+        if DEBUG_PID:
+            print(f'{P=}, {I=}, {D=}, {v=}, {error=}, {error_integral=}, {error_derivative=}')
 
         robot.set_motor_velocities(-v, v)
 
@@ -198,12 +198,11 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     error = np.linalg.norm(coord - robot.current_location())
     error_integral = 0
     error_derivative = 0
-    
+
     kP = 10.0
     kI = 0.9
     kD = 2.0
-    
-    
+
     if DEBUG_TRANSLATE:
         print("start of translation")
         start = robot._robot.getTime()
@@ -222,17 +221,15 @@ def PID_translation(coord, final_error=0.15, reverse=False):
         time_elapsed = robot.step()
 
         new_error = np.linalg.norm(coord - robot.current_location())
-        
+
         if np.isclose(time_elapsed, robot.TIME_STEP / 1000, atol=0.001):
             error_integral += new_error * time_elapsed
             error_derivative = (new_error - error) / time_elapsed
         else:
-            if DEBUG_PID:
+            if DEBUG_TRANSLATE:
                 print('PID_rotation resetting state due to collision detection')
             error_integral = 0
             error_derivative = 0
-        
-        
 
         # Correct bearing (returns immediately if no correction is required)
         bearing = required_bearing(coord, robot.gps.getValues())
@@ -247,9 +244,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
 
     robot.reset_motor_velocities()
     if DEBUG_TRANSLATE:
-        print("end of translation",robot._robot.getTime() - start)
-       
-    
+        print("end of translation", robot._robot.getTime() - start)
 
 
 @trace
@@ -308,7 +303,6 @@ def sweep(velocity=-0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
-                
 
         # check if boxes are in between the robots
         if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.4:
@@ -324,7 +318,7 @@ def sweep(velocity=-0.5, swept_angle=355):
 
     locations = box_position(np.array(boxes))
     print(locations)
-    
+
     robot.reset_motor_velocities()
     robot.step()
 
@@ -462,9 +456,10 @@ while True:
         robot.step()
         # if this is a new box and colour needs to be checked
         if t[0] == 0:
-        
-            result = robot.get_target()[0] # -1, -2 for errors, True for getting same colour, False for detecting different colour
-            
+
+            # -1, -2 for errors, True for getting same colour, False for detecting different colour
+            result = robot.get_target()[0]
+
             if result == -1:
                 print('did not detect box')
             elif result == -2:
@@ -496,7 +491,7 @@ while True:
                 # elif c == 1:
                     # colour = 'green'
                     # print('detected ', colour)
-               
+
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
             return_box_field(robot.gps.getValues())
