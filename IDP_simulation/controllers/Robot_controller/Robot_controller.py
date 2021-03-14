@@ -374,7 +374,7 @@ def finish_in_field():
     move_avoid_fields(intermediate)
 
     # TODO: Think of something better
-    if not robot.box_queue.empty() and robot.field.available():
+    if not len(robot.box_list) ==  0 and robot.field.available():
         return False
 
     if robot.colour == 'red':
@@ -382,7 +382,7 @@ def finish_in_field():
     else:
         PID_rotation(0)
 
-    if not robot.box_queue.empty() and robot.field.available():
+    if not len(robot.box_list) ==  0 and robot.field.available():
         return False
 
     PID_translation(final, reverse=True)
@@ -461,7 +461,9 @@ else:
 # while t < 2:
 #     t += robot.step()
 
+
 positions = sweep(0.5)
+
 
 robot.step()
 robot.send_sweep_locations(positions)
@@ -471,13 +473,17 @@ initial_pass = True
 robot.parked = False
 
 while True:
-    while not robot.box_queue.empty() and robot.field.available():
+    while not len(robot.box_list) == 0 and robot.field.available():
         robot.parked = False
         robot.send_message('done', 4)
 
-        t = robot.box_queue.get() #Get first item from the queue
+        # t = robot.box_queue.get() #Get first item from the queue
+        t = robot.get_next_target()
+        
         if DEBUG_MAINLOOP:
-            print('first item from queue:',t)
+            pass
+            # print('first item from list:',t)
+            # print(robot.box_list)
         pos = t[1]
 
         robot.withdraw_dualclaw()
@@ -509,7 +515,11 @@ while True:
 
         else:  # this is a known box, got a location form another robot, just need to pick it up
             robot.close_dualclaw()
-            return_box_field(robot.gps.getValues())
+            if not robot.dsUltrasonic.getValue() > 0.15:
+            #check if it is actually holding a box, otherwise just go on looking for the next box
+                return_box_field(robot.gps.getValues())
+            else:
+                robot.withdraw_dualclaw()
 
     if not robot.parked:
         robot.parked = finish_in_field()

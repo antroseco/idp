@@ -45,6 +45,7 @@ class Robot:
         self.infrared_vref = 4.3
         # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
         self.box_queue = queue.Queue()
+        self.box_list = []
         self.sweep_locations = []
         self.other_sweep_locations = []
         self.position = np.array([])
@@ -394,6 +395,7 @@ class Robot:
             elif type == 1:
                 try:
                     coord = np.array([float(x) for x in s])
+                    self.box_list.append((1,coord))
                     self.box_queue.put((1, coord))
                 except:
                     print('ERROR MESSAGE ', message)
@@ -477,8 +479,11 @@ class Robot:
         for pos in positions:
             if self.colour == 'red' and pos[1] > 0:
                 self.box_queue.put((0, pos))
+                self.box_list.append((0,pos))
             elif self.colour == 'green' and pos[1] <= 0:
                 self.box_queue.put((0, pos))
+                self.box_list.append((0,pos))
+                
         return
 
     @staticmethod
@@ -589,7 +594,7 @@ class Robot:
         """
         dist = self.dsUltrasonic.getValue()
         pos = potential_box_position(dist + 0.09, self.bearing(self.compass1), self.gps.getValues())
-
+        print(pos)
         return pos
 
     @trace
@@ -752,6 +757,21 @@ class Robot:
             self.withdraw_dualclaw()
             self.move_forwards(-0.1)
             return False
+        
+    def get_next_target(self):
+        
+        currentLocation = np.array(self.position)
+        nearestLocation = None
+        nearestLocationIndex = 0
+        nearestDistance = 10 #place holder
+        for n, item in enumerate(self.box_list):
+            if np.linalg.norm(item[1] - currentLocation) < nearestDistance:
+                nearestDistance = np.linalg.norm(item[1] - currentLocation)
+                nearestLocation = item
+                nearestLocationIndex = n
+        
+        return self.box_list.pop(nearestLocationIndex)
+               
 
     def set_motor_velocities(self, left: float, right: float):
         """Sets motor velocities to the values specified.
