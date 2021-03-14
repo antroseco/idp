@@ -15,6 +15,7 @@ np.set_printoptions(suppress=True)
 DEBUG_PID = False
 DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
+DEBUG_MAINLOOP = True
 
 
 # Default level is WARNING, change it to DEBUG
@@ -474,7 +475,9 @@ while True:
         robot.parked = False
         robot.send_message('done', 4)
 
-        t = robot.box_queue.get()
+        t = robot.box_queue.get() #Get first item from the queue
+        if DEBUG_MAINLOOP:
+            print('first item from queue:',t)
         pos = t[1]
 
         robot.withdraw_dualclaw()
