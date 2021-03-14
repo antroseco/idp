@@ -13,7 +13,7 @@ from instrumentation import trace
 np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
-DEBUG_TRACING = False
+DEBUG_TRACING = True
 DEBUG_TRANSLATE = False
 
 
@@ -411,11 +411,29 @@ def test_collisions_2():
         move((0, -0.5))
 
 
+def test_move_forwards():
+    robot.step()
+
+    assert robot.move_forwards(-0.4)
+    for _ in range(10):
+        robot.step()
+    assert robot.move_forwards(0.1)
+
+
+def test_move_forwards_2():
+    robot.step()
+
+    assert not robot.move_forwards(-2)
+    assert robot.move_forwards(0.15)
+    assert PID_rotation(20 if robot.colour == 'red' else 160)
+    assert not robot.move_forwards(-2)
+    assert robot.move_forwards(0.15)
+
+
 print('********')
 
 
 # This part is executed
-
 
 robot.step()
 

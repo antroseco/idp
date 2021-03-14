@@ -780,12 +780,17 @@ class Robot:
         return np.asarray_chkfinite([values[0], values[2]])
 
     @trace
-    def move_forwards(self, distance: float, threshold: float = 0.05, collision_detection: bool = True):
+    def move_forwards(self, distance: float, threshold: float = 0.05, collision_detection: bool = True) -> bool:
         """Moves forwards (or backwards if distance is negative) in a straight line.
+        May exit early if it gets stuck (e.g. on a wall).
 
         Args:
             distance (float): Distance to move.
             threshold (float, optional): Maximum error. Defaults to 0.05.
+            collision_detection (bool, optional): Run collision prevention when Robot.step() is called. Defaults to True.
+
+        Returns:
+            bool: True if error < threshold.
         """
         assert np.isfinite(distance)
         assert threshold > 0
@@ -804,7 +809,14 @@ class Robot:
             # TODO: Check if the collision detection algorithm made us move
             self.step(collision_detection)
 
+            previous_error = error
             # Euclidean distance
             error = abs(distance) - np.linalg.norm(start - self.current_location())
 
+            # Check that we aren't stuck
+            if np.isclose(previous_error, error):
+                print('Robot.move_forwards() halted due to a collision')
+                return error < threshold
+
         self.reset_motor_velocities()
+        return True
