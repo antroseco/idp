@@ -183,7 +183,7 @@ class Robot:
                         self.send_message('blocked', 5)
                         if self.other_blocked:
                             # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.move_forwards(-0.10, collision_detection=False)
+                            self.move_forwards(-0.10, collision_prevention=False)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
                         else:
@@ -197,7 +197,7 @@ class Robot:
                         if not resolved:
                             self.send_message('blocked', 5)
                             # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.move_forwards(-0.10, collision_detection=False)
+                            self.move_forwards(-0.10, collision_prevention=False)
                             self.left_wheel.setVelocity(-3)
                             self.right_wheel.setVelocity(3)
                     else:
@@ -279,7 +279,7 @@ class Robot:
             # check that robots aren't stuck
             i += 1
             if i == 10 and abs(diff - diff_start) < 1:
-                self.move_forwards(-0.10, collision_detection=False)
+                self.move_forwards(-0.10, collision_prevention=False)
                 break
             self._robot.step(Robot.TIME_STEP)
             self.get_messages()
@@ -780,14 +780,14 @@ class Robot:
         return np.asarray_chkfinite([values[0], values[2]])
 
     @trace
-    def move_forwards(self, distance: float, threshold: float = 0.05, collision_detection: bool = True) -> bool:
+    def move_forwards(self, distance: float, threshold: float = 0.05, collision_prevention: bool = True) -> bool:
         """Moves forwards (or backwards if distance is negative) in a straight line.
         May exit early if it gets stuck (e.g. on a wall).
 
         Args:
             distance (float): Distance to move.
             threshold (float, optional): Maximum error. Defaults to 0.05.
-            collision_detection (bool, optional): Run collision prevention when Robot.step() is called. Defaults to True.
+            collision_prevention (bool, optional): Run collision prevention when Robot.step() is called. Defaults to True.
 
         Returns:
             bool: True if error < threshold.
@@ -807,7 +807,7 @@ class Robot:
             self.set_motor_velocities(v, v)
 
             # TODO: Check if the collision detection algorithm made us move
-            self.step(collision_detection)
+            self.step(collision_prevention)
 
             previous_error = error
             # Euclidean distance
