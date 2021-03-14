@@ -384,23 +384,32 @@ def finish_in_field():
     return True
 
 
-def test_collisions():
+def test_collisions_1():
     robot.step()
 
     if robot.colour == 'green':
-        move((-0.95, 0))
+        move((0.1, -0.2))
 
     if robot.colour == 'red':
-        move((0.95, 0))
+        move((-0.1, -0.2))
+
+
+def test_collisions_2():
+    robot.step()
+
+    if robot.colour == 'green':
+        while True:
+            PID_rotation(0)
+            PID_rotation(180)
+
+    if robot.colour == 'red':
+        move((0, -0.5))
 
 
 print('********')
 
 
 # This part is executed
-
-# robot.step()
-# test_collisions()
 
 
 robot.step()
