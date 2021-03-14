@@ -14,6 +14,7 @@ np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
 DEBUG_TRACING = False
+DEBUG_TRANSLATE = True
 
 
 # Default level is WARNING, change it to DEBUG
@@ -195,18 +196,43 @@ def PID_translation(coord, final_error=0.15, reverse=False):
 
     # Euclidean distance
     error = np.linalg.norm(coord - robot.current_location())
+    error_integral = 0
+    error_derivative = 0
+    
+    kP = 10.0
+    kI = 0.9
+    kD = 2.0
+    
+    
+    if DEBUG_TRANSLATE:
+        print("start of translation")
+        start = robot._robot.getTime()
 
     while error > final_error:
-        v = np.clip(error * robot.MAX_VELOCITY * 5, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
+        P = kP * error
+        I = kI * error_integral
+        D = kD * error_derivative
+        v = np.clip(P+I+D, -robot.MAX_VELOCITY, robot.MAX_VELOCITY)
 
         if reverse:
             v *= -1
 
         robot.set_motor_velocities(v, v)
 
-        robot.step()
+        time_elapsed = robot.step()
 
-        error = np.linalg.norm(coord - robot.current_location())
+        new_error = np.linalg.norm(coord - robot.current_location())
+        
+        if np.isclose(time_elapsed, robot.TIME_STEP / 1000, atol=0.001):
+            error_integral += new_error * time_elapsed
+            error_derivative = (new_error - error) / time_elapsed
+        else:
+            if DEBUG_PID:
+                print('PID_rotation resetting state due to collision detection')
+            error_integral = 0
+            error_derivative = 0
+        
+        
 
         # Correct bearing (returns immediately if no correction is required)
         bearing = required_bearing(coord, robot.gps.getValues())
@@ -217,8 +243,13 @@ def PID_translation(coord, final_error=0.15, reverse=False):
                 bearing += 180
 
         PID_rotation(bearing)
+        error = new_error
 
     robot.reset_motor_velocities()
+    if DEBUG_TRANSLATE:
+        print("end of translation",robot._robot.getTime() - start)
+       
+    
 
 
 @trace
