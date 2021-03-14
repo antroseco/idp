@@ -11,7 +11,7 @@ from instrumentation import trace
 
 class Robot:
 
-    TIME_STEP = 64  # in ms, must be a multiple of the simulation's time step
+    TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
     DEBUG_COLLISIONS = False
 
