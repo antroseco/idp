@@ -77,15 +77,21 @@ class Robot:
         self.compass = robot.getDevice(Robot.compass_name)
         self.compass1 = robot.getDevice(Robot.compass1_name)
 
+        # Device.enable() takes the sampling period in milliseconds
         TIME_STEP = self.TIME_STEP
-        self.infrared.enable(TIME_STEP)
+        # 38.3 ms ± 9.6 ms, choose the upper bound (worst-case scenario)
+        self.infrared.enable(48)
+        # 150 μs to 25 ms, 38 ms if no obstacle
+        # We're only using it at small distances, so it should be well under one TIME_STEP (16 ms)
         self.dsUltrasonic.enable(TIME_STEP)
         self.box_claw_sensor.enable(TIME_STEP)
         self.left_claw_sensor.enable(TIME_STEP)
         self.right_claw_sensor.enable(TIME_STEP)
+        # ATmega4809's ADC samples really quickly
         self.lightsensorRed.enable(TIME_STEP)
         self.lightsensorGreen.enable(TIME_STEP)
         self.receiver.enable(TIME_STEP)
+        # Assume computer vision is close to real time
         self.gps.enable(TIME_STEP)
         self.compass.enable(TIME_STEP)
         self.compass1.enable(TIME_STEP)
@@ -624,16 +630,16 @@ class Robot:
         green = False
         redLowerBound = 948  # (environment is 930),one reading above this value turns red to True
         greenLowerBound = 436  # (environment is 418), values are about 0.5 lux above ambient
-        reverseDistance1 = 0.05 #reverse this distance with box in case close to walls
-        reverseDistance2 = 0.05 #reverse this distance without box
-        advanceDistance3 = 0.1 #advance this distance without box
+        reverseDistance1 = 0.05  # reverse this distance with box in case close to walls
+        reverseDistance2 = 0.05  # reverse this distance without box
+        advanceDistance3 = 0.1  # advance this distance without box
         moveVelocity = 0.5
-        
-        def reached(distance,startPosition):
+
+        def reached(distance, startPosition):
             return np.sqrt((self.position[0]-startPosition[0])**2 + (self.position[1]-startPosition[1])**2) > distance
-            
+
         position1 = self.position
-        while not reached(reverseDistance1,position1):
+        while not reached(reverseDistance1, position1):
             # Reverse with box incase close to walls
             wheel1.setVelocity(-moveVelocity)
             wheel2.setVelocity(-moveVelocity)
@@ -644,9 +650,9 @@ class Robot:
             if greenValue > greenLowerBound:
                 green = True
             self.step()
-        
+
         position2 = self.position
-        while not reached(reverseDistance2,position2):
+        while not reached(reverseDistance2, position2):
             # Release the box and move backwards, while doing color detection
             claw1.setPosition(openAngle)
             claw2.setPosition(-openAngle)
@@ -659,9 +665,9 @@ class Robot:
             if greenValue > greenLowerBound:
                 green = True
             self.step()
-        
+
         position3 = self.position
-        while not reached(advanceDistance3,position3):
+        while not reached(advanceDistance3, position3):
             # Move forwards and do color detection
             wheel1.setVelocity(moveVelocity)
             wheel2.setVelocity(moveVelocity)
@@ -709,41 +715,41 @@ class Robot:
             claw2.setPosition(-desired)
             self._robot.step(self.TIME_STEP)
             error = abs(desired - sensor1.getValue())
-            
+
     def get_target(self):
         """combine individual functions, step through multiple time steps,
-        start from deploying claws and remeasure if needed, print colour detected, 
-        compared colour with the colour it is supposed to collect,        
+        start from deploying claws and remeasure if needed, print colour detected,
+        compared colour with the colour it is supposed to collect,
         and returns the following:
         return -1 if no boxes were founded at the position
         return -2 if failed to get colour after remeasure
         otherwise, return if it is right color,(and picks it up if it is)
         return potential box location of the box after measuring it if it is not right color"""
-    
+
         c = self.deploy_dualclaw()
-        if c != 0 and c!= 1:
+        if c != 0 and c != 1:
             if self.dsUltrasonic.getValue() > 0.15:
-            #check ultrasonic sensor whether the box is present, if not present, return -1
+                # check ultrasonic sensor whether the box is present, if not present, return -1
                 return -1,
-        	
+
             c = self.remeasure()
 
         if c == 0:
-        	colour = 'red'
-        	print('detected', colour)
+            colour = 'red'
+            print('detected', colour)
         elif c == 1:
-        	colour = 'green'
-        	print('detected',colour)
-        
+            colour = 'green'
+            print('detected', colour)
+
         else:
-            #return -2 if failed to measure after remeasure function is called
+            # return -2 if failed to measure after remeasure function is called
             return -2,
-        
+
         if colour == self.colour:
             self.close_dualclaw()
             return True,
         else:
-        
+
             pos = self.remeasure_position()
             self.withdraw_dualclaw()
             self.move_forwards(-0.1)

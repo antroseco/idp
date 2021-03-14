@@ -276,6 +276,11 @@ def sweep(velocity=-0.5, swept_angle=355):
     # sweep 360 degrees
     swept_angle = 0
 
+    # wait for infrared sensor to initialize
+    # worst-case scenario: 48 ms for a measurement + 5 ms to put the output on the bus
+    while robot._robot.getTime() < (48 + 5) / 1000:
+        robot.step()
+
     while swept_angle < 355:
 
         robot.set_motor_velocities(-velocity, velocity)
