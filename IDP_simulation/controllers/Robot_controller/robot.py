@@ -780,13 +780,13 @@ class Robot:
         return np.asarray_chkfinite([values[0], values[2]])
 
     @trace
-    def move_forwards(self, distance: float, threshold: float = 0.05, collision_prevention: bool = True) -> bool:
+    def move_forwards(self, distance: float, threshold: float = 0.01, collision_prevention: bool = True) -> bool:
         """Moves forwards (or backwards if distance is negative) in a straight line.
         May exit early if it gets stuck (e.g. on a wall).
 
         Args:
             distance (float): Distance to move.
-            threshold (float, optional): Maximum error. Defaults to 0.05.
+            threshold (float, optional): Maximum error. Defaults to 0.01.
             collision_prevention (bool, optional): Run collision prevention when Robot.step() is called. Defaults to True.
 
         Returns:
