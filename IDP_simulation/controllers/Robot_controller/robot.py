@@ -130,19 +130,22 @@ class Robot:
         if collision_detection:
             self.collision_prevention()
         
-        
-        angle = self.bearing(self.compass)
-        position = self.gps.getValues()
-        wall_dist = get_wall_position(angle, position) - 0.11
-        dist = self.dsUltrasonic.getValue()
+        if len(self.box_list) > 0:
+            angle = self.bearing(self.compass)
+            position = self.gps.getValues()
+            wall_dist = get_wall_position(angle, position) - 0.11
+            dist = self.dsUltrasonic.getValue()
 
-        if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
-            valid, x, z = potential_box_position(dist + 0.11, angle, position)
-            if(valid):
-                self.box_list.append((0, [x, z]))
-                self.box_queue.put((0, [x, z]))
-                self.send_box_location(np.array([x, z]))
-        
+            if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
+                valid, x, z = potential_box_position(dist + 0.11, angle, position)
+                if(valid):
+                    diffs = []
+                    for i in self.box_list:
+                        diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
+                        diffs.append(diff)
+                    min_index = diffs.index(min(diffs))
+                    if min(diffs) < 0.2:
+                        self.box_list[min_index] = (0, [x, z])
 
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
