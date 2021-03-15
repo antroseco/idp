@@ -156,8 +156,16 @@ class Robot:
             if(diff > 180):
                 diff = 360 - diff
 
+            small_distance = False
             if diff > angle_threshold:
-                return
+                if not self.distance_too_small():
+                    self.send_message('done', 3)
+                    self.send_message('done', 5)
+                    return
+                #flag this particular case
+                else:
+                    small_distance = True
+
 
             self.left_wheel.setVelocity(0)
             self.right_wheel.setVelocity(0)
@@ -171,52 +179,91 @@ class Robot:
                 self.send_location()
 
             if self.stop and self.other_stop:
-                # print('both stop')
-                bearing = self.bearing(self.compass)
-                # check if there is anything close in direction +-45 of current direction
-                dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60) % 360)
-                dist_right = obstacle_distance_at_angle(self.gps.getValues(), (bearing + 60) % 360)
-                if self.colour == 'green':
-                    # can be improved (2)
-                    resolved = self.can_resolve_collision(dist_left, dist_right)
-                    if not resolved:
-                        # send help pls
-                        self.send_message('blocked', 5)
+                if Robot.DEBUG_COLLISIONS:
+                    print('both stop')
+                
+                if small_distance:
+                    #deal with this specific case
+                    if Robot.DEBUG_COLLISIONS:
+                        print('distance too small')
+                    self.move_forwards(-0.20, collision_prevention=False)
+                    self.set_motor_velocities(left=-6, right=6)
+                    for _ in range(30):
+                        self._robot.step(Robot.TIME_STEP)
+                    
+
+                else:
+                    bearing = self.bearing(self.compass)
+                    # check if there is anything close in direction +-45 of current direction
+                    dist_left = obstacle_distance_at_angle(self.gps.getValues(), (bearing - 60) % 360)
+                    dist_right = obstacle_distance_at_angle(self.gps.getValues(), (bearing + 60) % 360)
+                    if self.colour == 'green':
+                        # can be improved (2)
+                        resolved = self.can_resolve_collision(dist_left, dist_right)
+                        if Robot.DEBUG_COLLISIONS:
+                            if resolved:
+                                print('resolved')
+                            else:
+                                print('cannot resolve')
+                        if not resolved:
+                            # send help pls
+                            # wait two timesteps to actually sync both robots
+                            for _ in range(2):
+                                # check
+                                self._robot.step(self.TIME_STEP)
+                                self.send_message('blocked', 5)
+                                self.get_messages()
+                                self.send_location()
+                            if self.other_blocked:
+                                # this may result in crashing into walls or going into the fields, but I don't see another solution
+                                self.move_forwards(-0.10, collision_prevention=False)
+                                self.set_motor_velocities(left=-3, right=3)
+                                if Robot.DEBUG_COLLISIONS:
+                                    print('both blocked, avoid destructively')
+                            else:
+                                self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
+                                self.send_message('done', 3)
+                                self.send_message('done', 5)
+                                return
+                    else:
                         if self.other_blocked:
-                            # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.move_forwards(-0.10, collision_prevention=False)
-                            self.left_wheel.setVelocity(-3)
-                            self.right_wheel.setVelocity(3)
+                            resolved = self.can_resolve_collision(dist_left, dist_right)
+                            if Robot.DEBUG_COLLISIONS:
+                                print('resolved')
+                            if not resolved:
+                                # wait two timesteps to actually sync both robots
+                                for _ in range(2):
+                                    # check
+                                    self._robot.step(self.TIME_STEP)
+                                    self.send_message('blocked', 5)
+                                    self.get_messages()
+                                    self.send_location()
+                                if Robot.DEBUG_COLLISIONS:
+                                    print('both blocked, avoid destructively')
+                                # this may result in crashing into walls or going into the fields, but I don't see another solution
+                                self.move_forwards(-0.10, collision_prevention=False)
+                                self.set_motor_velocities(left=-3, right=3)
+
                         else:
                             self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                             self.send_message('done', 3)
                             self.send_message('done', 5)
                             return
-                else:
-                    if self.other_blocked:
-                        resolved = self.can_resolve_collision(dist_left, dist_right)
-                        if not resolved:
-                            self.send_message('blocked', 5)
-                            # this may result in crashing into walls or going into the fields, but I don't see another solution
-                            self.move_forwards(-0.10, collision_prevention=False)
-                            self.left_wheel.setVelocity(-3)
-                            self.right_wheel.setVelocity(3)
-                    else:
-                        self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
-                        self.send_message('done', 3)
-                        self.send_message('done', 5)
-                        return
 
-                self.turn_to_avoid_collision(diff, angle_threshold)
-                self.left_wheel.setVelocity(3)
-                self.left_wheel.setVelocity(3)
+                    self.turn_to_avoid_collision(diff, angle_threshold)
+                self.set_motor_velocities(left=6.7, right = 6.7)
+
                 # move forwards until path is cleared for the other robot
                 diff = self.get_angle_diff_other()
                 while diff < angle_threshold:
+                    print(diff)
                     diff = self.get_angle_diff_other()
                     self._robot.step(Robot.TIME_STEP)
                     self.send_location()
                     self.get_messages()
+                self.reset_motor_velocities()
+                if Robot.DEBUG_COLLISIONS:
+                    print("moved out of the way")
             else:
                 self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                 if self.other_stop or self.other_blocked:
@@ -225,6 +272,40 @@ class Robot:
             self.send_message('done', 3)
             self.send_message('done', 5)
         return
+
+    def distance_too_small(self, threshold = 0.25):
+        """
+        calculates perpendicular distance between the robots relative to its' directions
+        returns True if this distance is less than 25cm
+        """    
+        bearing1 = (self.bearing(self.compass) %360 - 90)%360
+        bearing2 = (self.other_bearing%360 - 90) %360
+        position1 = self.position
+        position2 = self.other_position
+
+        dist_vector = position1 - position2
+        dir1_vector = np.array([math.cos(math.radians(bearing1)), math.sin(math.radians(bearing2))])
+        dir2_vector = np.array([math.cos(math.radians(bearing2)), math.sin(math.radians(bearing2))])
+
+        parallel_dist1 = np.dot(dist_vector, dir1_vector)
+        parallel_dist2 = np.dot(dist_vector, dir2_vector)
+        if abs(parallel_dist1) >= 0.25 or abs(parallel_dist2) >= 0.25:
+            return False 
+
+        #find perpendicular distance
+        bearing1 = (bearing1 + 90) % 360
+        bearing2 = (bearing2 + 90) % 360
+        dir1_vector = np.array([math.cos(math.radians(bearing1)), math.sin(math.radians(bearing2))])
+        dir2_vector = np.array([math.cos(math.radians(bearing2)), math.sin(math.radians(bearing2))])
+
+        perpendicular_dist1 = np.dot(dist_vector, dir1_vector)
+        perpendicular_dist2 = np.dot(dist_vector, dir2_vector)
+        if abs(perpendicular_dist1) >= 0.25 or abs(perpendicular_dist2) >= 0.25:
+            return False
+        return True
+
+
+        
 
     def get_angle_diff_other(self):
         required = math.degrees(
@@ -248,8 +329,10 @@ class Robot:
         diff = abs(required - current)
         if(diff > 180):
             diff = 360 - diff
-        while dist < threshold or diff <= angle_threshold:
-            if self.other_blocked or self.other_stop:
+        while dist < threshold and diff <= angle_threshold:
+            if self.other_blocked or self.other_stop or self.other_parked:
+                if Robot.DEBUG_COLLISIONS:
+                    print("break waiting")
                 return
 
             self._robot.step(self.TIME_STEP)
@@ -276,11 +359,16 @@ class Robot:
         i = 0
         diff_start = diff
         while diff <= angle_threshold:
-            # print('turning')
+            if Robot.DEBUG_COLLISIONS:
+                print('turning ', diff)
             # check that robots aren't stuck
             i += 1
-            if i == 10 and abs(diff - diff_start) < 1:
+            if i == 10 and abs(diff - diff_start) < 0.5:
                 self.move_forwards(-0.10, collision_prevention=False)
+                self.reset_motor_velocities()
+                self._robot.step(Robot.TIME_STEP)
+                if Robot.DEBUG_COLLISIONS:
+                    print('stuck ')
                 break
             self._robot.step(Robot.TIME_STEP)
             self.get_messages()
@@ -299,14 +387,12 @@ class Robot:
 
     def can_resolve_collision(self, dist_left, dist_right):
         if dist_right > 0.3:
-            self.left_wheel.setVelocity(-3)
-            self.right_wheel.setVelocity(3)
+            self.set_motor_velocities(left=-3, right=3)
             # send that you're not blocked
             self.send_message('done', 5)
             return True
         if dist_left > 0.3:
-            self.left_wheel.setVelocity(3)
-            self.right_wheel.setVelocity(-3)
+            self.set_motor_velocities(left=3, right=-3)
             # say that you're not blocked
             self.send_message('done', 5)
             return True

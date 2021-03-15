@@ -283,7 +283,6 @@ def sweep(velocity=-0.5, swept_angle=355):
         robot.step()
 
     while swept_angle < 355:
-
         robot.set_motor_velocities(-velocity, velocity)
 
         robot.step()
@@ -294,7 +293,7 @@ def sweep(velocity=-0.5, swept_angle=355):
         wall_dist = get_wall_position(current_angle, current_position)
 
         # wall_dist is decreased by robot-sensor distance
-        wall_dist -= 0.09
+        wall_dist -= 0.11
 
         # get quantized infrared level and convert to volts
         infrared_volts = robot.infrared_analogue.read() * robot.infrared_vref / 1023
@@ -306,13 +305,13 @@ def sweep(velocity=-0.5, swept_angle=355):
         # if measured distance is less than wall_dist then assume there's a box
         # also if wall is more than 1.5 away disregard measurements because it's further than sensor's range
         if abs(wall_dist - infrared_dist) > 0.09 and wall_dist < 1.4:
-            valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
+            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
 
         # check if boxes are in between the robots
         if abs(wall_dist - infrared_dist) > 0.1 and wall_dist > 1.4 and abs(infrared_dist) < 0.4:
-            valid, x, z = potential_box_position(infrared_dist + 0.09, current_angle, current_position)
+            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
                 print(x)
@@ -394,23 +393,36 @@ def test_collisions_1():
     robot.step()
 
     if robot.colour == 'green':
-        move((0.1, -0.2))
+        move((0, 1))
 
     if robot.colour == 'red':
-        move((-0.1, -0.2))
+        move((-0, -1))
 
 
 def test_collisions_2():
+    """
+    position green to (0, -0.4)
+    position red to (0.18, 0.4)
+    """
     robot.step()
 
     if robot.colour == 'green':
-        while True:
-            PID_rotation(0)
-            PID_rotation(180)
+        move((0, 1))
 
     if robot.colour == 'red':
-        move((0, -0.5))
+        move((0.18, -1))
 
+def test_collisions_3():
+    """
+    position red to (-0.4, 0.4)
+    leave green as it is
+    """
+    robot.step()
+
+    if robot.colour == 'green':
+        move((0, 1))
+    if robot.colour == 'red':
+        move((1, 0.4))
 
 def test_move_forwards():
     robot.step()
@@ -429,6 +441,11 @@ def test_move_forwards_2():
     assert PID_rotation(20 if robot.colour == 'red' else 160)
     assert not robot.move_forwards(-2)
     assert robot.move_forwards(0.15)
+
+def test_distance_function():
+    robot.step()
+    robot.step()
+    robot.distance_too_small()
 
 
 print('********')

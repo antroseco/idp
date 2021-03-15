@@ -154,7 +154,8 @@ def box_position(potential_boxes):
     input: an array with potential box locations
     returns: array of approximated box positions
     """
-
+    if potential_boxes.size == 0:
+        return []
     locations = []
 
     same_box_num = 1
