@@ -129,21 +129,20 @@ class Robot:
         self.get_messages()
         if collision_detection:
             self.collision_prevention()
-
+        
+        
         angle = self.bearing(self.compass)
         position = self.gps.getValues()
         wall_dist = get_wall_position(angle, position) - 0.11
-        infrared_volts = self.infrared_analogue.read() * self.infrared_vref / 1023
-        infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
+        dist = self.dsUltrasonic.getValue()
 
-        if abs(wall_dist - infrared_dist) > 0.09 and wall_dist < 1.4:
-            pos = potential_box_position(infrared_dist + 0.11, angle, position)
-            if(pos[1]):
-                self.box_list.append((0, pos))
-                self.box_queue.put((0, pos))
+        if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
+            valid, x, z = potential_box_position(dist + 0.11, angle, position)
+            if(valid):
+                self.box_list.append((0, [x, z]))
+                self.box_queue.put((0, [x, z]))
                 self.send_box_location(np.array([x, z]))
-
-
+        
 
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
