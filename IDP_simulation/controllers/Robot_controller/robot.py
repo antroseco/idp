@@ -130,7 +130,6 @@ class Robot:
         if collision_detection:
             self.collision_prevention()
 
-        boxes = []
         angle = self.bearing(self.compass)
         position = self.gps.getValues()
         wall_dist = get_wall_position(angle, position) - 0.11
@@ -138,9 +137,13 @@ class Robot:
         infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
 
         if abs(wall_dist - infrared_dist) > 0.09 and wall_dist < 1.4:
-            valid, x, z = potential_box_position(infrared_dist + 0.11, angle, position)
-            if(valid):
-                boxes.append([x, z])
+            pos = potential_box_position(infrared_dist + 0.11, angle, position)
+            if(pos[1]):
+                self.box_list.append((0, pos))
+                self.box_queue.put((0, pos))
+                self.send_box_location(np.array([x, z]))
+
+
 
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
