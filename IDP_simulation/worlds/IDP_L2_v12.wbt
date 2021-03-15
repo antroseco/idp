@@ -1,0 +1,574 @@
+#VRML_SIM R2021a utf8
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+  contactProperties [
+    ContactProperties {
+      material2 "slippy"
+      coulombFriction [
+        0
+      ]
+    }
+    ContactProperties {
+      material2 "block"
+      coulombFriction [
+        0.01
+      ]
+    }
+    ContactProperties {
+      material2 "ball_bearing"
+      coulombFriction [
+        0
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.5071357603754855 0.7076745435604284 0.4919451808331064 4.387447968554996
+  position -0.3392518422584322 1.145498734099091 -0.03221238913411978
+}
+Background {
+  skyColor [
+    0.15 0.45 1
+  ]
+}
+Floor {
+  size 2.4 2.4
+  appearance Asphalt {
+  }
+}
+Robot {
+  translation 0 0.068 -0.4
+  rotation 0 1 0 -1.5707953071795862
+  children [
+    Compass {
+      name "compass1"
+    }
+    Compass {
+      rotation 0 1 0 -1.5708
+    }
+    GPS {
+    }
+    Receiver {
+      channel 1
+    }
+    Emitter {
+      channel 1
+    }
+    DEF BODY Solid {
+      rotation 0 1 0 4.692820414042842e-06
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0 1 0
+          }
+          geometry DEF SOLIDBOX Box {
+            size 0.2 0.1 0.2
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE SOLIDBOX
+      physics Physics {
+      }
+    }
+    DEF LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.074892064168798e-12
+        axis 0 0 -1
+        anchor 0.04 -0.0172 0.11
+      }
+      device [
+        RotationalMotor {
+          name "left_wheel"
+          maxVelocity 6.702
+          maxTorque 0.4
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.0172 0.11
+        rotation 1 -5.530995983357472e-10 -5.530974907381772e-10 1.5707999999999938
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.0508
+            }
+          }
+        ]
+        name "left_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.07847065672431e-12
+        axis 0 0 -1
+        anchor 0.04 -0.0172 -0.11
+      }
+      device [
+        RotationalMotor {
+          name "right_wheel"
+          maxVelocity 6.702
+          maxTorque 0.4
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.0172 -0.11
+        rotation -0.9999999999999999 2.1819892599552882e-09 -2.181991440055469e-09 1.5707953071795426
+        children [
+          USE WHEEL
+        ]
+        name "right_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF BEARING Solid {
+      translation -0.06 -0.059 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.5 0.5 0.5
+          }
+          geometry DEF Ball_bearing Sphere {
+            radius 0.009
+          }
+        }
+      ]
+      name "solid(1)"
+      contactMaterial "ball_bearing"
+      boundingObject USE Ball_bearing
+      physics Physics {
+      }
+    }
+    DEF RIGHT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 0.03
+      }
+      device [
+        RotationalMotor {
+          name "right_claw"
+        }
+        PositionSensor {
+          name "right_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.115 -0.035 0.03
+      }
+    }
+    DEF LEFT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 -0.03
+      }
+      device [
+        RotationalMotor {
+          name "left_claw"
+        }
+        PositionSensor {
+          name "left_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.115 -0.035 -0.03
+      }
+    }
+    DEF BOX_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.09 -0.03 0
+      }
+      device [
+        RotationalMotor {
+          name "box_claw"
+        }
+        PositionSensor {
+          name "box_claw_sensor"
+        }
+      ]
+    }
+    DistanceSensor {
+      translation 0.09 -0.055 0.01
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Group {
+          children [
+            DEF ultrasonicShape Transform {
+              translation 0 0.01 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry Box {
+                    size 0.015 0.045 0.02
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "ultrasonic"
+      boundingObject USE ultrasonicShape
+      lookupTable [
+        0 0 0
+        0.02 0 0.002
+        0.02 0.02 0.002
+        1.5 1.5 0.002
+      ]
+      type "sonar"
+      aperture 0.5236
+      resolution 0.003
+    }
+    IRSensor {
+      translation 0.11 -0.03 0
+    }
+    TEPT4400 {
+      translation 0.155 0.03 0.005
+      rotation 0 0 -1 1.0472
+      name "TEPT4400_RED"
+      red_filter TRUE
+    }
+    TEPT4400 {
+      translation 0.155 0.03 -0.005
+      rotation 0 0 -1 1.0472
+      name "TEPT4400_GREEN"
+      green_filter TRUE
+    }
+  ]
+  name "robot_green"
+  physics Physics {
+  }
+  controller "Robot_controller"
+}
+Robot {
+  translation 0 0.068 0.4
+  rotation 0 1 0 1.5708
+  children [
+    Compass {
+      name "compass1"
+    }
+    Compass {
+      rotation 0 1 0 -1.5708
+    }
+    GPS {
+    }
+    Receiver {
+      channel 1
+    }
+    Emitter {
+      channel 1
+    }
+    DEF BODY Solid {
+      rotation 0 1 0 4.692820414042842e-06
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 1 0 0
+          }
+          geometry DEF SOLIDBOX Box {
+            size 0.2 0.1 0.2
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE SOLIDBOX
+      physics Physics {
+      }
+    }
+    DEF LEFT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.074892064168798e-12
+        axis 0 0 -1
+        anchor 0.04 -0.0172 0.11
+      }
+      device [
+        RotationalMotor {
+          name "left_wheel"
+          maxVelocity 6.702
+          maxTorque 0.4
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.0172 0.11
+        rotation 1 -1.1563694545264393e-09 -1.1563660151434041e-09 1.5707999999999926
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 1 0 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.0508
+            }
+          }
+        ]
+        name "left_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF RIGHT_WHEEL HingeJoint {
+      jointParameters HingeJointParameters {
+        position 4.07847065672431e-12
+        axis 0 0 -1
+        anchor 0.04 -0.0172 -0.11
+      }
+      device [
+        RotationalMotor {
+          name "right_wheel"
+          maxVelocity 6.702
+          maxTorque 0.4
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.0172 -0.11
+        rotation -0.9999999999999999 1.3609354496098839e-09 -1.360936117152685e-09 1.570795307179541
+        children [
+          USE WHEEL
+        ]
+        name "right_wheel"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF BEARING Solid {
+      translation -0.06 -0.059 0
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.5 0.5 0.5
+          }
+          geometry DEF Ball_bearing Sphere {
+            radius 0.009
+          }
+        }
+      ]
+      name "solid(1)"
+      contactMaterial "ball_bearing"
+      boundingObject USE Ball_bearing
+      physics Physics {
+      }
+    }
+    DEF RIGHT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 0.03
+      }
+      device [
+        RotationalMotor {
+          name "right_claw"
+        }
+        PositionSensor {
+          name "right_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.115 -0.035 0.03
+      }
+    }
+    DEF LEFT_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 1 0
+        anchor 0.09 0 -0.03
+      }
+      device [
+        RotationalMotor {
+          name "left_claw"
+        }
+        PositionSensor {
+          name "left_claw_sensor"
+        }
+      ]
+      endPoint SINGLE_CLAW {
+        translation 0.115 -0.035 -0.03
+      }
+    }
+    DEF BOX_CLAW HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.09 -0.03 0
+      }
+      device [
+        RotationalMotor {
+          name "box_claw"
+        }
+        PositionSensor {
+          name "box_claw_sensor"
+        }
+      ]
+    }
+    DistanceSensor {
+      translation 0.09 -0.055 0.01
+      rotation 1 0 0 -1.5707953071795862
+      children [
+        Group {
+          children [
+            DEF ultrasonicShape Transform {
+              translation 0 0.01 0
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                  }
+                  geometry Box {
+                    size 0.015 0.045 0.02
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      name "ultrasonic"
+      boundingObject USE ultrasonicShape
+      lookupTable [
+        0 0 0
+        0.02 0 0.002
+        0.02 0.02 0.002
+        1.5 1.5 0.002
+      ]
+      type "sonar"
+      aperture 0.5236
+      resolution 0.003
+    }
+    IRSensor {
+      translation 0.11 -0.03 0
+    }
+    TEPT4400 {
+      translation 0.155 0.03 0.005
+      rotation 0 0 -1 1.0472
+      name "TEPT4400_RED"
+      red_filter TRUE
+    }
+    TEPT4400 {
+      translation 0.155 0.03 -0.005
+      rotation 0 0 -1 1.0472
+      name "TEPT4400_GREEN"
+      green_filter TRUE
+    }
+  ]
+  name "robot_red"
+  physics Physics {
+  }
+  controller "Robot_controller"
+}
+target {
+  translation 0.7396 0.025 -0.7449
+  name "target(9)"
+}
+target {
+  translation -0.8839 0.025 0.42
+  name "target(8)"
+}
+target {
+  translation -0.8766 0.025 -0.8046
+  name "target(7)"
+}
+target {
+  translation 0.8314 0.025 0.5059
+  name "target(6)"
+}
+target {
+  translation 0.401 0.025 0.0243
+  colour 0 1 0
+  name "target(5)"
+}
+target {
+  translation -0.9458 0.025 -0.0344
+  colour 0 1 0
+  name "target(1)"
+}
+target {
+  translation -0.5205 0.025 0.7057
+  colour 0 1 0
+  name "target(2)"
+}
+target {
+  translation 0.331745 0.025 -0.994464
+  colour 0 1 0
+  name "target(3)"
+}
+DEF Floor_colour Solid {
+  translation 0 0.0001 0.4
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+      }
+      geometry Plane {
+        size 0.4 0.4
+      }
+    }
+  ]
+  name "solid(6)"
+}
+DEF Floor_colour Solid {
+  translation 0 0.0001 -0.4
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0 1 0
+      }
+      geometry Plane {
+        size 0.4 0.4
+      }
+    }
+  ]
+  name "solid(5)"
+}
+DEF WALL_1 Solid {
+  translation 1.2 0.05 0
+  children [
+    DEF WALL_SHAPE Shape {
+      appearance PBRAppearance {
+        baseColor 0 0.333333 0
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.02 0.1 2.38
+      }
+    }
+  ]
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_2 Solid {
+  translation -1.2 0.05 0
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(1)"
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_3 Solid {
+  translation 0 0.05 -1.2
+  rotation 0 1 0 1.5708
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(2)"
+  boundingObject USE WALL_SHAPE
+}
+DEF WALL_4 Solid {
+  translation 0 0.05 1.2
+  rotation 0 1 0 1.5708
+  children [
+    USE WALL_SHAPE
+  ]
+  name "solid(3)"
+  boundingObject USE WALL_SHAPE
+}
+TexturedBackgroundLight {
+  texture "empty_office"
+}
