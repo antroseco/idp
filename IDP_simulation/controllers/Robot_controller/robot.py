@@ -138,7 +138,7 @@ class Robot:
         infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
 
         if abs(wall_dist - infrared_dist) > 0.09 and wall_dist < 1.4:
-            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
+            valid, x, z = potential_box_position(infrared_dist + 0.11, angle, position)
             if(valid):
                 boxes.append([x, z])
 
