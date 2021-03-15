@@ -15,7 +15,8 @@ np.set_printoptions(suppress=True)
 DEBUG_PID = False
 DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
-DEBUG_MAINLOOP = True
+DEBUG_MAINLOOP = False
+Robot.DEBUG_COLLISIONS = True
 
 
 # Default level is WARNING, change it to DEBUG
@@ -314,7 +315,7 @@ def sweep(velocity=-0.5, swept_angle=355):
             valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
             if(valid):
                 boxes.append([x, z])
-                print(x)
+                #print(x)
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
@@ -322,7 +323,7 @@ def sweep(velocity=-0.5, swept_angle=355):
             swept_angle = 360 - initial_angle + current_angle
 
     locations = box_position(np.array(boxes))
-    print(locations)
+    #print(locations)
 
     robot.reset_motor_velocities()
     robot.step()

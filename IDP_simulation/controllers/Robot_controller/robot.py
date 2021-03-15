@@ -13,6 +13,7 @@ class Robot:
 
     TIME_STEP = 16  # in ms, must be a multiple of the simulation's time step
     COMMUNICATION_CHANNEL = 1
+    DEBUG_COLLISIONS = False
 
     MAX_VELOCITY = 6.7
 
@@ -140,8 +141,12 @@ class Robot:
         threshold and stops the robot once beneath the threshold"""
         # stop it from turning and moving when it's parked
         if self.parked or self.other_parked:
+            self.send_message('done', 3)
+            self.send_message('done', 5)
             return
         if self.other_position.size == 0 or self.position.size == 0:
+            self.send_message('done', 3)
+            self.send_message('done', 5)
             return
 
         dist = get_distance(self.position, self.other_position)
@@ -256,7 +261,6 @@ class Robot:
                 # move forwards until path is cleared for the other robot
                 diff = self.get_angle_diff_other()
                 while diff < angle_threshold:
-                    print(diff)
                     diff = self.get_angle_diff_other()
                     self._robot.step(Robot.TIME_STEP)
                     self.send_location()
@@ -680,7 +684,7 @@ class Robot:
         """
         dist = self.dsUltrasonic.getValue()
         pos = potential_box_position(dist + 0.09, self.bearing(self.compass1), self.gps.getValues())
-        print(pos)
+        #print(pos)
         return pos
 
     @trace
