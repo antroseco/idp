@@ -518,6 +518,80 @@ def test_collisions_3():
         move((1, 0.4))
 
 
+def test_collisions_4():
+    # FIXME
+    robot.step()
+
+    if robot.colour == 'green':
+        move((-0.3, -0.4))
+        while robot._robot.getTime() < 20:
+            robot.step()
+        move_avoid_fields((0.3, 0.4))
+    if robot.colour == 'red':
+        move((0, 0))
+        move_avoid_fields((-0.5, 0))
+
+
+def test_collisions_5():
+    # FIXME
+    robot.step()
+
+    if robot.colour == 'green':
+        move((-0.3, -0.4))
+        while robot._robot.getTime() < 20:
+            robot.step()
+        move_avoid_fields((0.3, 0.5))
+    if robot.colour == 'red':
+        move((0, 0))
+        move_avoid_fields((-0.5, 0))
+
+
+def test_collisions_6():
+    # FIXME
+    robot.step()
+
+    if robot.colour == 'green':
+        move((-0.6, -0.4))
+        while robot._robot.getTime() < 10:
+            robot.step()
+        move_avoid_fields((0.5, 0.8))
+    if robot.colour == 'red':
+        move((0, 0))
+        move_avoid_fields((-0.5, 0))
+
+
+def test_collisions_7():
+    # FIXME
+    robot.step()
+
+    if robot.colour == 'green':
+        move((-0.6, -0.4))
+        while robot._robot.getTime() < 10:
+            robot.step()
+        move_avoid_fields((0.5, 0.8))
+    if robot.colour == 'red':
+        move((0, 0))
+        while robot._robot.getTime() < 10:
+            robot.step()
+        move_avoid_fields((-0.5, 0))
+
+
+def test_collisions_8():
+    # FIXME
+    robot.step()
+
+    if robot.colour == 'green':
+        move((-0.6, -0.4))
+        while robot._robot.getTime() < 10:
+            robot.step()
+        move_avoid_fields((0.5, 0.8))
+    if robot.colour == 'red':
+        move((-0.1, 0))
+        while robot._robot.getTime() < 18:
+            robot.step()
+        move_avoid_fields((-0.5, 0))
+
+
 def test_move_forwards():
     robot.step()
 
