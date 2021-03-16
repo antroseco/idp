@@ -46,7 +46,6 @@ class Robot:
         self.field = Field(colour)
         self.infrared_vref = 4.3
         # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
-        self.box_queue = queue.Queue()
         self.box_list = []
         self.sweep_locations = []
         self.other_sweep_locations = []
@@ -529,7 +528,6 @@ class Robot:
                 try:
                     coord = np.array([float(x) for x in s])
                     self.box_list.append((1, coord))
-                    self.box_queue.put((1, coord))
                 except:
                     print('ERROR MESSAGE ', message)
             elif type == 2:
@@ -625,10 +623,8 @@ class Robot:
         """
         for pos in positions:
             if self.colour == 'red' and pos[1] > 0:
-                self.box_queue.put((0, pos))
                 self.box_list.append((0, pos))
             elif self.colour == 'green' and pos[1] <= 0:
-                self.box_queue.put((0, pos))
                 self.box_list.append((0, pos))
 
         return

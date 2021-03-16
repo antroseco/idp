@@ -722,7 +722,6 @@ while True:
         robot.parked = False
         robot.send_message('done', 4)
 
-        # t = robot.box_queue.get() #Get first item from the queue
         t = robot.get_next_target()
 
         if DEBUG_MAINLOOP:
