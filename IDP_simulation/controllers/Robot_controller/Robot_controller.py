@@ -718,7 +718,7 @@ robot.parked = False
 
 while True:
 
-    while not len(robot.box_list) == 0 and robot.field.available():
+    while len(robot.box_list) != 0 and robot.field.available():
         robot.parked = False
         robot.send_message('done', 4)
 
@@ -768,6 +768,8 @@ while True:
     if not robot.parked:
         robot.parked = finish_in_field()
         robot.send_message('parked', 4)
+
+    print(f'{robot.box_list=}')
 
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
