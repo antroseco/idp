@@ -331,6 +331,109 @@ def sweep(velocity=-0.5, swept_angle=355):
     robot.sweep_locations = locations
 
     return locations
+    
+@trace
+def second_sweep(velocity=-0.5, swept_angle=355):
+    """
+    360 sweep to find other boxes which are hidden
+    input: velocity of wheels/how fast is the rotation
+    output: numpy array with stored values from the distance sensor
+            -1 if there are no blocks left to be picked up
+    """
+    
+    if(robot.colour == 'red'):
+        move([0.4,0])
+    else:
+        move([-0.4,0])
+      
+    
+    # find current rotation [0-360 degrees]
+    initial_angle = robot.bearing(robot.compass1)
+
+
+    # store potential boxes locations
+    boxes = []
+
+    # sweep 360 degrees
+    swept_angle = 0
+
+    # wait for infrared sensor to initialize
+    # worst-case scenario: 48 ms for a measurement + 5 ms to put the output on the bus
+    while robot._robot.getTime() < (48 + 5) / 1000:
+        robot.step()
+
+    while swept_angle < 355:
+        robot.set_motor_velocities(-velocity, velocity)
+        
+        
+        try:
+            robot.step()
+        except:
+
+            break
+
+        # distance from robot centre to wall in this direction
+        current_angle = robot.bearing(robot.compass1)
+        current_position = robot.gps.getValues()
+        wall_dist = get_wall_position(current_angle, current_position)
+
+        # wall_dist is decreased by robot-sensor distance
+        wall_dist -= 0.11
+
+        # get quantized infrared level and convert to volts
+        infrared_volts = robot.infrared_analogue.read() * robot.infrared_vref / 1023
+        # get infrared reading and convert to meters
+        infrared_dist = 0.7611 * math.pow(infrared_volts, -0.9313) - 0.1252
+
+        # print(infrared_dist, wall_dist)
+
+
+        # puts all measurements into potential_box_position and filters depending on whether box is
+        # inside the boxes
+        if(abs(wall_dist - infrared_dist) > 0.1 and (wall_dist < 1.4)):
+            valid, x, z = potential_box_position(infrared_dist + 0.11, current_angle, current_position)
+            # field_boxes_green = [[0.2, -0.205], [0.2,-0.595], [-0.2,-0.595], [-0.2, -0.195]]
+            # field_boxes_red   = [[0.2, 0.205] , [0.2, 0.595], [-0.2, 0.595]. [-0.2, 0.195]]
+            # field_red_robot   = [[0.12, 0.275], [0.12, -0.275],  [0.66, -0.275], [0.66, 0.275]]
+            # field_greed_robot = [[-0.12, 0.275], [-0.12, -0.275], [-0.66, -0.275], [-0.66, 0.275]]
+                
+            avoid = 0
+            if( (-0.2 < x < 0.2) and (-0.595 < z < -0.195)):
+                avoid = 1
+            elif( (-0.2 < x < 0.2) and (0.195 < z < 0.595)):
+                avoid = 1
+            elif( (-0.275 < z < 0.275) and (0.12 < x < 0.66)):
+                avoid = 1
+            elif( (-0.275 < z < 0.275) and (-0.66 < x < -0.12)):
+                avoid = 1
+            elif((robot.colour == 'red') and (x < 0)):
+                avoid = 1
+            elif((robot.colour == 'green') and (x > 0)):
+                avoid = 1
+    
+            elif(valid and avoid == 0): 
+                    boxes.append([x, z])
+        
+            
+        if current_angle > initial_angle:
+            swept_angle = current_angle - initial_angle
+        else:
+            swept_angle = 360 - initial_angle + current_angle
+    
+        
+    # try/except since other functions will give errors if no blocks 
+    # have been found 
+    try:  
+        locations = box_position(np.array(boxes))
+        robot.reset_motor_velocities()
+        robot.step()
+    
+        robot.sweep_locations = locations
+    except:
+        locations = -1
+    
+    return locations
+
 
 
 @trace
@@ -388,6 +491,8 @@ def finish_in_field():
     PID_translation(final, reverse=True)
 
     return True
+
+
 
 
 def test_collisions_1():
@@ -491,6 +596,7 @@ initial_pass = True
 robot.parked = False
 
 while True:
+    
     while not len(robot.box_list) == 0 and robot.field.available():
         robot.parked = False
         robot.send_message('done', 4)
@@ -542,6 +648,8 @@ while True:
     if not robot.parked:
         robot.parked = finish_in_field()
         robot.send_message('parked', 4)
+        
+      
 
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
