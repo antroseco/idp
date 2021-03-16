@@ -29,7 +29,6 @@ def reroute_after_collision_prevention(func: AnyCallable) -> AnyCallable:
                 return func(*args, **kwargs)
             except(CollisionPreventionException):
                 # retry
-                print('REROUTING!')
                 pass
 
     return wrapper
