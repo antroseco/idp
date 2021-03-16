@@ -205,11 +205,20 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     kI = 0.9
     kD = 2.0
 
-    if DEBUG_TRANSLATE:
-        print("start of translation")
-        start = robot._robot.getTime()
-
+    time_since_rotation = np.inf
     while error > final_error:
+        # Correct bearing (returns immediately if no correction is required)
+        if time_since_rotation > 0.2:
+            bearing = required_bearing(coord, robot.gps.getValues())
+            if reverse:
+                if bearing > 0:
+                    bearing -= 180
+                else:
+                    bearing += 180
+
+            PID_rotation(bearing, 5)
+            time_since_rotation = 0
+
         P = kP * error
         I = kI * error_integral
         D = kD * error_derivative
@@ -221,6 +230,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
         robot.set_motor_velocities(v, v)
 
         time_elapsed = robot.step()
+        time_since_rotation += time_elapsed
 
         new_error = np.linalg.norm(coord - robot.current_location())
 
@@ -229,37 +239,20 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = (new_error - error) / time_elapsed
         else:
             if DEBUG_TRANSLATE:
-                print('PID_rotation resetting state due to collision detection')
+                print('PID_translation resetting state due to collision detection')
             error_integral = 0
             error_derivative = 0
 
-        # Correct bearing (returns immediately if no correction is required)
-        bearing = required_bearing(coord, robot.gps.getValues())
-        if reverse:
-            if bearing > 0:
-                bearing -= 180
-            else:
-                bearing += 180
-
-        PID_rotation(bearing)
         error = new_error
-        # box_collision()
 
     robot.reset_motor_velocities()
-    if DEBUG_TRANSLATE:
-        print("end of translation", robot._robot.getTime() - start)
 
 
-@trace
-def move(coord, error_rotation=0.5, error_translation=0.1):
+def move(coord, error_translation=0.1):
     """
-    move to location coord
+    DEPRECATED! Use PID_translation directly.
     """
-    required_angle = required_bearing(coord, robot.gps.getValues())
-
-    PID_rotation(required_angle, error_rotation)
     PID_translation(coord, error_translation)
-    return
 
 
 @trace
@@ -630,6 +623,7 @@ print('********')
 # This part is executed
 
 robot.step()
+
 
 if robot.colour == 'green':
     PID_rotation(180)
