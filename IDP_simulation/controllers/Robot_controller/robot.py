@@ -5,6 +5,7 @@ import numpy as np
 
 import hardware
 from calculations import *
+from exception import CollisionPreventionException
 from field import Field
 from instrumentation import trace
 
@@ -114,9 +115,8 @@ class Robot:
             lambda: hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
         self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
-        
+
     def update_unique_boxes(self):
-        #self.step()
         self.step()
 
         duplicates = []
@@ -153,7 +153,7 @@ class Robot:
         self.get_messages()
         if collision_detection:
             self.collision_prevention()
-        
+
         if len(self.box_list) > 0:
             angle = self.bearing(self.compass)
             position = self.gps.getValues()
@@ -165,18 +165,18 @@ class Robot:
                 if(valid):
                     diffs = []
                     for i in self.box_list:
-                        diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
+                        diff = math.sqrt(abs(x - i[1][0])**2 + abs(z - i[1][1])*2)
                         diffs.append(diff)
                     min_index = diffs.index(min(diffs))
                     if min(diffs) < 0.05:
                         self.box_list[min_index] = (0, [x, z])
                         message = "{},{}".format(x, z)
                         self.send_message(message, type=6)
-        
+
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
-        
+
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
@@ -211,10 +211,9 @@ class Robot:
                     self.send_message('done', 3)
                     self.send_message('done', 5)
                     return
-                #flag this particular case
+                # flag this particular case
                 else:
                     small_distance = True
-
 
             self.left_wheel.setVelocity(0)
             self.right_wheel.setVelocity(0)
@@ -230,16 +229,15 @@ class Robot:
             if self.stop and self.other_stop:
                 if Robot.DEBUG_COLLISIONS:
                     print('both stop')
-                
+
                 if small_distance:
-                    #deal with this specific case
+                    # deal with this specific case
                     if Robot.DEBUG_COLLISIONS:
                         print('distance too small')
                     self.move_forwards(-0.20, collision_prevention=False)
                     self.set_motor_velocities(left=-6, right=6)
                     for _ in range(30):
                         self._robot.step(Robot.TIME_STEP)
-                    
 
                 else:
                     bearing = self.bearing(self.compass)
@@ -300,7 +298,7 @@ class Robot:
                             return
 
                     self.turn_to_avoid_collision(diff, angle_threshold)
-                self.set_motor_velocities(left=6.7, right = 6.7)
+                self.set_motor_velocities(left=6.7, right=6.7)
 
                 # move forwards until path is cleared for the other robot
                 diff = self.get_angle_diff_other()
@@ -316,18 +314,22 @@ class Robot:
                 self.wait_for_other_to_move(dist, required, current, threshold, angle_threshold)
                 if self.other_stop or self.other_blocked:
                     return
+
             self.stop = False
             self.send_message('done', 3)
             self.send_message('done', 5)
+
+            raise CollisionPreventionException('Robot.collision_prevention() has moved the robot, please reroute!')
+
         return
 
-    def distance_too_small(self, threshold = 0.25):
+    def distance_too_small(self, threshold=0.25):
         """
         calculates perpendicular distance between the robots relative to its' directions
         returns True if this distance is less than 25cm
-        """    
-        bearing1 = (self.bearing(self.compass) %360 - 90)%360
-        bearing2 = (self.other_bearing%360 - 90) %360
+        """
+        bearing1 = (self.bearing(self.compass) % 360 - 90) % 360
+        bearing2 = (self.other_bearing % 360 - 90) % 360
         position1 = self.position
         position2 = self.other_position
 
@@ -338,9 +340,9 @@ class Robot:
         parallel_dist1 = np.dot(dist_vector, dir1_vector)
         parallel_dist2 = np.dot(dist_vector, dir2_vector)
         if abs(parallel_dist1) >= 0.25 or abs(parallel_dist2) >= 0.25:
-            return False 
+            return False
 
-        #find perpendicular distance
+        # find perpendicular distance
         bearing1 = (bearing1 + 90) % 360
         bearing2 = (bearing2 + 90) % 360
         dir1_vector = np.array([math.cos(math.radians(bearing1)), math.sin(math.radians(bearing2))])
@@ -351,9 +353,6 @@ class Robot:
         if abs(perpendicular_dist1) >= 0.25 or abs(perpendicular_dist2) >= 0.25:
             return False
         return True
-
-
-        
 
     def get_angle_diff_other(self):
         required = math.degrees(
@@ -529,7 +528,7 @@ class Robot:
             elif type == 1:
                 try:
                     coord = np.array([float(x) for x in s])
-                    self.box_list.append((1,coord))
+                    self.box_list.append((1, coord))
                     self.box_queue.put((1, coord))
                 except:
                     print('ERROR MESSAGE ', message)
@@ -559,14 +558,13 @@ class Robot:
                     x = float(s[0])
                     z = float(s[1])
                     for i in self.box_list:
-                        diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
+                        diff = math.sqrt(abs(x - i[1][0])**2 + abs(z - i[1][1])*2)
                         diffs.append(diff)
                     min_index = diffs.index(min(diffs))
                     if min(diffs) < 0.05:
                         self.box_list[min_index] = (0, [x, z])
                 except:
                     print('ERROR MESSAGE ', message)
-
 
     def send_sweep_locations(self, locations):
         """
@@ -620,9 +618,6 @@ class Robot:
         #self.unique_boxes = unique
         self.add_boxes_to_queue(unique)
         return
-        
-
-    
 
     def add_boxes_to_queue(self, positions):
         """
@@ -631,11 +626,11 @@ class Robot:
         for pos in positions:
             if self.colour == 'red' and pos[1] > 0:
                 self.box_queue.put((0, pos))
-                self.box_list.append((0,pos))
+                self.box_list.append((0, pos))
             elif self.colour == 'green' and pos[1] <= 0:
                 self.box_queue.put((0, pos))
-                self.box_list.append((0,pos))
-                
+                self.box_list.append((0, pos))
+
         return
 
     @staticmethod
@@ -746,7 +741,7 @@ class Robot:
         """
         dist = self.dsUltrasonic.getValue()
         pos = potential_box_position(dist + 0.09, self.bearing(self.compass1), self.gps.getValues())
-        #print(pos)
+        # print(pos)
         return pos
 
     @trace
@@ -909,21 +904,20 @@ class Robot:
             self.withdraw_dualclaw()
             self.move_forwards(-0.1)
             return False
-        
+
     def get_next_target(self):
-        
+
         currentLocation = np.array(self.position)
         nearestLocation = None
         nearestLocationIndex = 0
-        nearestDistance = 10 #place holder
+        nearestDistance = 10  # place holder
         for n, item in enumerate(self.box_list):
             if np.linalg.norm(item[1] - currentLocation) < nearestDistance:
                 nearestDistance = np.linalg.norm(item[1] - currentLocation)
                 nearestLocation = item
                 nearestLocationIndex = n
-        
+
         return self.box_list.pop(nearestLocationIndex)
-               
 
     def set_motor_velocities(self, left: float, right: float):
         """Sets motor velocities to the values specified.

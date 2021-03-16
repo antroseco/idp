@@ -6,9 +6,10 @@ import controller
 import numpy as np
 
 from calculations import *
+from exception import reroute_after_collision_prevention
 from field import Field
-from robot import Robot
 from instrumentation import trace
+from robot import Robot
 
 np.set_printoptions(suppress=True)
 
@@ -83,6 +84,7 @@ def encircle(coord, location, field):
 
 
 @trace
+@reroute_after_collision_prevention
 def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
@@ -247,9 +249,11 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     robot.reset_motor_velocities()
 
 
+@trace
+@reroute_after_collision_prevention
 def move(coord, error_translation=0.1):
     """
-    DEPRECATED! Use PID_translation directly.
+    Straight line move
     """
     PID_translation(coord, error_translation)
 
@@ -546,7 +550,6 @@ def test_collisions_5():
 
 
 def test_collisions_6():
-    # FIXME
     robot.step()
 
     if robot.colour == 'green':
@@ -576,7 +579,6 @@ def test_collisions_7():
 
 
 def test_collisions_8():
-    # FIXME
     robot.step()
 
     if robot.colour == 'green':
