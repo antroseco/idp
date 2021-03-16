@@ -129,6 +129,26 @@ class Robot:
         self.get_messages()
         if collision_detection:
             self.collision_prevention()
+        
+        if len(self.box_list) > 0:
+            angle = self.bearing(self.compass)
+            position = self.gps.getValues()
+            wall_dist = get_wall_position(angle, position) - 0.11
+            dist = self.dsUltrasonic.getValue()
+
+            if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
+                valid, x, z = potential_box_position(dist + 0.11, angle, position)
+                if(valid):
+                    diffs = []
+                    for i in self.box_list:
+                        diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
+                        diffs.append(diff)
+                    min_index = diffs.index(min(diffs))
+                    if min(diffs) < 0.1:
+                        self.box_list[min_index] = (0, [x, z])
+                        message = "{},{}".format(x, z)
+                        self.send_message(message, type=6)
+        
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
@@ -509,6 +529,20 @@ class Robot:
                     self.other_blocked = True
                 elif message == 'done':
                     self.other_blocked = False
+            elif type == 6:
+                try:
+                    diffs = []
+                    x = float(s[0])
+                    z = float(s[1])
+                    for i in self.box_list:
+                        diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
+                        diffs.append(diff)
+                    min_index = diffs.index(min(diffs))
+                    if min(diffs) < 0.1:
+                        self.box_list[min_index] = (0, [x, z])
+                except:
+                    print('ERROR MESSAGE ', message)
+
 
     def send_sweep_locations(self, locations):
         """
