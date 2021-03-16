@@ -168,7 +168,7 @@ class Robot:
                         diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
                         diffs.append(diff)
                     min_index = diffs.index(min(diffs))
-                    if min(diffs) < 0.1:
+                    if min(diffs) < 0.05:
                         self.box_list[min_index] = (0, [x, z])
                         message = "{},{}".format(x, z)
                         self.send_message(message, type=6)
@@ -562,7 +562,7 @@ class Robot:
                         diff = math.sqrt( abs(x - i[1][0])**2 + abs(z - i[1][1])*2 )
                         diffs.append(diff)
                     min_index = diffs.index(min(diffs))
-                    if min(diffs) < 0.1:
+                    if min(diffs) < 0.05:
                         self.box_list[min_index] = (0, [x, z])
                 except:
                     print('ERROR MESSAGE ', message)
