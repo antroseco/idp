@@ -549,6 +549,16 @@ def test_distance_function():
     robot.distance_too_small()
 
 
+def test_pid_rotation():
+    PID_rotation(90)
+    t = 0
+    while t < 1:
+        t += robot.step()
+    PID_rotation(-45)
+    while t < 2:
+        t += robot.step()
+
+
 print('********')
 
 
@@ -560,24 +570,6 @@ if robot.colour == 'green':
     PID_rotation(180)
 else:
     PID_rotation(0)
-
-# Test PID_rotation
-# PID_rotation(90)
-# t = 0
-# while t < 1:
-#     t += robot.step()
-# PID_rotation(-45)
-# while t < 2:
-#     t += robot.step()
-
-# Test move_forwards
-# robot.move_forwards(.5)
-# t = 0
-# while t < 1:
-#     t += robot.step()
-# robot.move_forwards(-.5)
-# while t < 2:
-#     t += robot.step()
 
 
 positions = sweep(0.5)
