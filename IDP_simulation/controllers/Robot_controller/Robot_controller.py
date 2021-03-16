@@ -592,9 +592,8 @@ while True:
         t = robot.get_next_target()
 
         if DEBUG_MAINLOOP:
-            pass
-            # print('first item from list:',t)
-            # print(robot.box_list)
+            print('first item from list:', t)
+            print(robot.box_list)
         pos = t[1]
 
         robot.withdraw_dualclaw()
