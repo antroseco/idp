@@ -25,7 +25,11 @@ WorldInfo {
 }
 Viewpoint {
   orientation 0.5071357603754855 0.7076745435604284 0.4919451808331064 4.387447968554996
+<<<<<<< Updated upstream
   position -2.0521848453699554 5.791350333286165 0.2727650466709771
+=======
+  position -1.7528971031190304 5.0360209233357915 -0.0321313149838651
+>>>>>>> Stashed changes
 }
 Background {
   skyColor [
@@ -87,7 +91,11 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
+<<<<<<< Updated upstream
         rotation 1 -5.551370443678316e-10 -5.551349292863183e-10 1.5707999999999938
+=======
+        rotation 1 -6.244102094587024e-10 -6.244078399231144e-10 1.5707999999999938
+>>>>>>> Stashed changes
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -120,7 +128,11 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
+<<<<<<< Updated upstream
         rotation -0.9999999999999999 2.1840284952836505e-09 -2.184030677463068e-09 1.5707953071795426
+=======
+        rotation -0.9999999999999999 2.2533624964479708e-09 -2.253364749321449e-09 1.5707953071795426
+>>>>>>> Stashed changes
         children [
           USE WHEEL
         ]
@@ -300,7 +312,11 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
+<<<<<<< Updated upstream
         rotation 1 -1.158406900558524e-09 -1.158403453691545e-09 1.5707999999999926
+=======
+        rotation 1 -1.2276800656493986e-09 -1.2276763643283387e-09 1.5707999999999922
+>>>>>>> Stashed changes
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -333,7 +349,11 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
+<<<<<<< Updated upstream
         rotation -0.9999999999999999 1.362974684938246e-09 -1.3629753545602839e-09 1.570795307179541
+=======
+        rotation -0.9999999999999999 1.4323086861025627e-09 -1.4323094264186487e-09 1.5707953071795409
+>>>>>>> Stashed changes
         children [
           USE WHEEL
         ]
@@ -464,7 +484,7 @@ Robot {
   controller "Robot_controller"
 }
 target {
-  translation 0.7396 0.05 1.0751
+  translation 0.7396 0.05 -0.2749
   name "target(9)"
 }
 target {
@@ -480,7 +500,7 @@ target {
   name "target(6)"
 }
 target {
-  translation 0.311 0.05 1.0743
+  translation 0.511 0.05 0.4043
   colour 0 1 0
   name "target(5)"
 }

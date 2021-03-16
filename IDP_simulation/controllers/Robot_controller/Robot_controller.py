@@ -15,7 +15,7 @@ np.set_printoptions(suppress=True)
 DEBUG_PID = False
 DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
-DEBUG_MAINLOOP = False
+DEBUG_MAINLOOP = True
 Robot.DEBUG_COLLISIONS = True
 
 
@@ -126,7 +126,7 @@ def move_avoid_fields(coord, error_translation=0.1):
     return
 
 
-@trace
+#@trace
 def PID_rotation(required, threshold=0.4) -> bool:
     """Rotate until the required bearing is reached.
     Exits if error < threshold or oscillatory behaviour is detected.
@@ -243,6 +243,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
 
         PID_rotation(bearing)
         error = new_error
+        #box_collision()
 
     robot.reset_motor_velocities()
     if DEBUG_TRANSLATE:
@@ -547,6 +548,71 @@ def test_distance_function():
     robot.step()
     robot.step()
     robot.distance_too_small()
+    
+    
+@trace   
+def box_collision(threshold_distance = 0.15,threshold_angle=30):
+    """
+    check for collisions with closest box
+    """
+    boxes = np.array(robot.box_list)
+    if not list(boxes):
+        return
+    boxes = boxes[:,1]
+    distances = []
+    for box in boxes:
+        distance = np.linalg.norm(box - robot.current_location())
+        distances.append(distance)
+    
+    i = distances.index(min(distances))
+    
+    if min(distances) > threshold_distance:
+        return
+    
+    avoidance_box = boxes[i]
+    
+    required = required_bearing(avoidance_box, robot.gps.getValues())
+    current_bearing =  robot.bearing1(robot.compass)
+
+    
+    def angle_between(a, b):
+        return min(a - b, a - b + 360, a - b - 360, key=abs)
+        
+    error = angle_between(required, current_bearing)
+    
+    if abs(error) > threshold_angle:
+        return
+        
+    def rotation_clockwise(current_bearing):
+        bearing = current_bearing + 70
+        if bearing > 180:
+            bearing -= 360
+        return bearing
+        
+    def rotation_anticlockwise(current_bearing):
+        bearing = current_bearing - 70
+        if bearing < -180:
+            bearing += 360
+        return bearing
+    
+    PID_rotation(rotation_clockwise(current_bearing))
+    wall_distance = get_wall_position(robot.bearing(robot.compass), robot.gps.getValues()) 
+    outer_velocity = 3.0
+    inner_velocity = 1.5
+    
+    if wall_distance > 0.4:
+        robot.set_motor_velocities(inner_velocity, outer_velocity)
+        
+    else:
+        PID_rotation(rotation_anticlockwise(current_bearing))
+        robot.set_motor_velocities(outer_velocity,inner_velocity)
+    while abs(error) < 90:
+        required = required_bearing(avoidance_box, robot.gps.getValues())
+        current_bearing = robot.bearing1(robot.compass)
+        error = angle_between(required, current_bearing)
+        robot.step()
+    robot.reset_motor_velocities()
+    return
 
 
 def test_pid_rotation():
@@ -592,8 +658,16 @@ while True:
         t = robot.get_next_target()
 
         if DEBUG_MAINLOOP:
+<<<<<<< Updated upstream
             print('first item from list:', t)
             print(robot.box_list)
+=======
+            robot.update_unique_boxes()
+            print(robot.unique_boxes,'all boxes')
+            #print('first item from list:',t)
+            #print(robot.box_list)
+            pass
+>>>>>>> Stashed changes
         pos = t[1]
 
         robot.withdraw_dualclaw()

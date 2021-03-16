@@ -49,6 +49,7 @@ class Robot:
         self.box_list = []
         self.sweep_locations = []
         self.other_sweep_locations = []
+        self.unique_boxes = []
         self.position = np.array([])
         self.other_position = np.array([])
         self.other_bearing = 0  # this one is 0-360
@@ -113,6 +114,29 @@ class Robot:
             lambda: hardware.PhototransistorCircuit(self.lightsensorGreen).voltage())
         self.red_analogue = hardware.ADCInput(lambda: hardware.PhototransistorCircuit(self.lightsensorRed).voltage())
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
+        
+    def update_unique_boxes(self):
+        #self.step()
+        self.step()
+
+        duplicates = []
+        if not list(self.sweep_locations):
+            return
+        print(self.sweep_locations)
+        for i in range(self.sweep_locations.shape[0]):
+            for j in range(self.other_sweep_locations.shape[1]):
+
+                loc1 = np.array(self.sweep_locations[i])
+                loc2 = np.array(self.other_sweep_locations[j])
+
+                # check if loc1 and loc2 are the same or very close
+                dist = np.linalg.norm(loc1 - loc2)
+                if dist < 0.03:
+                    duplicates.append(j)
+
+        unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis=0)
+        self.unique_boxes = unique
+        return
 
     def step(self, collision_detection: bool = True) -> float:
         """Block for self.TIME_STEP milliseconds and do some housekeeping.
@@ -152,7 +176,7 @@ class Robot:
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
-
+        
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
 
@@ -593,8 +617,12 @@ class Robot:
                     duplicates.append(j)
 
         unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis=0)
+        #self.unique_boxes = unique
         self.add_boxes_to_queue(unique)
         return
+        
+
+    
 
     def add_boxes_to_queue(self, positions):
         """
