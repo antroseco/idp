@@ -262,7 +262,7 @@ def move(coord, error_rotation=0.5, error_translation=0.1):
 
 
 @trace
-def sweep(velocity=-0.5, swept_angle=355):
+def sweep(velocity=1.8, swept_angle=355):
     """
     do a 180 degree spin while collecting data from distance sensor
     input: velocity of wheels/how fast is the rotation
@@ -572,7 +572,7 @@ else:
     PID_rotation(0)
 
 
-positions = sweep(0.5)
+positions = sweep()
 
 
 robot.step()
