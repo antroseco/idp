@@ -87,7 +87,6 @@ def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
     """
-    robot.step()
     location = robot.gps.getValues()
 
     if location[2] * coord[1] >= 0:  # target and current location are on the same half
