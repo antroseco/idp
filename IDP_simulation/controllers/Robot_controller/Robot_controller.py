@@ -784,7 +784,7 @@ while True:
             print(robot.get_unique_boxes(), 'all boxes')
 
         pos = t[1]
-        #print(pos)
+        # print(pos)
         robot.withdraw_dualclaw()
 
         if initial_pass:
@@ -805,6 +805,7 @@ while True:
             elif result == -2:
                 print('failed to detect colour after remeasure')
             elif result:
+                robot.move_forwards(-0.10, 0.01)
                 return_box_field(robot.gps.getValues())
             else:
                 robot.move_forwards(-0.15, 0.02)
@@ -825,16 +826,15 @@ while True:
         robot.current_target = []
         robot.send_message('parked', 4)
 
-        #check if that robot finished finding it's boxes
+        # check if that robot finished finding it's boxes
         if not robot.field.available:
 
             if len(robot.box_list) > 0:
-                #send the remaining locations to the other robot
+                # send the remaining locations to the other robot
                 for _, item in enumerate(robot.box_list):
                     pos = item[1]
                     robot.send_box_location(pos)
             robot.box_list = []
-            
 
     if((robot.field.available() == True) and robot.sweep_ready == False):
         robot.send_message('available', 8)
@@ -859,10 +859,10 @@ while True:
         if not robot.field.available:
 
             if len(robot.box_list) > 0:
-                #send the remaining locations to the other robot
+                # send the remaining locations to the other robot
                 for _, item in enumerate(robot.box_list):
                     pos = item[1]
                     robot.send_box_location(pos)
             robot.box_list = []
 
-        #print(robot.box_list)
+        # print(robot.box_list)
