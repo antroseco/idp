@@ -5,7 +5,7 @@ import numpy as np
 
 import hardware
 from calculations import *
-from exception import CollisionPreventionException
+from reroute import CollisionPreventionException
 from field import Field
 from instrumentation import trace
 

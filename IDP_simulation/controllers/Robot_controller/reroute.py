@@ -24,16 +24,24 @@ def reroute_after_collision_prevention(robot):
     def decorator_factory(func: AnyCallable) -> AnyCallable:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            robot.throw_on_collision_prevention = True
+            reroute = kwargs.pop('reroute', True)
+
+            if reroute:
+                robot.throw_on_collision_prevention = True
+
             # TODO: this probably shouldn't be an infinite loop
             while True:
                 try:
                     result = func(*args, **kwargs)
-                    robot.throw_on_collision_prevention = False
+
+                    if reroute:
+                        robot.throw_on_collision_prevention = False
+
                     return result
-                except(CollisionPreventionException):
-                    # retry
-                    pass
+                except CollisionPreventionException as e:
+                    if not reroute:
+                        raise e
+                    # else retry
 
         return wrapper
 

@@ -6,7 +6,7 @@ import controller
 import numpy as np
 
 from calculations import *
-from exception import reroute_after_collision_prevention
+from reroute import reroute_after_collision_prevention
 from field import Field
 from instrumentation import trace
 from robot import Robot
@@ -99,7 +99,7 @@ def move_avoid_fields(coord, error_translation=0.1):
         else:
             # green half
             encircle(coord, location, green_field)
-        move(coord, error_translation)
+        PID_translation(coord, error_translation)
 
     else:  # opposite halfs
         if coord[0] > 0.5 or coord[0] < -0.5:
@@ -112,17 +112,17 @@ def move_avoid_fields(coord, error_translation=0.1):
         if location[2] > 0:  # red half
             intermediate[1] = -0.2
             encircle(intermediate, location, red_field)
-            move(intermediate, error_translation)
+            PID_translation(intermediate, error_translation)
 
             encircle(coord, robot.gps.getValues(), green_field)
-            move(coord, error_translation)
+            PID_translation(coord, error_translation)
         else:  # green half
             intermediate[1] = 0.2
             encircle(intermediate, location, green_field)
-            move(intermediate, error_translation)
+            PID_translation(intermediate, error_translation)
 
             encircle(coord, robot.gps.getValues(), red_field)
-            move(coord, error_translation)
+            PID_translation(coord, error_translation)
 
     return
 
@@ -444,13 +444,13 @@ def return_box_field(coord):
     """
     robot.carrying = True
     intermediate, final = robot.field.get_to_field(coord)
-    move_avoid_fields(intermediate, error_translation=0.15)
+    move_avoid_fields(intermediate, error_translation=0.15, reroute=False)
     if final[0] > 0:
         PID_rotation(-90)
     else:
         PID_rotation(90)
 
-    move(final, error_translation=0.2)
+    PID_translation(final, 0.2)
 
     robot.withdraw_dualclaw()
 
@@ -475,7 +475,7 @@ def finish_in_field():
         intermediate = (0, -1)
         final = (0, -0.4)
 
-    move_avoid_fields(intermediate)
+    move_avoid_fields(intermediate, reroute=False)
 
     # TODO: Think of something better
     if not len(robot.box_list) == 0 and robot.field.available():
