@@ -18,6 +18,7 @@ DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
 DEBUG_MAINLOOP = False
 Robot.DEBUG_COLLISIONS = False
+BOX_AVOIDANCE = False
 
 
 # Default level is WARNING, change it to DEBUG
@@ -245,7 +246,10 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = 0
 
         error = new_error
-        # box_collision(coord,threshold_distance=0.45)
+
+        if BOX_AVOIDANCE:
+            box_collision(coord, threshold_distance=0.45)
+
     robot.reset_motor_velocities()
 
 
@@ -347,11 +351,11 @@ def second_sweep(velocity=-0.5, swept_angle=355):
         move([0.4, 0])
         PID_rotation(0)
     else:
-        move([0.0161,-1])
+        move([0.0161, -1])
         move([-0.4, -1])
         move([-0.4, 0])
         PID_rotation(180)
-    
+
     robot.send_message('sweep ready', 9)
     robot.sweep_ready = True
 
@@ -401,12 +405,12 @@ def second_sweep(velocity=-0.5, swept_angle=355):
             # field_greed_robot = [[-0.12, 0.275], [-0.12, -0.275], [-0.66, -0.275], [-0.66, 0.275]]
 
             avoid = 0
-            #ignore boxes that are in the fields
+            # ignore boxes that are in the fields
             if (-0.2 < x < 0.2) and (-0.595 < z < -0.195):
                 avoid = 1
             elif (-0.2 < x < 0.2) and (0.195 < z < 0.595):
                 avoid = 1
-            #ignore robots
+            # ignore robots
             elif (-0.3 < z < 0.3) and (0.1 < x < 0.7):
                 avoid = 1
             elif(-0.3 < z < 0.3) and (-0.7 < x < -0.1):
@@ -414,7 +418,6 @@ def second_sweep(velocity=-0.5, swept_angle=355):
 
             elif valid and avoid == 0:
                 boxes.append([x, z])
-
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
@@ -429,7 +432,7 @@ def second_sweep(velocity=-0.5, swept_angle=355):
         robot.step()
     except:
         locations = np.array([])
-    
+
     robot.sweep_locations = locations
     return locations
 
@@ -625,29 +628,20 @@ def test_distance_function():
     robot.distance_too_small()
 
 
+@trace
 def box_collision(coord, threshold_distance=0.45):
     """
     check for collisions with closest box
     """
 
-    def box_collision_detection(coord, threshold_distance=0.45):
-
-        boxes = np.array(Robot.unique_boxes)
-        if not list(boxes):
-            return
-        distances = []
-        for box in boxes:
-            distance = np.linalg.norm(box - robot.current_location())
-            distances.append(distance)
-
-        i = distances.index(min(distances))
-
-        if min(distances) > threshold_distance:
+    def box_collision_detection(avoidance_box, coord, threshold_distance=0.45):
+        check_points = [(0.4, 0.4), (0.4, -0.4), (0, 0), (0.8, 0.0),
+                        (-0.4, 0.4), (-0.4, -0.4), (0, 0), (-0.8, 0.0)]
+        coord = tuple(coord)
+        if coord in check_points:
+            # prioritise encirclement over box avoidance
             return False
-        else:
-            robot.reset_motor_velocities()
 
-        avoidance_box = boxes[i]
         location = robot.gps.getValues()
         location = (location[0], location[2])
 
@@ -657,16 +651,16 @@ def box_collision(coord, threshold_distance=0.45):
         x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
         z = m*x + c
 
-        z1 = [i for i in z if (i > avoidance_box[1] - 0.2 and i < avoidance_box[1] + 0.2)]
-        x1 = [i for i in x if (i > avoidance_box[0] - 0.2 and i < avoidance_box[0] + 0.2)]
+        z1 = [i for i in z if (i > avoidance_box[1] - 0.1 and i < avoidance_box[1] + 0.1)]
+        x1 = [i for i in x if (i > avoidance_box[0] - 0.1 and i < avoidance_box[0] + 0.1)]
+
         if z1 and x1:
+            # print(avoidance_box)
+            # print(location)
+            #print(coord, 'coord')
             return True
 
         return False
-
-    if not box_collision_detection(coord, 0.45):
-        return
-    robot.reset_motor_velocities()
 
     boxes = np.array(Robot.unique_boxes)
     if not list(boxes):
@@ -678,6 +672,9 @@ def box_collision(coord, threshold_distance=0.45):
 
     i = distances.index(min(distances))
     avoidance_box = boxes[i]
+    if not box_collision_detection(avoidance_box, coord, 0.45):
+        return
+    robot.reset_motor_velocities()
 
     required = required_bearing(avoidance_box, robot.gps.getValues())
     current_bearing = robot.bearing1(robot.compass)
@@ -721,12 +718,16 @@ def box_collision(coord, threshold_distance=0.45):
     else:
         PID_rotation(rotation_anticlockwise(current_bearing))
         robot.set_motor_velocities(outer_velocity, inner_velocity)"""
-    while box_collision_detection(coord, threshold_distance=0.45):
+    collision = box_collision_detection(avoidance_box, coord, threshold_distance=0.45)
+    while collision:
         required = required_bearing(avoidance_box, robot.gps.getValues())
         current_bearing = robot.bearing1(robot.compass)
         error = angle_between(required, current_bearing)
         distance = np.linalg.norm(box - robot.current_location())
         robot.step()
+        collision = box_collision_detection(avoidance_box, coord, threshold_distance=0.45)
+        print(collision)
+
     robot.reset_motor_velocities()
     return
 
@@ -771,12 +772,7 @@ robot.step(read_sensors=False)
 initial_pass = True
 
 robot.combine_two_list()
-# print('robot.box_list',robot.box_list)
-# print('robot.other_box_list',robot.other_box_list)
-# print('combined box list:', robot.unique_list)
 robot.unique_list_remove_duplicate()
-# print('combined box list:', robot.unique_list)
-
 robot.parked = False
 
 
@@ -814,7 +810,6 @@ while True:
             elif result == -2:
                 print('failed to detect colour after remeasure')
             elif result:
-
                 return_box_field(robot.gps.getValues())
             else:
                 robot.move_forwards(-0.15, 0.02)
@@ -835,26 +830,25 @@ while True:
         robot.current_target = []
         robot.send_message('parked', 4)
 
-        #check if that robot finished finding it's boxes
+        # check if that robot finished finding it's boxes
         if not robot.field.available:
 
             if len(robot.box_list) > 0:
-                #send the remaining locations to the other robot
+                # send the remaining locations to the other robot
                 for _, item in enumerate(robot.box_list):
                     pos = item[1]
                     robot.send_box_location(pos)
             robot.box_list = []
-            
 
     if((robot.field.available() == True) and robot.sweep_ready == False):
         robot.send_message('available', 8)
 
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
-        
+
     # Second sweep check
-    if( (robot.other_parked == True) and (robot.parked == True) and ( (robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
-        
+    if((robot.other_parked == True) and (robot.parked == True) and ((robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
+
         robot.parked = False
         positions_second = second_sweep(1.8)
 
@@ -865,6 +859,3 @@ while True:
         while not robot.other_second_sweep_locations_ready:
             robot.step()
         robot.compare_sweep_results()
-
-
-                
