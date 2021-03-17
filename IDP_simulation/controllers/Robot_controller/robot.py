@@ -62,9 +62,12 @@ class Robot:
         self.stop = False
         self.other_stop = False
         self.parked = False
+        self.sweep_ready = False
         self.other_parked = False
         self.other_blocked = False
         self.carrying = False
+        self.other_available = False
+        self.other_sweep_ready = False
 
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -607,6 +610,17 @@ class Robot:
                 coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
                 self.other_box_list = coordinates
                 self.update_unique_boxes()
+            elif type == 8:
+                if message == 'available':
+                    self.other_available = True
+                elif message == 'done':
+                    self.other_available = False
+            elif type == 9:
+                if message == 'sweep ready':
+                    self.other_sweep_ready = True
+                elif message == 'done':
+                    self.other_sweep_ready = False
+
 
     def send_box_list(self):
         """
@@ -655,6 +669,9 @@ class Robot:
         """
 
         duplicates = []
+        if((len(self.sweep_locations) == 0 or len(self.other_sweep_locations.shape)) and self.sweep_ready == True):
+            return
+
 
         for i in range(self.sweep_locations.shape[0]):
             for j in range(self.other_sweep_locations.shape[1]):

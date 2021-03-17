@@ -339,10 +339,23 @@ def second_sweep(velocity=-0.5, swept_angle=355):
             -1 if there are no blocks left to be picked up
     """
 
+    robot.step()
     if(robot.colour == 'red'):
+        move([0.0161,1])
+        move([0.4, 1])
         move([0.4, 0])
     else:
+        move([0.0161,-1])
+        print('move')
+        move([-0.4, -1])
         move([-0.4, 0])
+    
+    robot.send_message('sweep ready', 9)
+    robot.sweep_ready = True
+    
+    # wait until both robots are in the right position
+    while(robot.other_sweep_ready == False):
+        robot.step()
 
     # find current rotation [0-360 degrees]
     initial_angle = robot.bearing(robot.compass1)
@@ -361,12 +374,7 @@ def second_sweep(velocity=-0.5, swept_angle=355):
     while swept_angle < 355:
         robot.set_motor_velocities(-velocity, velocity)
 
-        try:
-            robot.step()
-        except:
-
-            break
-
+        robot.step()
         # distance from robot centre to wall in this direction
         current_angle = robot.bearing(robot.compass1)
         current_position = robot.gps.getValues()
@@ -422,7 +430,7 @@ def second_sweep(velocity=-0.5, swept_angle=355):
 
         robot.sweep_locations = locations
     except:
-        locations = -1
+        locations = []
 
     return locations
 
@@ -777,5 +785,22 @@ while True:
 
     print(f'{robot.box_list=}')
 
+    if((robot.field.available() == True) and robot.sweep_ready == False):
+        robot.send_message('available', 8)    
+
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
+
+        
+    # Second sweep check
+    if( (robot.other_parked == True) and (robot.parked == True) and ( (robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
+        robot.parked = False
+        positions_second = second_sweep(1.8)
+        robot.step()
+        if (len(positions_second) != 0):
+            try:
+                robot.box_list = positions_second
+            except:
+                pass
+                
+        robot.step()
