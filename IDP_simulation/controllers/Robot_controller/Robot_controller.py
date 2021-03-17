@@ -824,6 +824,17 @@ while True:
         robot.current_target = []
         robot.send_message('parked', 4)
 
+        #check if that robot finished finding it's boxes
+        if not robot.field.available:
+
+            if len(robot.box_list) > 0:
+                #send the remaining locations to the other robot
+                for _, item in enumerate(robot.box_list):
+                    pos = item[1]
+                    robot.send_box_location(pos)
+            robot.box_list = []
+            
+
     if((robot.field.available() == True) and robot.sweep_ready == False):
         robot.send_message('available', 8)
 
