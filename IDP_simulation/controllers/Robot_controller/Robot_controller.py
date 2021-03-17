@@ -784,6 +784,7 @@ while True:
             print(robot.get_unique_boxes(), 'all boxes')
 
         pos = t[1]
+        #print(pos)
         robot.withdraw_dualclaw()
 
         if initial_pass:
@@ -854,3 +855,14 @@ while True:
         while not robot.other_second_sweep_locations_ready:
             robot.step()
         robot.compare_sweep_results()
+
+        if not robot.field.available:
+
+            if len(robot.box_list) > 0:
+                #send the remaining locations to the other robot
+                for _, item in enumerate(robot.box_list):
+                    pos = item[1]
+                    robot.send_box_location(pos)
+            robot.box_list = []
+
+        #print(robot.box_list)
