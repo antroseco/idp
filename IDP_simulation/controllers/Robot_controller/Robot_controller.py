@@ -340,22 +340,24 @@ def second_sweep(velocity=-0.5, swept_angle=355):
     """
 
     robot.step()
+
     if(robot.colour == 'red'):
         move([0.0161, 1])
         move([0.4, 1])
         move([0.4, 0])
+        PID_rotation(0)
     else:
-        move([0.0161, -1])
+        move([0.0161,-1])
         move([-0.4, -1])
         move([-0.4, 0])
-
+        PID_rotation(180)
+    
     robot.send_message('sweep ready', 9)
     robot.sweep_ready = True
 
     # wait until both robots are in the right position
-    while(robot.other_sweep_ready == False):
+    while not robot.other_sweep_ready:
         robot.step()
-
     # find current rotation [0-360 degrees]
     initial_angle = robot.bearing(robot.compass1)
 
@@ -399,21 +401,20 @@ def second_sweep(velocity=-0.5, swept_angle=355):
             # field_greed_robot = [[-0.12, 0.275], [-0.12, -0.275], [-0.66, -0.275], [-0.66, 0.275]]
 
             avoid = 0
-            if((-0.2 < x < 0.2) and (-0.595 < z < -0.195)):
+            #ignore boxes that are in the fields
+            if (-0.2 < x < 0.2) and (-0.595 < z < -0.195):
                 avoid = 1
-            elif((-0.2 < x < 0.2) and (0.195 < z < 0.595)):
+            elif (-0.2 < x < 0.2) and (0.195 < z < 0.595):
                 avoid = 1
-            elif((-0.275 < z < 0.275) and (0.12 < x < 0.66)):
+            #ignore robots
+            elif (-0.3 < z < 0.3) and (0.1 < x < 0.7):
                 avoid = 1
-            elif((-0.275 < z < 0.275) and (-0.66 < x < -0.12)):
-                avoid = 1
-            elif((robot.colour == 'red') and (x < 0)):
-                avoid = 1
-            elif((robot.colour == 'green') and (x > 0)):
+            elif(-0.3 < z < 0.3) and (-0.7 < x < -0.1):
                 avoid = 1
 
-            elif(valid and avoid == 0):
+            elif valid and avoid == 0:
                 boxes.append([x, z])
+
 
         if current_angle > initial_angle:
             swept_angle = current_angle - initial_angle
@@ -426,11 +427,10 @@ def second_sweep(velocity=-0.5, swept_angle=355):
         locations = box_position(np.array(boxes))
         robot.reset_motor_velocities()
         robot.step()
-
-        robot.sweep_locations = locations
     except:
-        locations = []
-
+        locations = np.array([])
+    
+    robot.sweep_locations = locations
     return locations
 
 
@@ -829,16 +829,20 @@ while True:
 
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
-
+        
     # Second sweep check
-    if((robot.other_parked == True) and (robot.parked == True) and ((robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
+    if( (robot.other_parked == True) and (robot.parked == True) and ( (robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
+        
         robot.parked = False
         positions_second = second_sweep(1.8)
-        robot.step()
-        if (len(positions_second) != 0):
-            try:
-                robot.add_boxes_to_queue(positions_second)
-            except:
-                pass
 
-        robot.step()
+        robot.send_sweep_locations(positions_second)
+        robot.second_sweep_locations_ready = True
+        robot.send_message('locations sent', type=10)
+
+        while not robot.other_second_sweep_locations_ready:
+            robot.step()
+        robot.compare_sweep_results()
+
+
+                
