@@ -428,6 +428,7 @@ def second_sweep(velocity=-0.5, swept_angle=355):
 
 
 @trace
+@reroute_after_collision_prevention
 def return_box_field(coord):
     """
     function that makes robot return a box in the specified field without it clashing with
@@ -451,6 +452,7 @@ def return_box_field(coord):
 
 
 @trace
+@reroute_after_collision_prevention
 def finish_in_field():
     """
     for the ending of the task, robot goes and stays in its field
