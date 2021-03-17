@@ -84,7 +84,7 @@ def encircle(coord, location, field):
 
 
 @trace
-@reroute_after_collision_prevention
+@reroute_after_collision_prevention(robot)
 def move_avoid_fields(coord, error_translation=0.1):
     """
     avoids both fields
@@ -196,7 +196,6 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     The function moves in a straight line until the desired location is within
     the final error distance"""
     coord = np.clip(coord, -1, 1)
-    
 
     # Euclidean distance
     error = np.linalg.norm(coord - robot.current_location())
@@ -246,12 +245,12 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = 0
 
         error = new_error
-        #box_collision(coord,threshold_distance=0.45)
+        # box_collision(coord,threshold_distance=0.45)
     robot.reset_motor_velocities()
 
 
 @trace
-@reroute_after_collision_prevention
+@reroute_after_collision_prevention(robot)
 def move(coord, error_translation=0.1):
     """
     Straight line move
@@ -342,18 +341,18 @@ def second_sweep(velocity=-0.5, swept_angle=355):
 
     robot.step()
     if(robot.colour == 'red'):
-        move([0.0161,1])
+        move([0.0161, 1])
         move([0.4, 1])
         move([0.4, 0])
     else:
-        move([0.0161,-1])
+        move([0.0161, -1])
         print('move')
         move([-0.4, -1])
         move([-0.4, 0])
-    
+
     robot.send_message('sweep ready', 9)
     robot.sweep_ready = True
-    
+
     # wait until both robots are in the right position
     while(robot.other_sweep_ready == False):
         robot.step()
@@ -437,7 +436,7 @@ def second_sweep(velocity=-0.5, swept_angle=355):
 
 
 @trace
-@reroute_after_collision_prevention
+@reroute_after_collision_prevention(robot)
 def return_box_field(coord):
     """
     function that makes robot return a box in the specified field without it clashing with
@@ -462,7 +461,7 @@ def return_box_field(coord):
 
 
 @trace
-@reroute_after_collision_prevention
+@reroute_after_collision_prevention(robot)
 def finish_in_field():
     """
     for the ending of the task, robot goes and stays in its field
@@ -628,17 +627,15 @@ def test_distance_function():
     robot.step()
     robot.step()
     robot.distance_too_small()
-    
 
 
-
-def box_collision(coord,threshold_distance=0.45):
+def box_collision(coord, threshold_distance=0.45):
     """
     check for collisions with closest box
     """
-    
-    def box_collision_detection(coord,threshold_distance=0.45):
-   
+
+    def box_collision_detection(coord, threshold_distance=0.45):
+
         boxes = np.array(Robot.unique_boxes)
         if not list(boxes):
             return
@@ -646,37 +643,35 @@ def box_collision(coord,threshold_distance=0.45):
         for box in boxes:
             distance = np.linalg.norm(box - robot.current_location())
             distances.append(distance)
-    
+
         i = distances.index(min(distances))
-    
+
         if min(distances) > threshold_distance:
             return False
         else:
             robot.reset_motor_velocities()
-    
+
         avoidance_box = boxes[i]
         location = robot.gps.getValues()
         location = (location[0], location[2])
-    
+
         m = (coord[1] - location[1])/(coord[0]-location[0])
         c = coord[1] - m*coord[0]
-    
+
         x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
         z = m*x + c
-        
+
         z1 = [i for i in z if (i > avoidance_box[1] - 0.2 and i < avoidance_box[1] + 0.2)]
         x1 = [i for i in x if (i > avoidance_box[0] - 0.2 and i < avoidance_box[0] + 0.2)]
         if z1 and x1:
             return True
-    
+
         return False
-    
-    
-    if not box_collision_detection(coord,0.45):
+
+    if not box_collision_detection(coord, 0.45):
         return
     robot.reset_motor_velocities()
-    
-    
+
     boxes = np.array(Robot.unique_boxes)
     if not list(boxes):
         return
@@ -687,7 +682,6 @@ def box_collision(coord,threshold_distance=0.45):
 
     i = distances.index(min(distances))
     avoidance_box = boxes[i]
-
 
     required = required_bearing(avoidance_box, robot.gps.getValues())
     current_bearing = robot.bearing1(robot.compass)
@@ -710,17 +704,14 @@ def box_collision(coord,threshold_distance=0.45):
         return bearing
     outer_velocity = 4.0
     inner_velocity = 2.0
-        
+
     if error > 0:
         PID_rotation(rotation_anticlockwise())
-        robot.set_motor_velocities(inner_velocity,outer_velocity)
-    
+        robot.set_motor_velocities(inner_velocity, outer_velocity)
+
     else:
         PID_rotation(rotation_clockwise())
-        robot.set_motor_velocities(outer_velocity,inner_velocity)
-    
-        
-        
+        robot.set_motor_velocities(outer_velocity, inner_velocity)
 
     """PID_rotation(rotation_clockwise(current_bearing))
     wall_distance = get_wall_position(robot.bearing(robot.compass), robot.gps.getValues())
@@ -734,7 +725,7 @@ def box_collision(coord,threshold_distance=0.45):
     else:
         PID_rotation(rotation_anticlockwise(current_bearing))
         robot.set_motor_velocities(outer_velocity, inner_velocity)"""
-    while box_collision_detection(coord,threshold_distance=0.45):
+    while box_collision_detection(coord, threshold_distance=0.45):
         required = required_bearing(avoidance_box, robot.gps.getValues())
         current_bearing = robot.bearing1(robot.compass)
         error = angle_between(required, current_bearing)
@@ -755,8 +746,8 @@ def test_pid_rotation():
 
 
 print('********')
-#robot.step(read_sensors=False)
-#if robot.colour == 'red':
+# robot.step(read_sensors=False)
+# if robot.colour == 'red':
 #    coord = (0.9,0.4)
 #    move(coord)
 
@@ -780,7 +771,6 @@ robot.step(read_sensors=False)
 initial_pass = True
 
 robot.parked = False
-
 
 
 while True:
@@ -817,7 +807,7 @@ while True:
             elif result == -2:
                 print('failed to detect colour after remeasure')
             elif result:
-                
+
                 return_box_field(robot.gps.getValues())
             else:
                 robot.move_forwards(-0.15, 0.02)
@@ -838,16 +828,14 @@ while True:
         robot.current_target = []
         robot.send_message('parked', 4)
 
-
     if((robot.field.available() == True) and robot.sweep_ready == False):
-        robot.send_message('available', 8)    
+        robot.send_message('available', 8)
 
     # Yield if parked, otherwise Webots will be stuck waiting for us
     robot.step()
 
-        
     # Second sweep check
-    if( (robot.other_parked == True) and (robot.parked == True) and ( (robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
+    if((robot.other_parked == True) and (robot.parked == True) and ((robot.field.available() == True) or (robot.other_available == True)) and (robot.sweep_ready == False)):
         robot.parked = False
         positions_second = second_sweep(1.8)
         robot.step()
@@ -856,5 +844,5 @@ while True:
                 robot.add_boxes_to_queue(positions_second)
             except:
                 pass
-                
+
         robot.step()

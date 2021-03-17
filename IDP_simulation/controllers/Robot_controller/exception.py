@@ -11,7 +11,7 @@ class CollisionPreventionException(Exception):
 AnyCallable = TypeVar('AnyCallable', bound=Callable[..., Any])
 
 
-def reroute_after_collision_prevention(func: AnyCallable) -> AnyCallable:
+def reroute_after_collision_prevention(robot):
     """Decorator used to call high level navigation functions again if they
     were interrupted due to collision prevention.
 
@@ -21,14 +21,20 @@ def reroute_after_collision_prevention(func: AnyCallable) -> AnyCallable:
     Returns:
         AnyCallable: Wrapped function.
     """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # TODO: this probably shouldn't be an infinite loop
-        while True:
-            try:
-                return func(*args, **kwargs)
-            except(CollisionPreventionException):
-                # retry
-                pass
+    def decorator_factory(func: AnyCallable) -> AnyCallable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            robot.throw_on_collision_prevention = True
+            # TODO: this probably shouldn't be an infinite loop
+            while True:
+                try:
+                    result = func(*args, **kwargs)
+                    robot.throw_on_collision_prevention = False
+                    return result
+                except(CollisionPreventionException):
+                    # retry
+                    pass
 
-    return wrapper
+        return wrapper
+
+    return decorator_factory

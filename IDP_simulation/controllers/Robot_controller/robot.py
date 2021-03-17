@@ -36,8 +36,9 @@ class Robot:
     compass_name = 'compass'
     compass1_name = 'compass1'
 
-
     unique_boxes = np.array([])
+
+    throw_on_collision_prevention = False
 
     def __init__(self, robot: controller.Robot, colour='red'):
         """
@@ -125,7 +126,7 @@ class Robot:
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
     def update_unique_boxes(self):
-        
+
         duplicates = []
         if len(self.other_box_list) == 0 or len(self.box_list) == 0:
             return
@@ -166,10 +167,10 @@ class Robot:
 
         if collision_detection:
             self.collision_prevention()
-        
+
         if read_sensors == True:
             self.update_box_positions()
-        
+
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
@@ -185,20 +186,20 @@ class Robot:
 
         if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
             valid, x, z = potential_box_position(dist + 0.09, angle, position)
-            #check if it's in the field
-            if (x >= -0.2 and x <= 0.2) and ((z>=-0.6 and z<=-0.2) or (z >= 0.2 and z <= 0.6)):
+            # check if it's in the field
+            if (x >= -0.2 and x <= 0.2) and ((z >= -0.6 and z <= -0.2) or (z >= 0.2 and z <= 0.6)):
                 return
-            #check that it's not the current target
+            # check that it's not the current target
             if len(self.current_target) > 0 and math.sqrt((x - self.current_target[0])**2 + (z - self.current_target[1])**2) < 0.08:
                 return
-            #check that it's not the other robot
+            # check that it's not the other robot
             if math.sqrt((x - self.other_position[0])**2 + (z - self.other_position[1])**2) < 0.35:
                 return
-            #check if it's already carrying the box, then it couldn't have seen anything new
+            # check if it's already carrying the box, then it couldn't have seen anything new
             if self.carrying:
                 return
             if(valid):
-                #check if it's a box that already exists in the list or it was moved by a little
+                # check if it's a box that already exists in the list or it was moved by a little
                 diffs = []
                 if len(self.box_list) > 0:
                     for i in self.box_list:
@@ -211,15 +212,14 @@ class Robot:
                             self.send_message(message, type=6)
                             #print('old box: ', x, z)
                             return
-                #new box, add it to the queue/list or send it to another robot   
-                print('new box: ', x, z) 
+                # new box, add it to the queue/list or send it to another robot
+                print('new box: ', x, z)
                 if (self.colour == 'red' and z > 0) or (self.colour == 'green' and z <= 0):
                     self.box_queue.put((0, [x, z]))
-                    self.box_list.append((0,[x, z]))
+                    self.box_list.append((0, [x, z]))
                 else:
                     self.send_box_location([x, z])
         return
-
 
     def collision_prevention(self, threshold=0.7, angle_threshold=30):
         """Checks if the distance between each robot is below a certain
@@ -360,7 +360,8 @@ class Robot:
             self.send_message('done', 3)
             self.send_message('done', 5)
 
-            raise CollisionPreventionException('Robot.collision_prevention() has moved the robot, please reroute!')
+            if self.throw_on_collision_prevention:
+                raise CollisionPreventionException('Robot.collision_prevention() has moved the robot, please reroute!')
 
         return
 
@@ -621,7 +622,6 @@ class Robot:
                 elif message == 'done':
                     self.other_sweep_ready = False
 
-
     def send_box_list(self):
         """
         send current box_list
@@ -671,7 +671,6 @@ class Robot:
         duplicates = []
         if((len(self.sweep_locations) == 0 or len(self.other_sweep_locations.shape)) and self.sweep_ready == True):
             return
-
 
         for i in range(self.sweep_locations.shape[0]):
             for j in range(self.other_sweep_locations.shape[1]):
