@@ -14,7 +14,7 @@ from robot import Robot
 np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
-DEBUG_TRACING = True
+DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
 DEBUG_MAINLOOP = False
 Robot.DEBUG_COLLISIONS = False
@@ -246,7 +246,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = 0
 
         error = new_error
-        box_collision(coord,threshold_distance=0.45)
+        #box_collision(coord,threshold_distance=0.45)
     robot.reset_motor_velocities()
 
 
@@ -838,7 +838,6 @@ while True:
         robot.current_target = []
         robot.send_message('parked', 4)
 
-    print(f'{robot.box_list=}')
 
     if((robot.field.available() == True) and robot.sweep_ready == False):
         robot.send_message('available', 8)    
@@ -854,7 +853,7 @@ while True:
         robot.step()
         if (len(positions_second) != 0):
             try:
-                robot.box_list = positions_second
+                robot.add_boxes_to_queue(positions_second)
             except:
                 pass
                 
