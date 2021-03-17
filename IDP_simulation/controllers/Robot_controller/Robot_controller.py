@@ -18,6 +18,7 @@ DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
 DEBUG_MAINLOOP = False
 Robot.DEBUG_COLLISIONS = False
+BOX_AVOIDANCE = False
 
 
 # Default level is WARNING, change it to DEBUG
@@ -245,7 +246,10 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = 0
 
         error = new_error
-        # box_collision(coord,threshold_distance=0.45)
+        
+        if BOX_AVOIDANCE:
+            box_collision(coord,threshold_distance=0.45)
+            
     robot.reset_motor_velocities()
 
 
@@ -624,30 +628,24 @@ def test_distance_function():
     robot.step()
     robot.distance_too_small()
 
-
-def box_collision(coord, threshold_distance=0.45):
+@trace
+def box_collision(coord,threshold_distance=0.45):
     """
     check for collisions with closest box
     """
-
-    def box_collision_detection(coord, threshold_distance=0.45):
-
-        boxes = np.array(Robot.unique_boxes)
-        if not list(boxes):
-            return
-        distances = []
-        for box in boxes:
-            distance = np.linalg.norm(box - robot.current_location())
-            distances.append(distance)
-
-        i = distances.index(min(distances))
-
-        if min(distances) > threshold_distance:
+    
+    def box_collision_detection(avoidance_box,coord,threshold_distance=0.45):
+        check_points = [ (0.4,0.4), (0.4,-0.4), (0,0), (0.8,0.0),
+        (-0.4,0.4), (-0.4,-0.4),(0,0), (-0.8,0.0) ]
+        coord = tuple(coord)
+        if coord in check_points:
+            #prioritise encirclement over box avoidance
             return False
-        else:
-            robot.reset_motor_velocities()
+        
+        
 
-        avoidance_box = boxes[i]
+   
+      
         location = robot.gps.getValues()
         location = (location[0], location[2])
 
@@ -656,18 +654,18 @@ def box_collision(coord, threshold_distance=0.45):
 
         x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
         z = m*x + c
-
-        z1 = [i for i in z if (i > avoidance_box[1] - 0.2 and i < avoidance_box[1] + 0.2)]
-        x1 = [i for i in x if (i > avoidance_box[0] - 0.2 and i < avoidance_box[0] + 0.2)]
+        
+        z1 = [i for i in z if (i > avoidance_box[1] - 0.1 and i < avoidance_box[1] + 0.1)]
+        x1 = [i for i in x if (i > avoidance_box[0] - 0.1 and i < avoidance_box[0] + 0.1)]
+  
         if z1 and x1:
+            print(avoidance_box)
+            print(location)
+            print(coord,'coord')
             return True
 
         return False
-
-    if not box_collision_detection(coord, 0.45):
-        return
-    robot.reset_motor_velocities()
-
+    
     boxes = np.array(Robot.unique_boxes)
     if not list(boxes):
         return
@@ -678,6 +676,10 @@ def box_collision(coord, threshold_distance=0.45):
 
     i = distances.index(min(distances))
     avoidance_box = boxes[i]
+    if not box_collision_detection(avoidance_box,coord,0.45):
+        return
+    robot.reset_motor_velocities()
+   
 
     required = required_bearing(avoidance_box, robot.gps.getValues())
     current_bearing = robot.bearing1(robot.compass)
@@ -721,12 +723,16 @@ def box_collision(coord, threshold_distance=0.45):
     else:
         PID_rotation(rotation_anticlockwise(current_bearing))
         robot.set_motor_velocities(outer_velocity, inner_velocity)"""
-    while box_collision_detection(coord, threshold_distance=0.45):
+    collision = box_collision_detection(avoidance_box,coord,threshold_distance=0.45)
+    while collision :
         required = required_bearing(avoidance_box, robot.gps.getValues())
         current_bearing = robot.bearing1(robot.compass)
         error = angle_between(required, current_bearing)
         distance = np.linalg.norm(box - robot.current_location())
         robot.step()
+        collision =box_collision_detection(avoidance_box,coord,threshold_distance=0.45)
+        print(collision)
+        
     robot.reset_motor_velocities()
     return
 
@@ -803,7 +809,6 @@ while True:
             elif result == -2:
                 print('failed to detect colour after remeasure')
             elif result:
-
                 return_box_field(robot.gps.getValues())
             else:
                 robot.move_forwards(-0.15, 0.02)
@@ -842,3 +847,4 @@ while True:
                 pass
 
         robot.step()
+        
