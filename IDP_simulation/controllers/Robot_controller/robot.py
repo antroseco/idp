@@ -632,7 +632,6 @@ class Robot:
                     self.other_second_sweep_locations_ready = True
                 elif message == 'done':
                     self.other_second_sweep_locations_ready = False
-            
 
     def send_box_list(self):
         """
@@ -677,20 +676,21 @@ class Robot:
         self.position = np.array([location[0], location[2]])
         message = "{},{},{}".format(location[0], location[2], self.bearing(self.compass))
         self.send_message(message, type=0)
+
     @trace
     def compare_sweep_results(self):
         """
         check sweep results from both robots, remove duplicate locations
         save locations on robot's half of the table to queue starting from the closest one to the robot
-        """    
+        """
         if self.sweep_ready and self.other_sweep_ready:
             if not self.second_sweep_locations_ready or not self.other_second_sweep_locations_ready:
                 return
-                
+
         if self.sweep_locations.size == 0:
             if self.other_sweep_locations.size == 0:
                 return
-            else: 
+            else:
                 Robot.unique_boxes = self.other_sweep_locations
                 self.add_boxes_to_queue(self.other_sweep_locations)
                 return
@@ -719,6 +719,7 @@ class Robot:
             Robot.unique_boxes = unique
 
         return
+
     @trace
     def add_boxes_to_queue(self, positions):
         """

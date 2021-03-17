@@ -7,7 +7,7 @@ maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
 textFiles: -1
-globalOptionalRendering: LightSensorRays
+globalOptionalRendering: LightSensorRays::DistanceSensorRays
 consoles: Console:All:All
 consoles: Console:robot_red:All
 consoles: Console:robot_green:All

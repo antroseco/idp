@@ -3,16 +3,14 @@ import math
 import numpy as np
 
 
-
 def obstacle_distance_at_angle(position, bearing):
     """
     taking 3D gps position of the robot, and bearing 0-360 degrees
     check how far is the first obstacle (wall or a field) from that position looking at that angle
     returns distance from the nearest object (from an edge of the robot not its centre)
     """
-    #convert angle to normal coordinate system
-    angle = (bearing - 90)%360
-
+    # convert angle to normal coordinate system
+    angle = (bearing - 90) % 360
 
     l = 2.4
     d = np.linspace(0, l, 500)
@@ -22,19 +20,14 @@ def obstacle_distance_at_angle(position, bearing):
         x = position[0] + d[i]*cosine
         y = position[2] + d[i]*sine
 
-        #check for fields
+        # check for fields
         if x >= -0.2 and x <= 0.2:
-            if (y >=-0.6 and y <= -0.2) or (y >= 0.2 and y <= 0.6):
+            if (y >= -0.6 and y <= -0.2) or (y >= 0.2 and y <= 0.6):
                 return d[i] - 0.15
 
-        #check for walls
+        # check for walls
         if x >= 1.2 or x <= -1.2 or y >= 1.2 or y <= -1.2:
             return d[i] - 0.15
-
-
-
-   
-
 
 
 def get_distance(loc1, loc2):
@@ -142,8 +135,8 @@ def potential_box_position(distance, angle, position):
     #print('x: ' + str(x)+ 'z: ' +str(z))
     if abs(x) >= 1.16 or abs(z) >= 1.16:
         return False, 0, 0
-    #print('found')
-    
+    # print('found')
+
     return True, x, z
 
 

@@ -817,6 +817,7 @@ while True:
             robot.close_dualclaw()
             if not robot.dsUltrasonic.getValue() > 0.15:
                 # check if it is actually holding a box, otherwise just go on looking for the next box
+                robot.move_forwards(-0.06, 0.01)
                 return_box_field(robot.gps.getValues())
             else:
                 robot.withdraw_dualclaw()
