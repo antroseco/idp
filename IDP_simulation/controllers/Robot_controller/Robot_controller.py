@@ -734,7 +734,7 @@ def box_collision(coord,threshold_distance=0.45):
     else:
         PID_rotation(rotation_anticlockwise(current_bearing))
         robot.set_motor_velocities(outer_velocity, inner_velocity)"""
-    while abs(error) < 90 or distance < 0.15 :
+    while box_collision_detection(coord,threshold_distance=0.45):
         required = required_bearing(avoidance_box, robot.gps.getValues())
         current_bearing = robot.bearing1(robot.compass)
         error = angle_between(required, current_bearing)
