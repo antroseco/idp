@@ -24,8 +24,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.5071357603754855 0.7076745435604284 0.4919451808331064 4.387447968554996
-  position -2.519995997021561 6.961132555721238 0.24299409196689342
+  orientation 0.5027572378804789 0.7171167080166405 0.4826787615403934 4.409720958629694
+  position -2.776818413315181 7.0091153552546865 0.470464425127003
 }
 Background {
   skyColor [
@@ -87,7 +87,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -1.1337717174798356e-09 -1.1337674769583655e-09 1.5707999999999938
+        rotation 1 -1.0685734444531301e-09 -1.0685694434178538e-09 1.5707999999999938
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -120,7 +120,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 2.7631713285385663e-09 -2.763174101221258e-09 1.5707953071795426
+        rotation -0.9999999999999999 2.697915798030955e-09 -2.6979185041780757e-09 1.5707953071795426
         children [
           USE WHEEL
         ]
@@ -300,7 +300,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 0.11
-        rotation 1 -1.7370416111764042e-09 -1.7370358542188678e-09 1.5707999999999913
+        rotation 1 -1.6718433381496986e-09 -1.6718378206783447e-09 1.5707999999999913
         children [
           DEF WHEEL Shape {
             appearance PBRAppearance {
@@ -333,7 +333,7 @@ Robot {
       ]
       endPoint Solid {
         translation 0.04 -0.0172 -0.11
-        rotation -0.9999999999999999 1.942117693713932e-09 -1.9421185275417923e-09 1.5707953071795377
+        rotation -0.9999999999999999 1.87686216320634e-09 -1.8768629304986225e-09 1.5707953071795377
         children [
           USE WHEEL
         ]
@@ -464,11 +464,11 @@ Robot {
   controller "Robot_controller"
 }
 target {
-  translation 0.980201 0.05 -0.006059
+  translation 0.9796 0.05 0.91973
   name "target(9)"
 }
 target {
-  translation 0.5028 0.05 1.02145
+  translation -0.89925 0.05 0.569834
   name "target(8)"
 }
 target {
@@ -476,7 +476,7 @@ target {
   name "target(7)"
 }
 target {
-  translation 0.96129 0.05 0.479953
+  translation 0.590559 0.05 0.981461
   name "target(6)"
 }
 target {
@@ -490,12 +490,12 @@ target {
   name "target(1)"
 }
 target {
-  translation -0.80645 0.05 0.407233
+  translation 1.01716 0.05 0.0397657
   colour 0 1 0
   name "target(2)"
 }
 target {
-  translation 0.1102 0.05 -0.8416
+  translation 0.43822 0.05 -0.0430336
   colour 0 1 0
   name "target(3)"
 }
