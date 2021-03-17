@@ -346,7 +346,6 @@ def second_sweep(velocity=-0.5, swept_angle=355):
         move([0.4, 0])
     else:
         move([0.0161, -1])
-        print('move')
         move([-0.4, -1])
         move([-0.4, 0])
 
