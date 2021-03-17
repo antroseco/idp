@@ -1,13 +1,11 @@
-import queue
-
 import controller
 import numpy as np
 
 import hardware
 from calculations import *
-from reroute import CollisionPreventionException
 from field import Field
 from instrumentation import trace
+from reroute import CollisionPreventionException
 
 
 class Robot:
