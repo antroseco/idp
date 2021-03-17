@@ -38,6 +38,9 @@ class Field:
         returns closest available box position
         input are 3D coordinates of the robot
         """
+        # Fallback
+        if not len(self.box_positions):
+            return (self.x, self.y)
 
         min_dist = float('inf')
         min_index = 0
