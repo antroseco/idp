@@ -50,8 +50,8 @@ class Robot:
         # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
         self.box_list = []
         self.other_box_list = []
-        self.sweep_locations = []
-        self.other_sweep_locations = []
+        self.sweep_locations = np.array([])
+        self.other_sweep_locations = np.array([])
         self.unique_boxes = []
         self.position = np.array([])
         self.other_position = np.array([])
@@ -67,6 +67,8 @@ class Robot:
         self.carrying = False
         self.other_available = False
         self.other_sweep_ready = False
+        self.second_sweep_locations_ready = False
+        self.other_second_sweep_locations_ready = False
 
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -538,7 +540,7 @@ class Robot:
         input: string message, type = 0 for robot coordinates, type = 1 for a single box coordinates, type = 2 for multiple box coordinates
         return: /
         """
-        message = str(type) + message
+        message = str(type) + ';' + message
         data = message.encode('utf-8')
         self.emitter.send(data)
 
@@ -552,11 +554,17 @@ class Robot:
         while self.receiver.getQueueLength() > 0:
             data = self.receiver.getData()
             message = data.decode('utf-8')
-            type = int(message[0])
-            message = message[1:]
+            p = message.split(';')
+            type = int(p[0])
+            message = p[1]
             self.receiver.nextPacket()
             if message == "":
-                continue
+                if type == 2:
+                    self.other_sweep_locations = np.array([])
+                    self.compare_sweep_results()
+                    return
+                else:
+                    continue
 
             s = message.split(',')
 
@@ -619,6 +627,12 @@ class Robot:
                     self.other_sweep_ready = True
                 elif message == 'done':
                     self.other_sweep_ready = False
+            elif type == 10:
+                if message == 'locations sent':
+                    self.other_second_sweep_locations_ready = True
+                elif message == 'done':
+                    self.other_second_sweep_locations_ready = False
+            
 
     def send_box_list(self):
         """
@@ -631,10 +645,14 @@ class Robot:
 
         self.send_message(message[:-1], type=7)
 
+    @trace
     def send_sweep_locations(self, locations):
         """
         send an array of locations as one message to other robot after the sweep
         """
+        if locations.size == 0:
+            self.send_message("", type=2)
+            return
         message = ""
         for pos in locations:
             stringpos = "{},{}".format(pos[0], pos[1])
@@ -659,19 +677,31 @@ class Robot:
         self.position = np.array([location[0], location[2]])
         message = "{},{},{}".format(location[0], location[2], self.bearing(self.compass))
         self.send_message(message, type=0)
-
+    @trace
     def compare_sweep_results(self):
         """
         check sweep results from both robots, remove duplicate locations
         save locations on robot's half of the table to queue starting from the closest one to the robot
-        """
-
-        duplicates = []
-        if((len(self.sweep_locations) == 0 or len(self.other_sweep_locations.shape)) and self.sweep_ready == True):
+        """    
+        if self.sweep_ready and self.other_sweep_ready:
+            if not self.second_sweep_locations_ready or not self.other_second_sweep_locations_ready:
+                return
+                
+        if self.sweep_locations.size == 0:
+            if self.other_sweep_locations.size == 0:
+                return
+            else: 
+                Robot.unique_boxes = self.other_sweep_locations
+                self.add_boxes_to_queue(self.other_sweep_locations)
+                return
+        if self.other_sweep_locations.size == 0:
+            Robot.unique_boxes = self.sweep_locations
+            self.add_boxes_to_queue(self.sweep_locations)
             return
 
+        duplicates = []
         for i in range(self.sweep_locations.shape[0]):
-            for j in range(self.other_sweep_locations.shape[1]):
+            for j in range(self.other_sweep_locations.shape[0]):
 
                 loc1 = np.array(self.sweep_locations[i])
                 loc2 = np.array(self.other_sweep_locations[j])
@@ -689,7 +719,7 @@ class Robot:
             Robot.unique_boxes = unique
 
         return
-
+    @trace
     def add_boxes_to_queue(self, positions):
         """
         assigns boxes that are in one half of the field to this robot, the other one will check the rest

@@ -155,7 +155,7 @@ def box_position(potential_boxes):
     returns: array of approximated box positions
     """
     if potential_boxes.size == 0:
-        return []
+        return np.array([])
     locations = []
 
     same_box_num = 1
