@@ -464,38 +464,38 @@ Robot {
   controller "Robot_controller"
 }
 target {
-  translation 0.9796 0.05 0.91973
+  translation -0.5242    0.0500   -0.1440
   name "target(9)"
 }
 target {
-  translation -0.89925 0.05 0.569834
+  translation -1.0665    0.0500   -0.2783
   name "target(8)"
 }
 target {
-  translation -0.8766 0.05 -0.8046
+  translation -0.9467    0.0500    0.6240
   name "target(7)"
 }
 target {
-  translation 0.590559 0.05 0.981461
+  translation 0.7601    0.0500    0.6937
   name "target(6)"
 }
 target {
-  translation 0.77794 0.05 -0.726547
+  translation 0.4578    0.0500   -0.7358
   colour 0 1 0
   name "target(5)"
 }
 target {
-  translation -0.9458 0.05 -0.0344
+  translation -0.4298    0.0500   -0.0241
   colour 0 1 0
   name "target(1)"
 }
 target {
-  translation 1.01716 0.05 0.0397657
+  translation 1.0580    0.0500   -0.1279
   colour 0 1 0
   name "target(2)"
 }
 target {
-  translation 0.43822 0.05 -0.0430336
+  translation -1.0941    0.0500    0.3438
   colour 0 1 0
   name "target(3)"
 }
