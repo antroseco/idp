@@ -16,8 +16,8 @@ np.set_printoptions(suppress=True)
 DEBUG_PID = False
 DEBUG_TRACING = False
 DEBUG_TRANSLATE = False
-DEBUG_MAINLOOP = True
-Robot.DEBUG_COLLISIONS = True
+DEBUG_MAINLOOP = False
+Robot.DEBUG_COLLISIONS = False
 
 
 # Default level is WARNING, change it to DEBUG
@@ -278,12 +278,12 @@ def sweep(velocity=1.8, swept_angle=355):
     # wait for infrared sensor to initialize
     # worst-case scenario: 48 ms for a measurement + 5 ms to put the output on the bus
     while robot._robot.getTime() < (48 + 5) / 1000:
-        robot.step()
+        robot.step(read_sensors=False)
 
     while swept_angle < 355:
         robot.set_motor_velocities(-velocity, velocity)
 
-        robot.step()
+        robot.step(read_sensors=False)
 
         # distance from robot centre to wall in this direction
         current_angle = robot.bearing(robot.compass1)
@@ -323,7 +323,7 @@ def sweep(velocity=1.8, swept_angle=355):
     # print(locations)
 
     robot.reset_motor_velocities()
-    robot.step()
+    robot.step(read_sensors=False)
 
     robot.sweep_locations = locations
 
@@ -435,7 +435,7 @@ def return_box_field(coord):
     other boxes that are already in the field
     input 3D coordinates of the robot
     """
-
+    robot.carrying = True
     intermediate, final = robot.field.get_to_field(coord)
     move_avoid_fields(intermediate, error_translation=0.15)
     if final[0] > 0:
@@ -448,6 +448,7 @@ def return_box_field(coord):
     robot.withdraw_dualclaw()
 
     robot.move_forwards(-0.15, 0.02)
+    robot.carrying = False
     return
 
 
@@ -699,7 +700,7 @@ print('********')
 
 # This part is executed
 
-robot.step()
+robot.step(read_sensors=False)
 
 
 if robot.colour == 'green':
@@ -710,13 +711,14 @@ else:
 
 positions = sweep()
 
-
-robot.step()
+robot.step(read_sensors=False)
 robot.send_sweep_locations(positions)
-robot.step()
+robot.step(read_sensors=False)
 initial_pass = True
 
 robot.parked = False
+
+
 
 while True:
 
@@ -725,13 +727,13 @@ while True:
         robot.send_message('done', 4)
 
         t = robot.get_next_target()
+        robot.current_target = t[1]
 
         if DEBUG_MAINLOOP:
             robot.update_unique_boxes()
-            print(robot.unique_boxes, 'all boxes')
+            print(robot.get_unique_boxes(), 'all boxes')
 
         pos = t[1]
-
         robot.withdraw_dualclaw()
 
         if initial_pass:
@@ -752,6 +754,7 @@ while True:
             elif result == -2:
                 print('failed to detect colour after remeasure')
             elif result:
+                
                 return_box_field(robot.gps.getValues())
             else:
                 robot.move_forwards(-0.15, 0.02)
@@ -769,6 +772,7 @@ while True:
 
     if not robot.parked:
         robot.parked = finish_in_field()
+        robot.current_target = []
         robot.send_message('parked', 4)
 
     print(f'{robot.box_list=}')

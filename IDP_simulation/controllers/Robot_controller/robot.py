@@ -36,6 +36,9 @@ class Robot:
     compass_name = 'compass'
     compass1_name = 'compass1'
 
+
+    unique_boxes = np.array([])
+
     def __init__(self, robot: controller.Robot, colour='red'):
         """
         initialize robot and its components, colour can be green or red
@@ -47,18 +50,21 @@ class Robot:
         self.infrared_vref = 4.3
         # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
         self.box_list = []
+        self.other_box_list = []
         self.sweep_locations = []
         self.other_sweep_locations = []
         self.unique_boxes = []
         self.position = np.array([])
         self.other_position = np.array([])
         self.other_bearing = 0  # this one is 0-360
+        self.current_target = []
 
         self.stop = False
         self.other_stop = False
         self.parked = False
         self.other_parked = False
         self.other_blocked = False
+        self.carrying = False
 
         self.left_wheel = robot.getDevice(Robot.left_wheel_name)
         self.right_wheel = robot.getDevice(Robot.right_wheel_name)
@@ -116,28 +122,31 @@ class Robot:
         self.infrared_analogue = hardware.ADCInput(lambda: self.infrared.getValue(), self.infrared_vref)
 
     def update_unique_boxes(self):
-        self.step()
-
+        
         duplicates = []
-        if not list(self.sweep_locations):
+        if len(self.other_box_list) == 0 or len(self.box_list) == 0:
             return
-        print(self.sweep_locations)
-        for i in range(self.sweep_locations.shape[0]):
-            for j in range(self.other_sweep_locations.shape[1]):
+        for i in range(len(self.box_list)):
+            for j in range(len(self.other_box_list)):
 
-                loc1 = np.array(self.sweep_locations[i])
-                loc2 = np.array(self.other_sweep_locations[j])
+                loc1 = np.array(self.box_list[i][1])
+                loc2 = np.array(self.other_box_list[j])
 
                 # check if loc1 and loc2 are the same or very close
                 dist = np.linalg.norm(loc1 - loc2)
                 if dist < 0.03:
                     duplicates.append(j)
 
-        unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis=0)
-        self.unique_boxes = unique
+        a = np.array([box[1] for box in self.box_list])
+        unique = np.concatenate((a, np.delete(self.other_box_list, duplicates, 0)), axis=0)
+        #self.unique_boxes = unique
+        Robot.unique_boxes = unique
         return
 
-    def step(self, collision_detection: bool = True) -> float:
+    def get_unique_boxes(self):
+        return Robot.unique_boxes
+
+    def step(self, collision_detection: bool = True, read_sensors: bool = False) -> float:
         """Block for self.TIME_STEP milliseconds and do some housekeeping.
 
         Args:
@@ -149,35 +158,65 @@ class Robot:
         start_time = self._robot.getTime()
         ret = self._robot.step(self.TIME_STEP)
         self.send_location()
+        self.send_box_list()
         self.get_messages()
+
         if collision_detection:
             self.collision_prevention()
-
-        if len(self.box_list) > 0:
-            angle = self.bearing(self.compass)
-            position = self.gps.getValues()
-            wall_dist = get_wall_position(angle, position) - 0.11
-            dist = self.dsUltrasonic.getValue()
-
-            if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
-                valid, x, z = potential_box_position(dist + 0.11, angle, position)
-                if(valid):
-                    diffs = []
-                    for i in self.box_list:
-                        diff = math.sqrt(abs(x - i[1][0])**2 + abs(z - i[1][1])*2)
-                        diffs.append(diff)
-                    min_index = diffs.index(min(diffs))
-                    if min(diffs) < 0.05:
-                        self.box_list[min_index] = (0, [x, z])
-                        message = "{},{}".format(x, z)
-                        self.send_message(message, type=6)
-
+        
+        if read_sensors == True:
+            self.update_box_positions()
+        
         # self.collision_prevention() may call robot._robot.step() multiple times
         # hence, we need to measure the actual time elapsed
         elapsed_time = self._robot.getTime() - start_time  # in seconds
 
         # -1 is Webots telling us to terminate the process
         return -1 if ret == -1 else elapsed_time
+
+    def update_box_positions(self):
+        angle = self.bearing(self.compass1)
+        position = self.gps.getValues()
+        wall_dist = get_wall_position(angle, position) - 0.09
+        dist = self.dsUltrasonic.getValue()
+
+        if abs(wall_dist - dist) > 0.09 and wall_dist < 1.4:
+            valid, x, z = potential_box_position(dist + 0.09, angle, position)
+            #check if it's in the field
+            if (x >= -0.2 and x <= 0.2) and ((z>=-0.6 and z<=-0.2) or (z >= 0.2 and z <= 0.6)):
+                return
+            #check that it's not the current target
+            if len(self.current_target) > 0 and math.sqrt((x - self.current_target[0])**2 + (z - self.current_target[1])**2) < 0.08:
+                return
+            #check that it's not the other robot
+            if math.sqrt((x - self.other_position[0])**2 + (z - self.other_position[1])**2) < 0.35:
+                return
+            #check if it's already carrying the box, then it couldn't have seen anything new
+            if self.carrying:
+                return
+            if(valid):
+                #check if it's a box that already exists in the list or it was moved by a little
+                diffs = []
+                if len(self.box_list) > 0:
+                    for i in self.box_list:
+                        diff = math.sqrt((x - i[1][0])**2 + (z - i[1][1])**2)
+                        diffs.append(diff)
+                        min_index = diffs.index(min(diffs))
+                        if min(diffs) < 0.08:
+                            self.box_list[min_index] = (0, [x, z])
+                            message = "{},{}".format(x, z)
+                            self.send_message(message, type=6)
+                            #print('old box: ', x, z)
+                            return
+                #new box, add it to the queue/list or send it to another robot   
+                print('new box: ', x, z) 
+                if (self.colour == 'red' and z > 0) or (self.colour == 'green' and z <= 0):
+                    self.box_queue.put((0, [x, z]))
+                    self.box_list.append((0,[x, z]))
+                else:
+                    self.send_box_location([x, z])
+        return
+
 
     def collision_prevention(self, threshold=0.7, angle_threshold=30):
         """Checks if the distance between each robot is below a certain
@@ -563,6 +602,22 @@ class Robot:
                         self.box_list[min_index] = (0, [x, z])
                 except:
                     print('ERROR MESSAGE ', message)
+            elif type == 7:
+                coordinates = np.array([float(x) for x in s])
+                coordinates = np.reshape(coordinates, (int(coordinates.size / 2), 2))
+                self.other_box_list = coordinates
+                self.update_unique_boxes()
+
+    def send_box_list(self):
+        """
+        send current box_list
+        """
+        message = ""
+        for pos in self.box_list:
+            stringpos = "{},{}".format(pos[1][0], pos[1][1])
+            message += stringpos + ','
+
+        self.send_message(message[:-1], type=7)
 
     def send_sweep_locations(self, locations):
         """
@@ -615,6 +670,10 @@ class Robot:
         unique = np.concatenate((self.sweep_locations, np.delete(self.other_sweep_locations, duplicates, 0)), axis=0)
         #self.unique_boxes = unique
         self.add_boxes_to_queue(unique)
+
+        if Robot.unique_boxes.size == 0:
+            Robot.unique_boxes = unique
+
         return
 
     def add_boxes_to_queue(self, positions):
