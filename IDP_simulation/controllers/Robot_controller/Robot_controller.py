@@ -14,7 +14,7 @@ from robot import Robot
 np.set_printoptions(suppress=True)
 
 DEBUG_PID = False
-DEBUG_TRACING = False
+DEBUG_TRACING = True
 DEBUG_TRANSLATE = False
 DEBUG_MAINLOOP = False
 Robot.DEBUG_COLLISIONS = False
@@ -196,6 +196,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
     The function moves in a straight line until the desired location is within
     the final error distance"""
     coord = np.clip(coord, -1, 1)
+    
 
     # Euclidean distance
     error = np.linalg.norm(coord - robot.current_location())
@@ -245,7 +246,7 @@ def PID_translation(coord, final_error=0.15, reverse=False):
             error_derivative = 0
 
         error = new_error
-
+        box_collision(coord,threshold_distance=0.45)
     robot.reset_motor_velocities()
 
 
@@ -627,28 +628,66 @@ def test_distance_function():
     robot.step()
     robot.step()
     robot.distance_too_small()
+    
 
 
-@trace
-def box_collision(threshold_distance=0.15, threshold_angle=30):
+
+def box_collision(coord,threshold_distance=0.45):
     """
     check for collisions with closest box
     """
-    boxes = np.array(robot.box_list)
+    
+    def box_collision_detection(coord,threshold_distance=0.45):
+   
+        boxes = np.array(Robot.unique_boxes)
+        if not list(boxes):
+            return
+        distances = []
+        for box in boxes:
+            distance = np.linalg.norm(box - robot.current_location())
+            distances.append(distance)
+    
+        i = distances.index(min(distances))
+    
+        if min(distances) > threshold_distance:
+            return False
+        else:
+            robot.reset_motor_velocities()
+    
+        avoidance_box = boxes[i]
+        location = robot.gps.getValues()
+        location = (location[0], location[2])
+    
+        m = (coord[1] - location[1])/(coord[0]-location[0])
+        c = coord[1] - m*coord[0]
+    
+        x = np.linspace(min(coord[0], location[0]), max(coord[0], location[0]), 101, endpoint=True)
+        z = m*x + c
+        
+        z1 = [i for i in z if (i > avoidance_box[1] - 0.2 and i < avoidance_box[1] + 0.2)]
+        x1 = [i for i in x if (i > avoidance_box[0] - 0.2 and i < avoidance_box[0] + 0.2)]
+        if z1 and x1:
+            return True
+    
+        return False
+    
+    
+    if not box_collision_detection(coord,0.45):
+        return
+    robot.reset_motor_velocities()
+    
+    
+    boxes = np.array(Robot.unique_boxes)
     if not list(boxes):
         return
-    boxes = boxes[:, 1]
     distances = []
     for box in boxes:
         distance = np.linalg.norm(box - robot.current_location())
         distances.append(distance)
 
     i = distances.index(min(distances))
-
-    if min(distances) > threshold_distance:
-        return
-
     avoidance_box = boxes[i]
+
 
     required = required_bearing(avoidance_box, robot.gps.getValues())
     current_bearing = robot.bearing1(robot.compass)
@@ -658,36 +697,48 @@ def box_collision(threshold_distance=0.15, threshold_angle=30):
 
     error = angle_between(required, current_bearing)
 
-    if abs(error) > threshold_angle:
-        return
-
-    def rotation_clockwise(current_bearing):
-        bearing = current_bearing + 70
+    def rotation_clockwise():
+        bearing = required + 60
         if bearing > 180:
             bearing -= 360
         return bearing
 
-    def rotation_anticlockwise(current_bearing):
-        bearing = current_bearing - 70
+    def rotation_anticlockwise():
+        bearing = required - 60
         if bearing < -180:
             bearing += 360
         return bearing
+    outer_velocity = 4.0
+    inner_velocity = 2.0
+        
+    if error > 0:
+        PID_rotation(rotation_anticlockwise())
+        robot.set_motor_velocities(inner_velocity,outer_velocity)
+    
+    else:
+        PID_rotation(rotation_clockwise())
+        robot.set_motor_velocities(outer_velocity,inner_velocity)
+    
+        
+        
 
-    PID_rotation(rotation_clockwise(current_bearing))
+    """PID_rotation(rotation_clockwise(current_bearing))
     wall_distance = get_wall_position(robot.bearing(robot.compass), robot.gps.getValues())
     outer_velocity = 3.0
     inner_velocity = 1.5
+    print(wall_distance)
 
     if wall_distance > 0.4:
         robot.set_motor_velocities(inner_velocity, outer_velocity)
 
     else:
         PID_rotation(rotation_anticlockwise(current_bearing))
-        robot.set_motor_velocities(outer_velocity, inner_velocity)
-    while abs(error) < 90:
+        robot.set_motor_velocities(outer_velocity, inner_velocity)"""
+    while abs(error) < 90 or distance < 0.15 :
         required = required_bearing(avoidance_box, robot.gps.getValues())
         current_bearing = robot.bearing1(robot.compass)
         error = angle_between(required, current_bearing)
+        distance = np.linalg.norm(box - robot.current_location())
         robot.step()
     robot.reset_motor_velocities()
     return
@@ -704,6 +755,10 @@ def test_pid_rotation():
 
 
 print('********')
+#robot.step(read_sensors=False)
+#if robot.colour == 'red':
+#    coord = (0.9,0.4)
+#    move(coord)
 
 
 # This part is executed
