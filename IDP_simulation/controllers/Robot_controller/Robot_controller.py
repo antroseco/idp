@@ -465,9 +465,6 @@ def finish_in_field():
     """
     for the ending of the task, robot goes and stays in its field
     """
-
-    # print('parking')
-
     if robot.colour == 'red':
         intermediate = (0, 1)
         final = (0, 0.4)
@@ -478,7 +475,7 @@ def finish_in_field():
     move_avoid_fields(intermediate, reroute=False)
 
     # TODO: Think of something better
-    if not len(robot.box_list) == 0 and robot.field.available():
+    if len(robot.box_list) != 0 and robot.field.available():
         return False
 
     if robot.colour == 'red':
@@ -486,7 +483,7 @@ def finish_in_field():
     else:
         PID_rotation(0)
 
-    if not len(robot.box_list) == 0 and robot.field.available():
+    if len(robot.box_list) != 0 and robot.field.available():
         return False
 
     PID_translation(final, reverse=True)
