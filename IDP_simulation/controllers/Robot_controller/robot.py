@@ -50,6 +50,7 @@ class Robot:
         # queue of tuple (i, pos) where i is 0 if initial, 1 if added and pos is position of the box
         self.box_list = []
         self.other_box_list = []
+        self.unique_list = [] #public list to use instead of box_list, which is for single robot
         self.sweep_locations = np.array([])
         self.other_sweep_locations = np.array([])
         self.unique_boxes = []
@@ -1003,6 +1004,32 @@ class Robot:
             self.withdraw_dualclaw()
             self.move_forwards(-0.1)
             return False
+
+    def print_box_list(self):
+        for item in self.box_list:
+            print(item[0],item[1][0],item[1][1])
+            
+    def combine_two_list(self):
+        """
+        concatenate box_list with other_box_list, to form a single list for both robots
+        """
+        for item in self.box_list:
+            self.unique_list.append((0,item[1]))
+        for item in self.other_box_list:
+            self.unique_list.append((0,np.array([item[0],item[1]])))
+            
+    def unique_list_remove_duplicate(self):
+        tolerance = 0.15
+        no_duplicate = []
+        for num,item in enumerate(self.unique_list):
+            for item2 in self.unique_list[0:num]:
+                if np.linalg.norm(item[1] - item2[1]) < 0.05:
+                    break
+            else:
+                 no_duplicate.append(item)
+                
+        self.unique_list = no_duplicate
+
 
     def get_next_target(self):
 
