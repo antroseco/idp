@@ -1882,7 +1882,7 @@ Right angle and straight</description>
 <part name="RAPID65-0001" library="IDP_library" deviceset="POT" device="" value="5K"/>
 <part name="PHOTO1" library="IDP_library" deviceset="22-?-02" device="05-7028" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005"/>
 <part name="P+3" library="IDP_library" deviceset="+5V" device=""/>
-<part name="LED4" library="IDP_library" deviceset="LED_2" device="3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776"/>
+<part name="GND8" library="IDP_library" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -1952,19 +1952,19 @@ Right angle and straight</description>
 <instance part="P+4" gate="1" x="76.2" y="162.56" smashed="yes">
 <attribute name="VALUE" x="73.66" y="157.48" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="LED2" gate="G$1" x="162.56" y="5.08" smashed="yes">
-<attribute name="NAME" x="166.116" y="0.508" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="168.275" y="0.508" size="1.778" layer="96" rot="R90"/>
+<instance part="LED2" gate="G$1" x="175.26" y="7.62" smashed="yes">
+<attribute name="NAME" x="178.816" y="3.048" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="180.975" y="3.048" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="LED3" gate="G$1" x="190.5" y="5.08" smashed="yes">
-<attribute name="NAME" x="194.056" y="0.508" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="196.215" y="0.508" size="1.778" layer="96" rot="R90"/>
+<instance part="LED3" gate="G$1" x="203.2" y="7.62" smashed="yes">
+<attribute name="NAME" x="206.756" y="3.048" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="208.915" y="3.048" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="GND5" gate="1" x="162.56" y="-2.54" smashed="yes">
-<attribute name="VALUE" x="160.02" y="-5.08" size="1.778" layer="96"/>
+<instance part="GND5" gate="1" x="175.26" y="0" smashed="yes">
+<attribute name="VALUE" x="172.72" y="-2.54" size="1.778" layer="96"/>
 </instance>
-<instance part="GND6" gate="1" x="190.5" y="-2.54" smashed="yes">
-<attribute name="VALUE" x="187.96" y="-5.08" size="1.778" layer="96"/>
+<instance part="GND6" gate="1" x="203.2" y="0" smashed="yes">
+<attribute name="VALUE" x="200.66" y="-2.54" size="1.778" layer="96"/>
 </instance>
 <instance part="R4" gate="G$1" x="281.94" y="50.8" smashed="yes" rot="R90">
 <attribute name="NAME" x="280.4414" y="46.99" size="1.778" layer="95" rot="R90"/>
@@ -1974,9 +1974,9 @@ Right angle and straight</description>
 <attribute name="NAME" x="286.639" y="39.624" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="291.719" y="39.624" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="LED1" gate="G$1" x="91.44" y="139.7" smashed="yes" rot="R90">
-<attribute name="NAME" x="96.012" y="143.256" size="1.778" layer="95" rot="R180"/>
-<attribute name="VALUE" x="96.012" y="145.415" size="1.778" layer="96" rot="R180"/>
+<instance part="LED1" gate="G$1" x="142.24" y="7.62" smashed="yes">
+<attribute name="NAME" x="145.796" y="3.048" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="147.955" y="3.048" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="GND7" gate="1" x="144.78" y="111.76" smashed="yes">
 <attribute name="VALUE" x="142.24" y="109.22" size="1.778" layer="96"/>
@@ -1992,9 +1992,8 @@ Right angle and straight</description>
 <instance part="P+3" gate="1" x="144.78" y="165.1" smashed="yes">
 <attribute name="VALUE" x="142.24" y="160.02" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="LED4" gate="G$1" x="160.02" y="142.24" smashed="yes" rot="R90">
-<attribute name="NAME" x="164.592" y="145.796" size="1.778" layer="95" rot="R180"/>
-<attribute name="VALUE" x="164.592" y="147.955" size="1.778" layer="96" rot="R180"/>
+<instance part="GND8" gate="1" x="142.24" y="0" smashed="yes">
+<attribute name="VALUE" x="139.7" y="-2.54" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -2051,6 +2050,10 @@ Right angle and straight</description>
 <pinref part="RAPID65-0001" gate="G$1" pin="CCW"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 <wire x1="144.78" y1="114.3" x2="144.78" y2="124.46" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="LED1" gate="G$1" pin="C"/>
+<pinref part="GND8" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="+3V3" class="0">
@@ -2235,8 +2238,8 @@ Right angle and straight</description>
 </segment>
 <segment>
 <pinref part="LED3" gate="G$1" pin="A"/>
-<wire x1="190.5" y1="7.62" x2="190.5" y2="15.24" width="0.1524" layer="91"/>
-<label x="182.88" y="15.24" size="1.778" layer="95"/>
+<wire x1="203.2" y1="10.16" x2="203.2" y2="17.78" width="0.1524" layer="91"/>
+<label x="195.58" y="17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ERROR_SENSOR_MALF" class="0">
@@ -2247,8 +2250,8 @@ Right angle and straight</description>
 </segment>
 <segment>
 <pinref part="LED2" gate="G$1" pin="A"/>
-<wire x1="162.56" y1="7.62" x2="162.56" y2="15.24" width="0.1524" layer="91"/>
-<label x="142.24" y="15.24" size="1.778" layer="95"/>
+<wire x1="175.26" y1="10.16" x2="175.26" y2="17.78" width="0.1524" layer="91"/>
+<label x="154.94" y="17.78" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -2264,50 +2267,48 @@ Right angle and straight</description>
 <junction x="292.1" y="38.1"/>
 </segment>
 </net>
-<net name="PHOTO_ALALOG" class="0">
-<segment>
-<pinref part="PHOTO" gate="G$1" pin="1"/>
-<pinref part="RAPID65-0753" gate="G$1" pin="CW"/>
-<wire x1="76.2" y1="147.32" x2="76.2" y2="139.7" width="0.1524" layer="91"/>
-<pinref part="LED1" gate="G$1" pin="A"/>
-<wire x1="76.2" y1="139.7" x2="76.2" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="139.7" x2="88.9" y2="139.7" width="0.1524" layer="91"/>
-<junction x="76.2" y="139.7"/>
-</segment>
-</net>
 <net name="PHOTO_ANALOG" class="0">
-<segment>
-<pinref part="LED1" gate="G$1" pin="C"/>
-<wire x1="96.52" y1="139.7" x2="106.68" y2="139.7" width="0.1524" layer="91"/>
-<label x="104.14" y="139.7" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="M1" gate="G$1" pin="A3"/>
 <wire x1="208.28" y1="96.52" x2="254" y2="96.52" width="0.1524" layer="91"/>
 <label x="218.44" y="96.52" size="1.778" layer="95"/>
 </segment>
-</net>
-<net name="PHOTO_ALALOG1" class="0">
 <segment>
-<pinref part="PHOTO1" gate="G$1" pin="1"/>
-<pinref part="RAPID65-0001" gate="G$1" pin="CW"/>
-<wire x1="144.78" y1="149.86" x2="144.78" y2="142.24" width="0.1524" layer="91"/>
-<pinref part="LED4" gate="G$1" pin="A"/>
-<wire x1="144.78" y1="142.24" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
-<wire x1="144.78" y1="142.24" x2="157.48" y2="142.24" width="0.1524" layer="91"/>
-<junction x="144.78" y="142.24"/>
+<pinref part="PHOTO" gate="G$1" pin="1"/>
+<pinref part="RAPID65-0753" gate="G$1" pin="CW"/>
+<wire x1="76.2" y1="147.32" x2="76.2" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="139.7" x2="76.2" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="139.7" x2="96.52" y2="139.7" width="0.1524" layer="91"/>
+<junction x="76.2" y="139.7"/>
+<label x="93.98" y="137.16" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="COLOUR_CONFIRM" class="0">
+<segment>
+<pinref part="LED1" gate="G$1" pin="A"/>
+<wire x1="142.24" y1="10.16" x2="142.24" y2="17.78" width="0.1524" layer="91"/>
+<label x="149.86" y="20.32" size="1.778" layer="95" rot="R180"/>
+</segment>
+<segment>
+<pinref part="M1" gate="G$1" pin="D1"/>
+<wire x1="147.32" y1="96.52" x2="104.14" y2="96.52" width="0.1524" layer="91"/>
+<label x="104.14" y="96.52" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PHOTO_ANALOG_2" class="0">
 <segment>
-<pinref part="LED4" gate="G$1" pin="C"/>
-<wire x1="165.1" y1="142.24" x2="175.26" y2="142.24" width="0.1524" layer="91"/>
-<label x="172.72" y="142.24" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="M1" gate="G$1" pin="A5/SCL"/>
 <wire x1="208.28" y1="101.6" x2="254" y2="101.6" width="0.1524" layer="91"/>
 <label x="218.44" y="101.6" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="PHOTO1" gate="G$1" pin="1"/>
+<pinref part="RAPID65-0001" gate="G$1" pin="CW"/>
+<wire x1="144.78" y1="149.86" x2="144.78" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="142.24" x2="144.78" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="142.24" x2="177.8" y2="142.24" width="0.1524" layer="91"/>
+<junction x="144.78" y="142.24"/>
+<label x="165.1" y="142.24" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

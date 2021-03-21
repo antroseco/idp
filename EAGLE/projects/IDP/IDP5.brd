@@ -863,7 +863,7 @@ design rules under a new name.</description>
 <element name="IR_SENSOR_CONNECTOR" library="IDP_library" package="7395-03" package3d_urn="urn:adsk.eagle:package:8078646/1" value="Rapid 22-1010 /  22-0910" x="59.69" y="22.86" smashed="yes">
 <attribute name="MF" value="MOLEX" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="37.9999" y="21.1821" size="1.016" layer="25" ratio="10"/>
+<attribute name="NAME" x="56.2879" y="21.4899" size="1.016" layer="25" ratio="10" rot="R90"/>
 <attribute name="OC_FARNELL" value="unknown" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
 <attribute name="OC_NEWARK" value="unknown" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
 <attribute name="POPULARITY" value="0" x="59.69" y="22.86" size="1.778" layer="27" display="off"/>
@@ -898,29 +898,27 @@ design rules under a new name.</description>
 <attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="Bourns" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MP" value="3296W-1-250" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="72.862859375" y="36.771440625" size="1.275440625" layer="25" rot="R270"/>
 <attribute name="PACKAGE" value="SOT-23-5 Bourns" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="PRICE" value="None" x="69.85" y="31.75" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="76.650390625" y="26.73778125" size="1.273109375" layer="27" rot="R90"/>
+<attribute name="VALUE" x="74.110390625" y="26.73778125" size="1.273109375" layer="27" rot="R90"/>
 </element>
-<element name="RAPID65-0753" library="IDP_library" package="TRIM_3296W-1-250" value="5K" x="41.91" y="25.4" smashed="yes" rot="R180">
-<attribute name="AVAILABILITY" value="Unavailable" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MF" value="Bourns" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MP" value="3296W-1-250" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="50.327140625" y="20.378559375" size="1.275440625" layer="25" rot="R90"/>
-<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="PRICE" value="None" x="41.91" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" x="47.809609375" y="26.60221875" size="1.273109375" layer="27" rot="R270"/>
+<element name="RAPID65-0753" library="IDP_library" package="TRIM_3296W-1-250" value="5K" x="39.37" y="25.4" smashed="yes" rot="R180">
+<attribute name="AVAILABILITY" value="Unavailable" x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MF" value="Bourns" x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="MP" value="3296W-1-250" x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="PRICE" value="None" x="39.37" y="25.4" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="45.269609375" y="26.60221875" size="1.273109375" layer="27" rot="R270"/>
 </element>
 <element name="PHOTO" library="IDP_library" package="7395-02" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005" x="35.56" y="19.05" smashed="yes">
 <attribute name="MF" value="MOLEX" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="32.6121" y="24.2301" size="1.016" layer="25" ratio="10" rot="R270"/>
+<attribute name="NAME" x="30.0721" y="22.9601" size="1.016" layer="25" ratio="10" rot="R270"/>
 <attribute name="OC_FARNELL" value="9731601" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="OC_NEWARK" value="unknown" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
 <attribute name="POPULARITY" value="0" x="35.56" y="19.05" size="1.778" layer="27" display="off"/>
-<attribute name="VALUE" x="35.1521" y="25.5001" size="0.8128" layer="27" ratio="10" rot="R270"/>
+<attribute name="VALUE" x="32.6121" y="29.3101" size="0.8128" layer="27" ratio="10" rot="R270"/>
 </element>
 <element name="LED2" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="67.31" y="49.53" smashed="yes" rot="R270">
 <attribute name="NAME" x="60.325" y="47.371" size="1.27" layer="25" ratio="10"/>
@@ -940,36 +938,29 @@ design rules under a new name.</description>
 <attribute name="NAME" x="60.833" y="32.512" size="1.27" layer="25" ratio="10" rot="R90"/>
 <attribute name="POPULARITY" value="56" x="62.23" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="SPICEPREFIX" value="C" x="62.23" y="33.02" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="64.897" y="32.512" size="1.27" layer="27" ratio="10" rot="R90"/>
+<attribute name="VALUE" x="64.897" y="33.782" size="1.27" layer="27" ratio="10" rot="R90"/>
 </element>
-<element name="LED1" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="36.83" y="30.48" smashed="yes" rot="R90">
-<attribute name="NAME" x="36.449" y="32.385" size="1.27" layer="25" ratio="10" rot="R90"/>
-<attribute name="POPULARITY" value="97" x="36.83" y="30.48" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="38.481" y="32.385" size="1.27" layer="27" ratio="10" rot="R90"/>
+<element name="LED1" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="72.39" y="49.53" smashed="yes" rot="R270">
+<attribute name="NAME" x="72.771" y="56.515" size="1.27" layer="25" ratio="10" rot="R270"/>
+<attribute name="POPULARITY" value="97" x="72.39" y="49.53" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="RAPID65-0001" library="IDP_library" package="TRIM_3296W-1-250" value="5K" x="24.13" y="22.86" smashed="yes" rot="R180">
-<attribute name="AVAILABILITY" value="Unavailable" x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MF" value="Bourns" x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="MP" value="3296W-1-250" x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="29.151440625" y="19.847140625" size="1.275440625" layer="25" rot="R180"/>
-<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="PRICE" value="None" x="24.13" y="3.81" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" x="29.14221875" y="27.120390625" size="1.273109375" layer="27" rot="R180"/>
+<element name="RAPID65-0001" library="IDP_library" package="TRIM_3296W-1-250" value="5K" x="21.59" y="22.86" smashed="yes" rot="R90">
+<attribute name="AVAILABILITY" value="Unavailable" x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DESCRIPTION" value=" Trimpot 25 Ohm 3/8 Sq Cer Mt " x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="Bourns" x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MP" value="3296W-1-250" x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PACKAGE" value="SOT-23-5 Bourns" x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PRICE" value="None" x="2.54" y="22.86" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VALUE" x="25.850390625" y="17.84778125" size="1.273109375" layer="27" rot="R90"/>
 </element>
-<element name="PHOTO1" library="IDP_library" package="7395-02" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005" x="15.24" y="24.13" smashed="yes" rot="R270">
-<attribute name="MF" value="MOLEX" x="24.13" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="" x="24.13" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="13.1079" y="29.1099" size="1.016" layer="25" ratio="10" rot="R90"/>
-<attribute name="OC_FARNELL" value="9731601" x="24.13" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="OC_NEWARK" value="unknown" x="24.13" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="POPULARITY" value="0" x="24.13" y="33.02" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="VALUE" x="13.5621" y="39.4701" size="0.8128" layer="27" ratio="10" rot="R270"/>
-</element>
-<element name="LED4" library="IDP_library" package="LED3MM" package3d_urn="urn:adsk.eagle:package:15797/1" value="55-1776" x="21.59" y="27.94" smashed="yes" rot="R90">
-<attribute name="NAME" x="21.209" y="31.115" size="1.27" layer="25" ratio="10" rot="R90"/>
-<attribute name="POPULARITY" value="97" x="2.54" y="19.05" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="23.241" y="29.845" size="1.27" layer="27" ratio="10" rot="R90"/>
+<element name="PHOTO1" library="IDP_library" package="7395-02" package3d_urn="urn:adsk.eagle:package:8078644/1" value="Rapid 22-0905/22-1005" x="13.97" y="26.67" smashed="yes" rot="R270">
+<attribute name="MF" value="MOLEX" x="22.86" y="35.56" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="" x="22.86" y="35.56" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="NAME" x="13.1079" y="30.3799" size="1.016" layer="25" ratio="10" rot="R90"/>
+<attribute name="OC_FARNELL" value="9731601" x="22.86" y="35.56" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="OC_NEWARK" value="unknown" x="22.86" y="35.56" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="POPULARITY" value="0" x="22.86" y="35.56" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VALUE" x="13.5621" y="42.0101" size="0.8128" layer="27" ratio="10" rot="R270"/>
 </element>
 </elements>
 <signals>
@@ -1042,9 +1033,11 @@ design rules under a new name.</description>
 <wire x1="59.69" y1="29.21" x2="59.69" y2="35.56" width="0.1524" layer="16"/>
 <via x="59.69" y="35.56" extent="1-16" drill="0.35"/>
 <wire x1="59.69" y1="35.56" x2="62.23" y2="35.56" width="0.1524" layer="1"/>
-<wire x1="44.45" y1="25.4" x2="44.45" y2="20.32" width="0.1524" layer="16"/>
 <contactref element="RAPID65-0001" pad="1"/>
-<wire x1="26.67" y1="22.86" x2="26.67" y2="15.24" width="0.1524" layer="16"/>
+<contactref element="LED1" pad="K"/>
+<wire x1="72.39" y1="48.26" x2="72.39" y2="40.64" width="0.1524" layer="16"/>
+<wire x1="21.59" y1="20.32" x2="21.59" y2="15.24" width="0.1524" layer="16"/>
+<wire x1="41.91" y1="25.4" x2="41.91" y2="20.32" width="0.1524" layer="16"/>
 <wire x1="59.69" y1="20.32" x2="59.69" y2="22.86" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="+3V3">
@@ -1106,10 +1099,11 @@ design rules under a new name.</description>
 <wire x1="57.15" y1="29.21" x2="57.15" y2="22.86" width="0.1524" layer="16"/>
 <wire x1="34.29" y1="38.1" x2="34.29" y2="19.05" width="0.1524" layer="16"/>
 <contactref element="PHOTO1" pad="2"/>
-<via x="19.05" y="25.4" extent="1-16" drill="0.35"/>
+<via x="16.51" y="27.94" extent="1-16" drill="0.35"/>
 <via x="19.05" y="38.1" extent="1-16" drill="0.35"/>
-<wire x1="19.05" y1="38.1" x2="19.05" y2="25.4" width="0.1524" layer="1"/>
-<wire x1="15.24" y1="25.4" x2="19.05" y2="25.4" width="0.1524" layer="1"/>
+<via x="16.51" y="38.1" extent="1-16" drill="0.35"/>
+<wire x1="16.51" y1="38.1" x2="16.51" y2="27.94" width="0.1524" layer="1"/>
+<wire x1="13.97" y1="27.94" x2="16.51" y2="27.94" width="0.1524" layer="16"/>
 </signal>
 <signal name="MOTOR_CHANNEL_A_DIRECTION">
 <contactref element="M1" pad="D12"/>
@@ -1207,43 +1201,38 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$7">
 </signal>
-<signal name="PHOTO_ALALOG">
+<signal name="PHOTO_ANALOG">
+<contactref element="M1" pad="A3"/>
+<via x="69.85" y="17.78" extent="1-16" drill="0.35"/>
 <contactref element="PHOTO" pad="1"/>
 <contactref element="RAPID65-0753" pad="3"/>
+<wire x1="69.85" y1="17.78" x2="69.85" y2="15.24" width="0.1524" layer="1"/>
+<wire x1="69.85" y1="15.24" x2="39.37" y2="15.24" width="0.1524" layer="1"/>
+<wire x1="39.37" y1="21.59" x2="39.37" y2="15.24" width="0.1524" layer="1"/>
+<via x="36.83" y="21.59" extent="1-16" drill="0.35"/>
+<wire x1="36.83" y1="21.59" x2="39.37" y2="21.59" width="0.1524" layer="1"/>
+<wire x1="36.83" y1="21.59" x2="36.83" y2="25.4" width="0" layer="19" extent="1-1"/>
+<wire x1="36.83" y1="19.05" x2="36.83" y2="21.59" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="COLOUR_CONFIRM">
 <contactref element="LED1" pad="A"/>
-<wire x1="36.83" y1="19.05" x2="36.83" y2="25.4" width="0.1524" layer="16"/>
-<wire x1="39.37" y1="25.4" x2="36.83" y2="25.4" width="0.1524" layer="1"/>
-<via x="36.83" y="25.4" extent="1-16" drill="0.35"/>
-<wire x1="36.83" y1="29.21" x2="36.83" y2="25.4" width="0.1524" layer="16"/>
-</signal>
-<signal name="PHOTO_ANALOG">
-<contactref element="LED1" pad="K"/>
-<contactref element="M1" pad="A3"/>
-<via x="36.83" y="34.29" extent="1-16" drill="0.35"/>
-<wire x1="36.83" y1="34.29" x2="36.83" y2="31.75" width="0.1524" layer="16"/>
-<via x="49.53" y="34.29" extent="1-16" drill="0.35"/>
-<wire x1="36.83" y1="34.29" x2="49.53" y2="34.29" width="0.1524" layer="1"/>
-<wire x1="49.53" y1="34.29" x2="49.53" y2="15.24" width="0.1524" layer="1"/>
-<wire x1="49.53" y1="15.24" x2="69.85" y2="15.24" width="0.1524" layer="1"/>
-<wire x1="69.85" y1="15.24" x2="69.85" y2="17.78" width="0.1524" layer="1"/>
-<via x="69.85" y="17.78" extent="1-16" drill="0.35"/>
-</signal>
-<signal name="PHOTO_ALALOG1">
-<contactref element="PHOTO1" pad="1"/>
-<contactref element="RAPID65-0001" pad="3"/>
-<contactref element="LED4" pad="A"/>
-<wire x1="15.24" y1="22.86" x2="21.59" y2="22.86" width="0.1524" layer="1"/>
-<wire x1="21.59" y1="26.67" x2="21.59" y2="22.86" width="0.1524" layer="16"/>
+<contactref element="M1" pad="D1"/>
+<via x="72.39" y="60.96" extent="1-16" drill="0.35"/>
+<via x="72.39" y="55.88" extent="1-16" drill="0.35"/>
+<wire x1="72.39" y1="60.96" x2="72.39" y2="55.88" width="0.1524" layer="1"/>
+<wire x1="72.39" y1="55.88" x2="72.39" y2="50.8" width="0.1524" layer="16"/>
 </signal>
 <signal name="PHOTO_ANALOG_2">
-<contactref element="LED4" pad="K"/>
 <contactref element="M1" pad="A5"/>
-<via x="31.75" y="29.21" extent="1-16" drill="0.35"/>
-<wire x1="21.59" y1="29.21" x2="31.75" y2="29.21" width="0.1524" layer="1"/>
-<wire x1="31.75" y1="29.21" x2="31.75" y2="13.97" width="0.1524" layer="1"/>
-<wire x1="31.75" y1="13.97" x2="74.93" y2="13.97" width="0.1524" layer="1"/>
-<wire x1="74.93" y1="13.97" x2="74.93" y2="17.78" width="0.1524" layer="1"/>
+<contactref element="PHOTO1" pad="1"/>
+<contactref element="RAPID65-0001" pad="3"/>
+<wire x1="13.97" y1="25.4" x2="21.59" y2="25.4" width="0.1524" layer="16"/>
 <via x="74.93" y="17.78" extent="1-16" drill="0.35"/>
+<via x="26.67" y="25.4" extent="1-16" drill="0.35"/>
+<wire x1="21.59" y1="25.4" x2="26.67" y2="25.4" width="0.1524" layer="1"/>
+<wire x1="26.67" y1="25.4" x2="26.67" y2="13.97" width="0.1524" layer="1"/>
+<wire x1="26.67" y1="13.97" x2="74.93" y2="13.97" width="0.1524" layer="1"/>
+<wire x1="74.93" y1="13.97" x2="74.93" y2="17.78" width="0.1524" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
